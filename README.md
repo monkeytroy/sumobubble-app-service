@@ -12,27 +12,47 @@ yarn dev
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Config
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+DB config manually created to start.  At some point will be schema based...
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+```
+{
+  // mongo db id
+  "customerId": "some-unique-val",
+  "customer": {
+    "title": "wrpc",
+    "theme": {
+      "primary": "#aaaaff"
+    },
+    "logo": {
+      "url": "https://faithconnector.s3.amazonaws.com/wrpca/images/library/design_assets/8b9988_2.png",
+      "align": "center"
+    }
+  },
+  "summary": {
+    "content": "**Welcome** Please join us Sunday morning for live worship at 9am and 11am - Or live streaming at 11am on [YouTube](https://www.youtube.com/@WestminsterChurch/streams).  Here's the link to our [Media Page](/media)"
+  },
+  "special": {
+    "content": "***There is no student service this week.*** &#x1F600; \n\n No '<b>html</b>' allowed."
+  },
+  "contact": {
+    "content": "Please let us know how we can server you.",
+    "contact": "fredarters@gmail.com"
+  },  
+  "social": {
+    "youtube": "https://www.youtube.com/wrpca"
+  },
+  "funny": { 
+    "content": "A bland man walked into a bar, and chair, and a door..." 
+  },
+  "verse": {
+    "content": "**Psalm 41:11** Put your hope in God, for I will yet praise him, my Savior and my God."
+  },
+  "vod": {
+    "content": "",
+    "url": "https://www.youtube.com/embed/qVEOJzAYIW4"
+  }
+}
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+```
