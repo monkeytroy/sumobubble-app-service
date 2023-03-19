@@ -10,7 +10,8 @@ const cors = Cors({
 
 type ConfigRes = {
   success: boolean,
-  message: string
+  message: string,
+  data: any
 }
 
 export default async function handler(
@@ -34,7 +35,16 @@ export default async function handler(
     const custConfig = await db.collection("configurations").findOne({ customerId: customer});
 
     if (custConfig) {
-      res.status(200).json(custConfig);
+
+      // add more data.
+      const d = new Date();
+      const findToday = parseInt((d.toISOString().split('T')[0]).replace(/\-/g, ''));
+      const funnyRes = await db.collection("funny").findOne({ day: { $lte: findToday }});
+      if (funnyRes) {
+        custConfig.funny.daily = funnyRes?.lines;
+      }
+
+      res.status(200).json({ success: true, message: 'Message for you sir!', data: custConfig });
     } else {
       console.log('Could not get config for client: ' + customer);
       res.status(400).send({ success: false, message: 'No config found'});
