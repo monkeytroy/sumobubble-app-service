@@ -37,11 +37,17 @@ export default async function handler(
     if (custConfig) {
 
       // add more data.
-      const d = new Date();
-      const findToday = parseInt((d.toISOString().split('T')[0]).replace(/\-/g, ''));
-      const funnyRes = await db.collection("funny").findOne({ day: { $lte: findToday }});
-      if (funnyRes) {
-        custConfig.funny.daily = funnyRes?.lines;
+      try {
+        const d = new Date();
+        const findToday = parseInt((d.toISOString().split('T')[0]).replace(/\-/g, ''));
+        const funnyRes = await db.collection("funny").find({day: { $lte: findToday }}).sort({ day: -1}).limit(1);
+
+        if (funnyRes) {
+          const funnyResVals = await funnyRes.toArray();
+          custConfig.funny.daily = funnyResVals[0]?.lines;
+        }
+      } catch {
+        console.log('Could not pull in funny for today.');
       }
 
       res.status(200).json({ success: true, message: 'Message for you sir!', data: custConfig });
