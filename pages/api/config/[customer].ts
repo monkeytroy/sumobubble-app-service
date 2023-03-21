@@ -36,18 +36,48 @@ export default async function handler(
 
     if (custConfig) {
 
-      // add more data.
-      try {
-        const d = new Date();
-        const findToday = parseInt((d.toISOString().split('T')[0]).replace(/\-/g, ''));
-        const funnyRes = await db.collection("funny").find({day: { $lte: findToday }}).sort({ day: -1}).limit(1);
+      // process funny
+      const configFunny = { ...custConfig.funny };
+      
+      // only going to return one funny item.
+      custConfig.funny = {};
 
-        if (funnyRes) {
-          const funnyResVals = await funnyRes.toArray();
-          custConfig.funny.daily = funnyResVals[0]?.lines;
+      // priority is the cust config items.  meme, then lines. 
+      if (configFunny.meme) {
+        custConfig.funny = { 
+          meme: configFunny.meme
         }
-      } catch {
-        console.log('Could not pull in funny for today.');
+      } else if (configFunny.lines) {
+        custConfig.funny = {
+          lines: configFunny.lines
+        }
+      }
+
+      // if cust config does not have a funny set.. get daily
+      if ((!custConfig?.funny?.lines || custConfig?.funny?.lines?.length === 0) && !custConfig?.funny?.meme) {
+        try {
+          const d = new Date();
+          const findToday = parseInt((d.toISOString().split('T')[0]).replace(/\-/g, ''));
+          const funnyRes = await db.collection("funny").find({day: { $lte: findToday }}).sort({ day: -1}).limit(1);
+
+          if (funnyRes) {
+            const funnyResVals = await funnyRes.toArray();
+            const funnyDaily = funnyResVals[0];
+            
+            // merge in the             
+            if (funnyDaily.meme) {
+              custConfig.funny = {
+                meme: funnyDaily.meme
+              }
+            } else if (funnyDaily.lines) {
+              custConfig.funny = {
+                lines: funnyDaily.lines
+              }
+            }
+          }
+        } catch(err) {
+          console.log('Could not pull in funny for today.', err);
+        }
       }
 
       res.status(200).json({ success: true, message: 'Message for you sir!', data: custConfig });
