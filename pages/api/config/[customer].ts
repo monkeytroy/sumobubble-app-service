@@ -77,6 +77,7 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
     }
 
     const { customer } = req.query;
+    console.log(req.body);
     const body = JSON.parse(req.body);
     
     // fetch the customer
