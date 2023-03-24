@@ -78,7 +78,7 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
 
     const { customer } = req.query;
     console.log(req.body);
-    const body = JSON.parse(req.body);
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     
     // fetch the customer
     const { db } = await connectToDb();
