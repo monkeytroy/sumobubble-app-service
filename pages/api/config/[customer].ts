@@ -5,7 +5,9 @@ import { midware } from '@/services/midware';
 import { connectToDb } from '@/services/mongodb';
 import copyright from './copyright.json';
 import { Db, WithId } from 'mongodb';
+import SimpleCrypto from "simple-crypto-js"
 
+const crypto = new SimpleCrypto(process.env.CRYPTO_KEY);
 const copyrights: Copyrights = copyright;
 
 const JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJCRUFDT04iLCJuYW1lIjoiR2xvYmFsIiwiaWF0IjoxNTE2MTM5MDIyfQ.eVrEhwKxF4Dfj2S5fFFMnwLAae-E1h3Ilo9PQKgPYic';
@@ -67,6 +69,10 @@ const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
   }
 }
 
+const invalid = (res: NextApiResponse, reason: string) => {
+  res.status(400).send({ success: false, message: reason});
+}
+
 const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) => {
 
   try {
@@ -82,65 +88,148 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
     
     // fetch the customer
     const { db } = await connectToDb();
-    const configCol = db.collection("configurations");
+    const configCol = db.collection<CustomerConfig>("configurations");
 
-    const custConfig = await configCol.findOne({ customerId: customer}) as WithId<CustomerConfig>
+    const custConfigRes = await configCol.findOne({ customerId: customer}) as WithId<CustomerConfig>
+    const custConfig: CustomerConfig = custConfigRes ||  null;
 
     if (custConfig) {
 
+      
+      if (typeof body.pin !== 'undefined') {
+        if (typeof body.pin != 'string' || body.summaryContent?.length > 4) {
+          invalid(res, 'pin must be a string of 4 characters.');
+          return;
+        }
+        const pin = body.pin;
+        const encPin = crypto.encrypt(pin);
+        custConfig.customerPin = encPin;
+      }
       if (typeof body.summaryContent !== 'undefined') {
+        if (typeof body.specialContent != 'string' || body.summaryContent?.length > 2000) {
+          invalid(res, 'summaryContent must be a string is limited to 2k characters.');
+          return;
+        }
         custConfig.summary.content = body.summaryContent;
       }
       if (typeof body.specialContent !== 'undefined') {
+        if (typeof body.specialContent != 'string' || body.specialContent?.length > 2000) {
+          invalid(res, 'specialContent must be a string limited to 2k characters.');
+          return;
+        }
         custConfig.special.content = body.specialContent;
       }
       if (typeof body.contactEnabled !== 'undefined') {
+        if (typeof body.contactEnabled != 'boolean') {
+          invalid(res, 'contactEnabled must be boolean true or false.');
+          return;
+        }
         custConfig.contact.enabled = body.contactEnabled;
       }
       if (typeof body.contactContact !== 'undefined') {
+        if (typeof body.contactContact != 'string' || body.contactContact?.length > 320 || body.contactContact.indexOf('@') < 0) {
+          invalid(res, 'contactContact must be an email string limited to 320 characters');
+          return;
+        }
         custConfig.contact.contact = body.contactContact;
       }
       if (typeof body.contactContent !== 'undefined') {
+        if (typeof body.contactContent != 'string' || body.contactContent?.length > 2000) {
+          invalid(res, 'contactContent must be a string limited to 2k characters.');
+          return;
+        }
         custConfig.contact.content = body.contactContent;
       }
       if (typeof body.funnyEnabled !== 'undefined') {
+        if (typeof body.funnyEnabled != 'boolean') {
+          invalid(res, 'funnyEnabled must be boolean true or false.');
+          return;
+        }
         custConfig.funny.enabled = body.funnyEnabled;
       }
       if (typeof body.funnyMeme !== 'undefined') {
+        if (typeof body.funnyMeme != 'string') {
+          invalid(res, 'funnyMeme must be a url string');
+          return;
+        }
         custConfig.funny.meme = body.funnyMeme;
       }
       if (typeof body.funnyLines !== 'undefined') {
+        if (typeof body.funnyLines != 'string' && !Array.isArray(body.funnyLines)) {
+          invalid(res, 'funnyLines must be a string or array of strings');
+          return;
+        }
+        if (Array.isArray(body.funnyLines) && body.funnyLines.length > 6) {
+          invalid(res, 'funnyLines is limited to 6 lines.');
+          return;
+        }
         custConfig.funny.lines = body.funnyLines;
       }
       if (typeof body.verseEnabled !== 'undefined') {
+        if (typeof body.verseEnabled != 'boolean') {
+          invalid(res, 'verseEnabled must be boolean true or false.');
+          return;
+        }
         custConfig.verse.enabled = body.verseEnabled;
       }
       if (typeof body.verseContent !== 'undefined') {
+        if (typeof body.verseContent != 'string' || body.verseContent?.length > 2000) {
+          invalid(res, 'verseContent must be a string limited to 2k characters.');
+          return;
+        }
         custConfig.verse.content = body.verseContent;
       }
       if (typeof body.verseRef !== 'undefined') {
+        if (typeof body.verseRef != 'string' || body.verseRef?.length > 100) {
+          invalid(res, 'verseContent must be a string limited to 100 characters.');
+          return;
+        }
         custConfig.verse.verseRef = body.verseRef;
       }
       if (typeof body.verseTranslation !== 'undefined') {
+        if (typeof body.verseTranslation != 'string' || body.verseTranslation?.length > 3) {
+          invalid(res, 'verseTranslation must be a string limited to 3 characters.');
+          return;
+        }
         custConfig.verse.translation = body.verseTranslation;
       }
       if (typeof body.vodEnabled !== 'undefined') {
+        if (typeof body.vodEnabled != 'boolean') {
+          invalid(res, 'vodEnabled must be boolean true or false.');
+          return;
+        }
         custConfig.vod.enabled = body.vodEnabled;
       }
       if (typeof body.vodContent !== 'undefined') {
+        if (typeof body.vodContent != 'string' || body.vodContent?.length > 2000) {
+          invalid(res, 'vodContent must be a string limited to 2000 characters.');
+          return;
+        }
         custConfig.vod.content = body.vodContent;
       }
       if (typeof body.vodUrl !== 'undefined') {
+        if (typeof body.vodUrl != 'string' || body.vodUrl?.length > 2000) {
+          invalid(res, 'vodUrl must be a string url limited to 2000 characters.');
+          return;
+        }
         custConfig.vod.url = body.vodUrl;
       }
 
       const updateRes = await configCol.replaceOne({ customerId: customer}, custConfig);
 
-      if (updateRes && updateRes.modifiedCount == 1) {
-        res.status(200).json({ success: true, message: 'Updated', data: custConfig });  
+      const { customerPin: string, ...custConfigRet} = custConfig;     
+      //should db id be present or not?
+      //delete custConfigRet._id;
+
+      if (updateRes && updateRes.modifiedCount == 0 && updateRes.acknowledged) {
+  
+        res.status(200).json({ success: true, message: 'No changes detected', data: custConfigRet });  
+        return;
+      } else if (updateRes && updateRes.modifiedCount == 1) {
+        res.status(200).json({ success: true, message: 'Updated', data: custConfigRet });  
         return;
       } else {
-        console.log('Failed to update', updateRes, custConfig);
+        console.log('Failed to update', updateRes, custConfigRet);
       }
       
       res.status(200).json({ success: false, message: 'Failed to update'});  
@@ -148,6 +237,7 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
     } else {
       console.log('Could not get config for client: ' + customer);
       res.status(400).send({ success: false, message: 'No config found'});
+      return;
     }
 
   } catch(err) {

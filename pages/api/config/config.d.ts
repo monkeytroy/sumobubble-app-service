@@ -8,50 +8,54 @@ interface Copyrights {
 type ConfigRes = {
   success: boolean,
   message: string,
-  data: any
+  data: CustomerConfigResult
 }
 
-type CustomerConfig = {
-  customerId: string,
+interface CustomerConfig {
+  _id?: string;
+  customerId: string;
+  customerPin: string;
   customer: {
-    title: string,
+    title: string;
     theme: {
-      primary: string,
+      primary: string;
     },
     logo: {
-      url: string,
-      align: string
+      url: string;
+      align: string;
     },
     social: {
-      youtube: string
+      youtube: string;
     }
   },
   summary: {
-    content: string
+    content: string;
   },
   special: {
-    content: string
+    content: string;
   },
   contact: {
-    enabled: boolean,
-    content: string,
-    contact: string
+    enabled: boolean;
+    content: string;
+    contact: string;
   },
   funny: {
-    enabled: boolean,
-    lines: Array<string>,
-    meme: string
+    enabled: boolean;
+    lines: Array<string>;
+    meme: string;
   },
   verse: {
-    enabled: boolean,
-    verseRef?: string,
-    translation?: string,
-    content?: string,
-    copyright?: string
+    enabled: boolean;
+    verseRef?: string;
+    translation?: string;
+    content?: string;
+    copyright?: string;
   },
   vod: {
-    enabled: boolean,
-    content?: string,
-    url?: string
+    enabled: boolean;
+    content?: string;
+    url?: string;
   }
 }
+
+type CustomerConfigResult = Omit<CustomerConfig, "customerPin">;

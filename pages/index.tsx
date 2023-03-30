@@ -1,19 +1,21 @@
-import styles from '@/styles/Home.module.css'
+import LoginBtn from '@/components/login-btn';
+import ConfigEdit from '@/components/config-edit';
 
 export default function Home() {
   return (
-    <>
-      <div className="bg-white py-24 px-6 sm:py-32 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-            Beacon
-          </h2>
-          <p className="mt-6 text-lg leading-8 text-gray-600">
-            Coming soon, an app to provide one stop for all those seeking information 
-            about your church and services.
-          </p>
+    <div className="p-6 flex flex-col gap-8">
+      <div className="flex w-full justify-between items-center">
+        <div className="text-4xl font-bold tracking-tight text-gray-900 ">
+          Beacon
+        </div>
+        <div>
+          <LoginBtn></LoginBtn>
         </div>
       </div>
-    </>
+      <div>
+        <ConfigEdit></ConfigEdit>
+      </div>
+
+    </div>
   )
 }
