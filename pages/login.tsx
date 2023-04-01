@@ -16,12 +16,11 @@ export default function Home() {
     event.preventDefault();
     event.stopPropagation();
   
-    console.log('login');
     const result = await signIn("credentials", {
         customerId, customerPin, 
         callbackUrl: `${window.location.origin}`, redirect: false 
     });
-    console.log('login result');
+    
     if (result?.error !== null) {
       if (result?.status === 401) {
         setLoginError("Your login was incorrect. Please try again");
@@ -37,15 +36,19 @@ export default function Home() {
     <form onSubmit={(e) => handleLogin(e)}>
       <div className="mt-6 flex justify-center items-center">
 
-        <div className="p-4 bg-gray-200 border-2 border-gray-400 flex flex-col w-72 gap-2">
+        <div className="p-4 bg-gray-100 border-2 border-gray-200 rounded-md flex flex-col w-72 gap-2">
+
           <div className="text-2xl font-bold">Beacon</div>
           <label>Customer ID:</label>
-          <input type='text' value={customerId} onChange={(e) => setCustomerId(e.target.value)} />
+          <input type='text' className="rounded-md" value={customerId} onChange={(e) => setCustomerId(e.target.value)} />
           
           <label>PIN:</label>
-          <input type='password' value={customerPin} onChange={(e) => setCustomerPin(e.target.value)} />         
+          <input type='password' className="rounded-md" value={customerPin} onChange={(e) => setCustomerPin(e.target.value)} />         
           
-          <button className="mt-2 p-4 bg-blue-300" type='submit'>Submit login</button>
+          <button type='submit'
+            className="mt-4 rounded-md bg-blue-500 py-3 px-3 text-sm font-semibold 
+            text-white shadow-sm hover:bg-blue-600 disabled:opacity-25
+              focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Login</button>
 
           {loginError && 
             <div className="bg-red-300 p-4 my-4">

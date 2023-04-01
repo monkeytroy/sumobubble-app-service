@@ -1,1 +1,1 @@
-export const protectedRoutes = ['/config'];
+export const protectedRoutes = ['/', '/config'];

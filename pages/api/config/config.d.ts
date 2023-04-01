@@ -1,6 +1,53 @@
 declare module "copyright.json" {
 }
 
+enum Sections {
+  contact = 'contact'
+}
+
+interface IBeaconSection {
+  title?: string;
+  enabled: boolean;
+  content: string;
+  urls?: string[];
+  props: {
+    verseRef?: string;
+    autoFill?: boolean;
+    translation?: string;
+    email?: string;
+    copyright?: string;
+  }
+}
+
+interface IBeaconConfig {
+  customerId: string;
+  pin?: string;
+  isDev?: boolean;
+  customer: {
+    title: string;
+    theme?: {
+      primary?: string;
+    }
+    logo?: {
+      url?: string;
+      align?: string;
+    },
+    social?: {
+      youtube?: string;
+    }
+  }
+  summary: {
+    content: string;
+    special?: string;
+  }
+  sections: {
+    contact?: IBeaconSection,
+    verse?: IBeaconSection,
+    spotlight?: IBeaconSection,
+    funny?: IBeaconSection
+  }
+}
+
 interface Copyrights {
   [name: string]: string;
 }
@@ -8,54 +55,5 @@ interface Copyrights {
 type ConfigRes = {
   success: boolean,
   message: string,
-  data: CustomerConfigResult
+  data: IBeaconConfig
 }
-
-interface CustomerConfig {
-  _id?: string;
-  customerId: string;
-  customerPin: string;
-  customer: {
-    title: string;
-    theme: {
-      primary: string;
-    },
-    logo: {
-      url: string;
-      align: string;
-    },
-    social: {
-      youtube: string;
-    }
-  },
-  summary: {
-    content: string;
-  },
-  special: {
-    content: string;
-  },
-  contact: {
-    enabled: boolean;
-    content: string;
-    contact: string;
-  },
-  funny: {
-    enabled: boolean;
-    lines: Array<string>;
-    meme: string;
-  },
-  verse: {
-    enabled: boolean;
-    verseRef?: string;
-    translation?: string;
-    content?: string;
-    copyright?: string;
-  },
-  vod: {
-    enabled: boolean;
-    content?: string;
-    url?: string;
-  }
-}
-
-type CustomerConfigResult = Omit<CustomerConfig, "customerPin">;

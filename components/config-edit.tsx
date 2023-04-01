@@ -1,15 +1,16 @@
 
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
+import { IAppProps } from '@/pages';
 import ConfigTabs from './config-tabs';
-import VerseTranslationSelect from './verse-translation-select';
 
-const ConfigEdit = () => {
-
+export default function ConfigEdit(props: IAppProps) {
   return (
     <div className="mx-auto max-w-5xl px-4 lg:px-10">
-      <ConfigTabs></ConfigTabs>
+      {props.configuration && 
+        <ConfigTabs {...props}></ConfigTabs>
+      }
+      {!props.configuration &&
+        <div className="text-3xl text-center py-24">Missing configuration</div>
+      }
     </div>
   )
 }
-
-export default ConfigEdit;

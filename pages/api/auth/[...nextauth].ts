@@ -1,6 +1,6 @@
-import { connectToDb } from "@/services/mongodb";
-import { WithId } from "mongodb";
-import NextAuth from "next-auth";
+import Configuration from "@/models/config";
+import connectMongo from "@/services/mongoose";
+import NextAuth, { Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import SimpleCrypto from "simple-crypto-js"
@@ -18,7 +18,7 @@ export const authOptions = {
   },
   providers: [
     CredentialsProvider({
-      name: 'Creds',
+      name: 'Creds', 
       credentials: {
         customerId: { label: "BeaconId", type: "text", placeholder: "xxxx" },
         customerPin: {  label: "PIN", type: "password" }
@@ -29,22 +29,29 @@ export const authOptions = {
         const customerPin = credentials?.customerPin;
 
         try {      
-          // fetch the customer
-          const { db } = await connectToDb();
+          await connectMongo();
+          
+          // fetch the customer    
+          const configuration = await Configuration.findOne({ customerId: customerId });
       
-          const custConfig: CustomerConfig = 
-            await db.collection<CustomerConfig>("configurations").findOne({ customerId }) as WithId<CustomerConfig>
-      
-          if (custConfig) {
-            const pin = '' + crypto.decrypt(custConfig.customerPin);
-            if (pin === customerPin) {
-              return {
-                id: custConfig.customerId,
-                name: custConfig.customer.title
+          if (configuration) {
+            const pin = '' + crypto.decrypt(configuration.pin);
+
+            if (pin == customerPin) {
+
+              // this is the user used in jwt
+              const user: User = {
+                id: configuration.customerId,
+                name: configuration.customer.title
+                // todo have account admin for cust here.
               };
+
+              return user;
+
             }
           }     
         } catch(err) {
+          console.log(err);
         }
 
         console.log('Pin not right!');
@@ -73,15 +80,18 @@ export const authOptions = {
         console.error("Signin callback error:", err);
       }
     },
-    async jwt({ token, user }:{ token: JWT, user?: any}) {
+
+    async jwt({ token, user }: { token: JWT, user?: User}) {
       if (user) {
           token.user = user;
       }
       return token;
     },
 
-    async session({ session, token }: {session:any, token:any}) {
+    async session({ session, token }: {session: Session, token: JWT}) {
+      //console.log('session', session, 'token', token)
       session.user = token.user;
+      
       return session;
     },
   },
