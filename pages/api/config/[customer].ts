@@ -43,6 +43,38 @@ export default async function handler(
 
 }
 
+const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) => {
+
+  try {
+    await connectMongo();
+
+    const { customer } = req.query;
+  
+    const configuration = await Configuration.findOne({ customerId: customer });
+
+    const resTest = await Configuration.find();
+    console.log('Test res:', resTest);
+
+    // fetch the customer
+    if (configuration) {
+
+      await getDailyFunny(configuration);
+      await getDailyVerse(configuration);
+      
+      const { pin, __v, ...configurationRes} = configuration.toJSON();  
+      res.status(200).json({ success: true, message: 'Message for you sir!', data: configurationRes });
+
+     } else {
+       console.log('Could not get config for client: ' + customer);
+       res.status(400).send({ success: false, message: 'No config found'});
+     }
+
+  } catch(err) {
+    res.status(405).send({ success: false, message: `Error ${(<Error>err)?.message}`});
+    return;
+  }
+}
+
 /**
  * Create a new record.
  * @param req 
@@ -80,35 +112,6 @@ const put = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
     res.status(400).send({ success: false, message: err?.message || 'Something went wrong.'});
   }
 
-}
-
-const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) => {
-
-  try {
-    await connectMongo();
-
-    const { customer } = req.query;
-  
-    let configuration = await Configuration.findOne({ customerId: customer });
-
-    // fetch the customer
-    if (configuration) {
-
-      await getDailyFunny(configuration);
-      await getDailyVerse(configuration);
-      
-      const { pin, __v, ...configurationRes} = configuration.toJSON();  
-      res.status(200).json({ success: true, message: 'Message for you sir!', data: configurationRes });
-
-     } else {
-       console.log('Could not get config for client: ' + customer);
-       res.status(400).send({ success: false, message: 'No config found'});
-     }
-
-  } catch(err) {
-    res.status(405).send({ success: false, message: `Error ${(<Error>err)?.message}`});
-    return;
-  }
 }
 
 const invalid = (res: NextApiResponse, reason: string) => {

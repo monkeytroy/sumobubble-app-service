@@ -6,7 +6,11 @@ const connectMongo = async () => {
   console.log(`Connecting with ${MONGO_CONNECT}`);
   if (MONGO_CONNECT) {
     let res = await mongoose.connect(MONGO_CONNECT);
-    console.log(`Connecting with ${MONGO_CONNECT} result: `, res);
+    if (res) {
+      console.log(`Connected with ${MONGO_CONNECT}`);
+    } else {
+      console.log(`Failed to connect with ${MONGO_CONNECT}`);
+    }
   } 
 }
 
