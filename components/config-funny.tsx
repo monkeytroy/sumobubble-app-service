@@ -1,4 +1,4 @@
-import { IAppProps, IAppState, useAppStore } from "@/pages";
+import { IAppProps, useAppStore } from "@/pages";
 import { saveConfig } from "@/services/config";
 import { useState, FormEvent, useEffect } from "react";
 import ConfigSubmit from "./config-submit";

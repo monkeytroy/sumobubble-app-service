@@ -1,7 +1,7 @@
 import Configuration from "@/models/config";
 import connectMongo from "@/services/mongoose";
 import NextAuth, { Session, User } from "next-auth";
-import { JWT } from "next-auth/jwt";
+import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import SimpleCrypto from "simple-crypto-js"
 
@@ -25,6 +25,7 @@ export const authOptions = {
       },
       async authorize(credentials, req: any) {
         
+        let errormsg = 'Invalid or Bad Access';
         const customerId = credentials?.customerId;
         const customerPin = credentials?.customerPin;
 
@@ -49,12 +50,13 @@ export const authOptions = {
               return user;
 
             }
-          }     
+          } else {
+            errormsg = 'Could not load config for ' + customerId;
+          }  
         } catch(err) {
           console.log(err);
         }
 
-        console.log('Pin not right!');
         return null;
       }
     })
