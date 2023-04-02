@@ -53,7 +53,6 @@ const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
     const configuration = await Configuration.findOne({ customerId: customer });
 
     const resTest = await Configuration.find();
-    console.log('Test res:', resTest);
 
     // fetch the customer
     if (configuration) {
@@ -165,40 +164,42 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
 
 const getDailyVerse = async (custConfig: any) => {
   
-  const d = new Date();
-  const findToday = parseInt((d.toISOString().split('T')[0]).replace(/\-/g, ''));
+  if (custConfig.sections.verse) {
+    const d = new Date();
+    const findToday = parseInt((d.toISOString().split('T')[0]).replace(/\-/g, ''));
 
-  // copy the verse.
-  const verse = JSON.parse(JSON.stringify(custConfig.sections.verse || {}));
+    // copy the verse.
+    const verse = JSON.parse(JSON.stringify(custConfig.sections.verse || {}));
 
-  if (verse) {
-    const trans = verse.translation || DEFAULT_TRANSLATION;
+    if (verse) {
+      const trans = verse.translation || DEFAULT_TRANSLATION;
 
-    // get translation copyright. 
-    verse.props.copyright = copyrights[trans] || '';
+      // get translation copyright. 
+      verse.props.copyright = copyrights[trans] || '';
 
-    log('copyright:', verse.props.copyright);
-    log('verse:', verse);
+      log('copyright:', verse.props.copyright);
+      log('verse:', verse);
 
-    // if cust config does not have a verse set.. get daily
-    if (verse.enabled && (verse.props.autoFill)) {
-      try {
-        const verseRes = await Verse.find({day: { $lte: findToday }}).sort({ day: -1}).limit(1);
-        log('verseRes:', verseRes);
+      // if cust config does not have a verse set.. get daily
+      if (verse.enabled && (verse.props.autoFill)) {
+        try {
+          const verseRes = await Verse.find({day: { $lte: findToday }}).sort({ day: -1}).limit(1);
+          log('verseRes:', verseRes);
 
-        if (verseRes[0]) {
-          const daily = verseRes[0];          
-          verse.props.verseRef = daily.verseRef;
+          if (verseRes[0]) {
+            const daily = verseRes[0];          
+            verse.props.verseRef = daily.verseRef;
 
-          // merge in the verse by the translation
-          const content: string = daily.verses.get(trans);
-          verse.content = content;
+            // merge in the verse by the translation
+            const content: string = daily.verses.get(trans);
+            verse.content = content;
 
-          custConfig.sections.verse = {...verse};
-          log('getDailyVerse setting verse section: ', custConfig.sections.verse);
+            custConfig.sections.verse = {...verse};
+            log('getDailyVerse setting verse section: ', custConfig.sections.verse);
+          }
+        } catch(err) {
+          console.log('Could not pull in funny for today.', err);
         }
-      } catch(err) {
-        console.log('Could not pull in funny for today.', err);
       }
     }
   }
@@ -206,28 +207,30 @@ const getDailyVerse = async (custConfig: any) => {
 
 const getDailyFunny = async (custConfig: any) => {
 
-  const d = new Date();
-  const findToday = parseInt((d.toISOString().split('T')[0]).replace(/\-/g, ''));
+  if (custConfig.sections.funny) {
+    const d = new Date();
+    const findToday = parseInt((d.toISOString().split('T')[0]).replace(/\-/g, ''));
 
-  const funny = JSON.parse(JSON.stringify(custConfig.sections.funny || {}));
-  log('funny: ', funny);
+    const funny = JSON.parse(JSON.stringify(custConfig.sections.funny || {}));
+    log('funny: ', funny);
 
-  if (funny?.enabled && funny?.props?.autoFill) {
-    try {
+    if (funny?.enabled && funny?.props?.autoFill) {
+      try {
 
-      const funnyRes = await Funny.find({day: { $lte: findToday }}).sort({ day: -1}).limit(1);
-      log('funnyRes: ', funnyRes);
+        const funnyRes = await Funny.find({day: { $lte: findToday }}).sort({ day: -1}).limit(1);
+        log('funnyRes: ', funnyRes);
 
-      if (funnyRes[0]) {
-        const daily = funnyRes[0];
-        // merge in the funny lines.
-        funny.content = daily.content;
-        
-        custConfig.sections.funny = {...funny};
-        log('getDailyFunny setting funny section: ', custConfig.sections.funny);
+        if (funnyRes[0]) {
+          const daily = funnyRes[0];
+          // merge in the funny lines.
+          funny.content = daily.content;
+          
+          custConfig.sections.funny = {...funny};
+          log('getDailyFunny setting funny section: ', custConfig.sections.funny);
+        }
+      } catch(err) {
+        console.log('Could not pull in funny for today.', err);
       }
-    } catch(err) {
-      console.log('Could not pull in funny for today.', err);
     }
   }
 }

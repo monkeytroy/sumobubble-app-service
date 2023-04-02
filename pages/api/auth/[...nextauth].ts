@@ -7,6 +7,17 @@ import SimpleCrypto from "simple-crypto-js"
 
 const crypto = new SimpleCrypto(process.env.CRYPTO_KEY);
 
+// test
+console.log('Init crypto ---------------------------');
+console.log(process.env.CRYPTO_KEY);
+const e = crypto.encrypt('1234');
+const d = crypto.decrypt(e);
+console.log('1234', e, d);
+
+const en = crypto.encrypt(1234);
+const dn = crypto.decrypt(e);
+console.log('1234 as number', en, dn);
+
 export const authOptions = {
   // Configure one or more authentication providers
   cookie: {
