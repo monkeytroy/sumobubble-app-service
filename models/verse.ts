@@ -6,6 +6,11 @@ const verseSchema = new Schema({
   verses: { type: Map, of: String }
 });
 
-const Verse = models.Verse || model('Verse', verseSchema, 'verses_dev');
+let collectionName = 'verses';
+if (process.env.IS_DEV) {
+  collectionName += '_dev';
+}
+
+const Verse = models.Verse || model('Verse', verseSchema, collectionName);
 
 export default Verse;

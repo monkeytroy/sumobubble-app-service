@@ -2,9 +2,14 @@ import { Schema, model, models } from 'mongoose';
 
 const funnySchema = new Schema({
   day: Number,
-  content: [String]
+  content: {type: String, required: true }
 });
 
-const Funny = models.Funny || model('Funny', funnySchema, 'funnys_dev');
+let collectionName = 'funnys';
+if (process.env.IS_DEV) {
+  collectionName += '_dev';
+}
+
+const Funny = models.Funny || model('Funny', funnySchema, collectionName);
 
 export default Funny;

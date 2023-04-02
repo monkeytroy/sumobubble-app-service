@@ -58,7 +58,6 @@ export default function Home(props: IAppProps) {
   const count = useAppStore((state: any) => state.count);
 
   useEffect(() => {
-    console.log('count change');
     router.replace(router.asPath);
   }, [count]);
 
@@ -66,7 +65,7 @@ export default function Home(props: IAppProps) {
     <div className="p-6 flex flex-col gap-8">
       <div className="flex w-full justify-between items-center">
         <div className="text-4xl font-bold tracking-tight text-gray-900 ">
-          Beacon {count}
+          Beacon
         </div>
         <div>
           <LoginBtn></LoginBtn>

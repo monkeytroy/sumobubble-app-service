@@ -62,6 +62,11 @@ const configSchema = new Schema<IBeaconConfig>({
   }
 });
 
-const Configuration = models?.Configuration || model('Configuration', configSchema, 'configurations_dev');
+let collectionName = 'configurations';
+if (process.env.IS_DEV) {
+  collectionName += '_dev';
+}
+
+const Configuration = models?.Configuration || model('Configuration', configSchema, collectionName);
 
 export default Configuration;

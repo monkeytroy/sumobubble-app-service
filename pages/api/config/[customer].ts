@@ -232,5 +232,7 @@ const getDailyFunny = async (custConfig: any) => {
         console.log('Could not pull in funny for today.', err);
       }
     }
+  } else {
+    log('funny: No funny section detected to fill with daily');
   }
 }
