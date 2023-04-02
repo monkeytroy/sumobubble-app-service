@@ -47,7 +47,8 @@ export const authOptions = {
           const configuration = await Configuration.findOne({ customerId: customerId });
       
           if (configuration) {
-            const pin = '' + crypto.decrypt(configuration.pin);
+            console.log(`Decrypting pin: ${configuration.pin}`);
+            const pin = crypto.decrypt(configuration.pin + '');
 
             if (pin == customerPin) {
 

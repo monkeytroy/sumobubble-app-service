@@ -95,7 +95,7 @@ const put = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
         invalid(res, 'pin must be a string of 4 characters.');
         return;
       }
-      const encPin = crypto.encrypt(pin);
+      const encPin = crypto.encrypt(pin + '');
       body.pin = encPin;
     }
     
@@ -138,7 +138,7 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
         invalid(res, 'pin must be a string of 4 characters.');
         return;
       }
-      const encPin = crypto.encrypt(pin);
+      const encPin = crypto.encrypt(pin + '');
       body.pin = encPin;
     }
 
