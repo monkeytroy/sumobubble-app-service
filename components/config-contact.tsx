@@ -1,11 +1,14 @@
-import { IAppProps, useAppStore } from "@/pages";
 import { saveConfig } from "@/services/config";
+import { useAppStore, IAppState } from "@/store/app-store";
 import { useState, FormEvent, useEffect } from "react";
 import ConfigSubmit from "./config-submit";
 
-export default function ConfigContact(props: IAppProps) {
+export default function ConfigContact() {
 
-  const contact: IBeaconSection | undefined = props?.configuration?.sections?.contact;
+  const configuration = useAppStore((state: IAppState) => state.configuration);
+  const token = useAppStore((state: IAppState) => state.token);
+
+  const contact: IBeaconSection | undefined = configuration?.sections?.contact;
 
   //const [title, setTitle] = useState('');
   const [enabled, setEnabled] = useState(false);
@@ -13,53 +16,52 @@ export default function ConfigContact(props: IAppProps) {
   const [email, setEmail] = useState('');
   
   const [saving, setSaving] = useState(false);
-  const refresh = useAppStore((state: any) => state.refresh);
 
   const reset = () => {
     setEnabled(typeof contact?.enabled !== 'undefined' ? contact.enabled : false);
     setContent(contact?.content || '');
     setEmail(contact?.props.email || '');
   }
-  const inc = useAppStore((state: any) => state.inc);
-  setTimeout(inc, 1000);
   
   useEffect(() => {
     reset();
-  },[]);
+  },[configuration]);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault(); 
-    setSaving(true);
 
-    // copy configuration
-    const configuration = {...props.configuration};
+    if (configuration && token) {
+      setSaving(true);
 
-    // create the new section
-    const contact: IBeaconSection = {
-      //title,
-      enabled,
-      content,
-      props: {
-        email
+      // copy configuration
+      const newConfiguration = JSON.parse(JSON.stringify(configuration));
+
+      // create the new section
+      const contact: IBeaconSection = {
+        //title,
+        enabled,
+        content,
+        props: {
+          email
+        }
       }
+
+      // spread it out...  old first
+      newConfiguration.sections = {
+        ...configuration.sections,
+        contact: {...contact}
+      };
+
+      // save!
+      await saveConfig(newConfiguration, token);
+
+      setTimeout(() => setSaving(false), 2000);
     }
-
-    // spread it out...  old first
-    configuration.sections = {
-      ...configuration.sections,
-      contact: {...contact}
-    };
-
-    // save!
-    await saveConfig(configuration, props.token);
-    refresh();
-    
-    setTimeout(() => setSaving(false), 2000);
   }
 
   return (
     <form onSubmit={submit} onReset={reset}>
-      <div className="flex flex-col gap-4 pb-8 border-b border-gray-900/10  select-none">
+      <div className="flex flex-col gap-4 pb-8 select-none">
 
         <div className="flex gap-4 items-baseline py-4">
           <span className="text-xl font-semibold text-gray-900">Contact</span>

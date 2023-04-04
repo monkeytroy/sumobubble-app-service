@@ -1,11 +1,11 @@
 //import { PhotoIcon } from "@heroicons/react/24/solid";
 import { FormEvent, useEffect, useState } from "react";
 import ConfigSubmit from "@/components/config-submit";
-import { IAppProps, useAppStore } from "@/pages";
 import { saveConfig } from "@/services/config";
 import { TwitterPicker } from 'react-color';
+import { IAppState, useAppStore } from "@/store/app-store";
 
-export default function ConfigSummary(props: IAppProps) {
+export default function ConfigSummary() {
 
   const DEFAULT_THEME_COLOR = '#8ED1FC';
   
@@ -17,6 +17,9 @@ export default function ConfigSummary(props: IAppProps) {
     '#FFAB91', '#BCAAA4'
   ];
 
+  const configuration = useAppStore((state: IAppState) => state.configuration);
+  const token = useAppStore((state: IAppState) => state.token);
+
   const [title, setTitle] = useState('');
   const [logo, setLogo] = useState('');
   const [summary, setSummary] = useState('');
@@ -25,40 +28,41 @@ export default function ConfigSummary(props: IAppProps) {
 
   const [saving, setSaving] = useState(false);
   const [pickColor, setPickColor] = useState(false);
-  const refresh = useAppStore((state: any) => state.refresh);
-  
+
   const reset = () => {
-    setTitle(props.configuration.customer?.title || '');
-    setLogo(props.configuration.customer?.logo?.url || '');
-    setSummary(props.configuration.summary?.content || '');
-    setSpecial(props.configuration.summary?.special || '');
-    setThemePrimary(props.configuration.customer.theme?.primary || DEFAULT_THEME_COLOR)
+    setTitle(configuration?.customer?.title || '');
+    setLogo(configuration?.customer?.logo?.url || '');
+    setSummary(configuration?.summary?.content || '');
+    setSpecial(configuration?.summary?.special || '');
+    setThemePrimary(configuration?.customer?.theme?.primary || DEFAULT_THEME_COLOR)
   }
 
   useEffect(() => {
     reset();
-  },[]);
+  }, [configuration]);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault(); 
-    setSaving(true);
 
-    // copy configuration
-    const configuration = JSON.parse(JSON.stringify(props.configuration));
+    if (configuration && token) {
+      setSaving(true);
 
-    // create new section
-    configuration.customer.title = title;
-    configuration.customer.logo = { url: logo };
-    configuration.summary.content = summary;
-    configuration.summary.special = special;
-    configuration.customer.theme = {
-      primary: themePrimary
+      // copy configuration
+      const newConfiguration = JSON.parse(JSON.stringify(configuration));
+
+      // create new section
+      newConfiguration.customer.title = title;
+      newConfiguration.customer.logo = { url: logo };
+      newConfiguration.summary.content = summary;
+      newConfiguration.summary.special = special;
+      newConfiguration.customer.theme = {
+        primary: themePrimary
+      }
+
+      await saveConfig(newConfiguration, token);
+
+      setTimeout(() => setSaving(false), 2000);
     }
-
-    await saveConfig(configuration, props.token);
-    refresh();
-
-    setTimeout(() => setSaving(false), 2000);
   }
 
   const themeSelect = (color: any) => {
@@ -67,7 +71,7 @@ export default function ConfigSummary(props: IAppProps) {
 
   return (
     <form onSubmit={submit} onReset={() => reset()}>
-      <div className="flex flex-col gap-4 pb-8 border-b border-gray-900/10  select-none">
+      <div className="flex flex-col gap-4 pb-8 select-none">
 
         <div className="flex gap-4 items-baseline py-4">
           <span className="text-xl font-semibold text-gray-900">Customer Info</span>
@@ -136,10 +140,9 @@ export default function ConfigSummary(props: IAppProps) {
                 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:py-1.5 sm:text-sm sm:leading-6"
             />
           </div>
-          <p className="mt-3 text-sm leading-6 text-gray-600 flex gap-6">
+          <p className="text-xs leading-6 text-gray-600 flex gap-6">
             <span>**Bold**</span>
             <span>[Link Text](https://full-url.com)</span>
-            <span>\n\n = New Line</span>
           </p>
         </div>
 

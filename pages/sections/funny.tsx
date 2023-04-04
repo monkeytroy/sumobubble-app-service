@@ -1,10 +1,11 @@
-import { getServerSideProps, IAppProps } from '@/services/server-side-props';
-import ConfigSummary from '@/components/config-summary';
-import { useAppStore } from '@/store/app-store';
+import 'react-toastify/dist/ReactToastify.css';
 import { useEffect } from 'react';
+import { useAppStore } from '@/store/app-store';
+import { getServerSideProps, IAppProps } from '@/services/server-side-props';
+import ConfigFunny from '@/components/config-funny';
 
-export default function Home(props: IAppProps) { 
-    
+export default function FunnyPage(props: IAppProps) {
+
   // app props on app state
   const setConfiguration = useAppStore((state: any) => state.setConfiguration);
   const setAppToken = useAppStore((state: any) => state.setAppToken);
@@ -13,9 +14,9 @@ export default function Home(props: IAppProps) {
     setConfiguration(props.configuration);
     setAppToken(props.token);
   }, []);
-
+  
   return (
-    <ConfigSummary></ConfigSummary>
+    <ConfigFunny></ConfigFunny>
   )
 }
 

@@ -5,6 +5,13 @@ enum Sections {
   contact = 'contact'
 }
 
+interface IBeaconSections {
+  contact?: IBeaconSection,
+  verse?: IBeaconSection,
+  spotlight?: IBeaconSection,
+  funny?: IBeaconSection
+}
+
 interface IBeaconSection {
   title?: string;
   enabled: boolean;
@@ -40,12 +47,7 @@ interface IBeaconConfig {
     content: string;
     special?: string;
   }
-  sections: {
-    contact?: IBeaconSection,
-    verse?: IBeaconSection,
-    spotlight?: IBeaconSection,
-    funny?: IBeaconSection
-  }
+  sections: IBeaconSections
 }
 
 interface Copyrights {

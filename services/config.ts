@@ -1,4 +1,3 @@
-import { useAppStore } from "@/pages";
 import { toast } from "react-toastify";
 
 export const saveConfig = async (config: IBeaconConfig, token: string) => {
@@ -11,16 +10,34 @@ export const saveConfig = async (config: IBeaconConfig, token: string) => {
     body: JSON.stringify(config)
   });
 
-  // todo check for err
+  const json = await res.json();
 
-  toast.success('Saved!', {
-    position: "top-center",
-    autoClose: 3000,
-    hideProgressBar: true,
-    closeOnClick: true,
-    pauseOnHover: false,
-    draggable: true,
-    progress: undefined,
-    theme: "light",
-    });
+  if (json.success) {
+
+    toast.success('Saved!', {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      });
+
+      return json.data;
+  } else {
+    toast.error('Ooops! Could not save!', {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      });
+
+    return null;
+  }
 }

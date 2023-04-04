@@ -1,11 +1,15 @@
-import { IAppProps, useAppStore } from "@/pages";
+
 import { saveConfig } from "@/services/config";
+import { IAppState, useAppStore } from "@/store/app-store";
 import { useState, FormEvent, useEffect } from "react";
 import ConfigSubmit from "./config-submit";
 
-export default function ConfigFunny(props: IAppProps) {
+export default function ConfigFunny() {
 
-  const funny: IBeaconSection | undefined = props?.configuration?.sections?.funny;
+  const configuration = useAppStore((state: IAppState) => state.configuration);
+  const token = useAppStore((state: IAppState) => state.token);
+  
+  const funny: IBeaconSection | undefined = configuration?.sections?.funny;
 
   //const [title, setTitle] = useState('');
   const [enabled, setEnabled] = useState(false);
@@ -14,9 +18,7 @@ export default function ConfigFunny(props: IAppProps) {
   const [urls, setUrls] = useState(['']);
   
   const [saving, setSaving] = useState(false);
-  
-  const refresh = useAppStore((state: any) => state.refresh);
-  
+    
   const reset = () => {
     setEnabled(funny?.enabled || false);
     setAutoFill(typeof funny?.props?.autoFill !== 'undefined' ? funny?.props.autoFill : false);
@@ -26,41 +28,44 @@ export default function ConfigFunny(props: IAppProps) {
 
   useEffect(() => {
     reset();
-  },[]);
+  }, [configuration]);
 
   const submit = async (e: FormEvent) => {
-    e.preventDefault(); 
-    setSaving(true);
+    e.preventDefault();
 
-    // copy configuration
-    const configuration = {...props.configuration};
+    if (configuration && token) {
 
-    // create the new section
-    const funny: IBeaconSection = {
-      //title,
-      enabled,
-      content,
-      urls,
-      props: {
-        autoFill
+      setSaving(true);
+
+      // copy configuration
+      const newConfiguration = JSON.parse(JSON.stringify(configuration));
+
+      // create the new section
+      const funny: IBeaconSection = {
+        //title,
+        enabled,
+        content,
+        urls,
+        props: {
+          autoFill
+        }
       }
-    }
 
-    // spread it out... old first
-    configuration.sections = {
-      ...configuration.sections,
-      funny: {...funny}
-    }
+      // spread it out... old first
+      newConfiguration.sections = {
+        ...newConfiguration.sections,
+        funny: {...funny}
+      }
 
-    await saveConfig(configuration, props.token);
-    refresh();
-    
-    setTimeout(() => setSaving(false), 2000);
+      await saveConfig(newConfiguration, token);
+
+      setTimeout(() => setSaving(false), 2000);
+    }    
   }
 
   return (
     <form onSubmit={submit} onReset={() => reset()}>
-      <div className="flex flex-col gap-4 pb-8 border-b border-gray-900/10  select-none">
+      <div className="flex flex-col gap-4 pb-8 select-none">
 
         <div className="flex gap-4 items-baseline py-4">
           <span className="text-xl font-semibold text-gray-900">Daily Funny</span>

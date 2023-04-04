@@ -4,7 +4,6 @@ import ConfigFunny from './config-funny';
 import ConfigSpotlight from './config-spotlight';
 import ConfigSummary from './config-summary';
 import ConfigVerse from './config-verse';
-import { IAppProps } from '@/pages';
 
 export interface Notification {
   id?: string;
@@ -13,7 +12,7 @@ export interface Notification {
   text: string;
 }
 
-const ConfigTabs = (props: IAppProps) => {
+const ConfigTabs = () => {
 
   const tabClasses = 'whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium \
     focus: border-6 focus:outline-none  \
@@ -32,11 +31,11 @@ const ConfigTabs = (props: IAppProps) => {
         </Tab.List>
       
         <Tab.Panels className="">
-          <Tab.Panel className="py-4 focus:outline-none"><ConfigSummary {...props}></ConfigSummary></Tab.Panel>
-          <Tab.Panel className="py-4 focus:outline-none"><ConfigContact {...props}></ConfigContact></Tab.Panel>
-          <Tab.Panel className="py-4 focus:outline-none"><ConfigVerse {...props}></ConfigVerse></Tab.Panel>
-          <Tab.Panel className="py-4 focus:outline-none"><ConfigSpotlight {...props}></ConfigSpotlight></Tab.Panel>
-          <Tab.Panel className="py-4 focus:outline-none"><ConfigFunny {...props}></ConfigFunny></Tab.Panel>
+          <Tab.Panel className="py-4 focus:outline-none"><ConfigSummary></ConfigSummary></Tab.Panel>
+          <Tab.Panel className="py-4 focus:outline-none"><ConfigContact></ConfigContact></Tab.Panel>
+          <Tab.Panel className="py-4 focus:outline-none"><ConfigVerse></ConfigVerse></Tab.Panel>
+          <Tab.Panel className="py-4 focus:outline-none"><ConfigSpotlight></ConfigSpotlight></Tab.Panel>
+          <Tab.Panel className="py-4 focus:outline-none"><ConfigFunny></ConfigFunny></Tab.Panel>
         </Tab.Panels>
 
     </Tab.Group>

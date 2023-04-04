@@ -1,14 +1,23 @@
 
-import { IAppProps } from '@/pages';
-import ConfigTabs from './config-tabs';
+import { IAppState, useAppStore } from '@/store/app-store';
+import ConfigSummary from './config-summary';
+import SectionSelection from './section-selection';
 
-export default function ConfigEdit(props: IAppProps) {
+export default function ConfigEdit() {
+
+  const configuration = useAppStore((state: IAppState) => state.configuration);
+  const token = useAppStore((state: IAppState) => state.token);
+
   return (
     <div className="mx-auto max-w-5xl px-4 lg:px-10">
-      {props.configuration && 
-        <ConfigTabs {...props}></ConfigTabs>
+      {configuration && 
+        <div>
+          <ConfigSummary></ConfigSummary>
+          <div className="py-4 text-3xl">Info Sections</div>
+          <SectionSelection></SectionSelection>
+        </div>
       }
-      {!props.configuration &&
+      {!configuration &&
         <div className="text-3xl text-center py-24">Missing configuration</div>
       }
     </div>

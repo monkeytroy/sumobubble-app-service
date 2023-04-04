@@ -1,11 +1,14 @@
-import { IAppProps, useAppStore } from "@/pages";
 import { saveConfig } from "@/services/config";
+import { IAppState, useAppStore } from "@/store/app-store";
 import { useState, FormEvent, useEffect } from "react";
 import ConfigSubmit from "./config-submit";
 
-export default function ConfigSpotlight(props: IAppProps) {
+export default function ConfigSpotlight() {
 
-  const spotlight: IBeaconSection | undefined = props?.configuration?.sections?.spotlight;
+  const configuration = useAppStore((state: IAppState) => state.configuration);
+  const token = useAppStore((state: IAppState) => state.token);
+
+  const spotlight: IBeaconSection | undefined = configuration?.sections?.spotlight;
 
   //const [title, setTitle] = useState(contact?.title);
   const [enabled, setEnabled] = useState(false);
@@ -23,35 +26,37 @@ export default function ConfigSpotlight(props: IAppProps) {
 
   useEffect(() => {
     reset();
-  },[]);
+  }, [configuration]);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault(); 
-    setSaving(true);
 
-    // copy configuration
-    const configuration = {...props.configuration};
+    if (configuration && token) {
+      setSaving(true);
 
-    // create the new section
-    const spotlight: IBeaconSection = {
-      //title,
-      enabled,
-      content,
-      urls,
-      props: {
+      // copy configuration
+      const newConfiguration = JSON.parse(JSON.stringify(configuration));
+
+      // create the new section
+      const spotlight: IBeaconSection = {
+        //title,
+        enabled,
+        content,
+        urls,
+        props: {
+        }
       }
-    }
 
-    // spread it out... old first
-    configuration.sections = {
-      ...configuration.sections,
-      spotlight: {...spotlight}
-    }
+      // spread it out... old first
+      newConfiguration.sections = {
+        ...newConfiguration.sections,
+        spotlight: {...spotlight}
+      }
 
-    await saveConfig(configuration, props.token);
-    refresh();
+      await saveConfig(newConfiguration, token);
     
-    setTimeout(() => setSaving(false), 2000);
+      setTimeout(() => setSaving(false), 2000);
+    }    
   }
 
   return (
