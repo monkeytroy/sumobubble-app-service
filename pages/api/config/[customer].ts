@@ -6,7 +6,7 @@ import copyright from './copyright.json';
 import SimpleCrypto from "simple-crypto-js"
 import connectMongo from '@/services/mongoose';
 import Configuration from '@/models/config';
-import Funny from '@/models/funny';
+import Funny, { IFunny } from '@/models/funny';
 import Verse from '@/models/verse';
 import { log } from '@/services/log';
 
@@ -211,20 +211,24 @@ const getDailyFunny = async (custConfig: any) => {
     const d = new Date();
     const findToday = parseInt((d.toISOString().split('T')[0]).replace(/\-/g, ''));
 
-    const funny = JSON.parse(JSON.stringify(custConfig.sections.funny || {}));
+    const funny: IBeaconSection = JSON.parse(JSON.stringify(custConfig.sections.funny || {}));
     log('funny: ', funny);
 
     if (funny?.enabled && funny?.props?.autoFill) {
       try {
 
-        const funnyRes = await Funny.find({day: { $lte: findToday }}).sort({ day: -1}).limit(1);
+        const funnyRes: Array<IFunny> = await Funny.find({day: { $lte: findToday }}).sort({ day: -1}).limit(1);
         log('funnyRes: ', funnyRes);
 
         if (funnyRes[0]) {
           const daily = funnyRes[0];
+          log('daily: ', daily, daily.urls);
+          
           // merge in the funny lines.
           funny.content = daily.content;
-          
+          funny.urls = [...daily.urls];
+          log('funny: ', funny);
+
           custConfig.sections.funny = {...funny};
           log('getDailyFunny setting funny section: ', custConfig.sections.funny);
         }
