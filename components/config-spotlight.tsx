@@ -1,5 +1,6 @@
 import { saveConfig } from "@/services/config";
 import { IAppState, useAppStore } from "@/store/app-store";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { useState, FormEvent, useEffect } from "react";
 import ConfigSubmit from "./config-submit";
 
@@ -14,9 +15,9 @@ export default function ConfigSpotlight() {
   const [enabled, setEnabled] = useState(false);
   const [content, setContent] = useState('');
   const [urls, setUrls] = useState(['']);
+  const [urlsValid, setUrlsValid] = useState(true);
   
   const [saving, setSaving] = useState(false);
-  const refresh = useAppStore((state: any) => state.refresh);
   
   const reset = () => {
     setEnabled(spotlight?.enabled || false);
@@ -31,32 +32,47 @@ export default function ConfigSpotlight() {
   const submit = async (e: FormEvent) => {
     e.preventDefault(); 
 
-    if (configuration && token) {
-      setSaving(true);
+    if (urlsValid) {
 
-      // copy configuration
-      const newConfiguration = JSON.parse(JSON.stringify(configuration));
+      if (configuration && token) {
+        setSaving(true);
 
-      // create the new section
-      const spotlight: IBeaconSection = {
-        //title,
-        enabled,
-        content,
-        urls,
-        props: {
+        // copy configuration
+        const newConfiguration = JSON.parse(JSON.stringify(configuration));
+
+        // create the new section
+        const spotlight: IBeaconSection = {
+          //title,
+          enabled,
+          content,
+          urls,
+          props: {
+          }
         }
-      }
 
-      // spread it out... old first
-      newConfiguration.sections = {
-        ...newConfiguration.sections,
-        spotlight: {...spotlight}
-      }
+        // spread it out... old first
+        newConfiguration.sections = {
+          ...newConfiguration.sections,
+          spotlight: {...spotlight}
+        }
 
-      await saveConfig(newConfiguration, token);
-    
-      setTimeout(() => setSaving(false), 2000);
-    }    
+        await saveConfig(newConfiguration, token);
+      
+        setTimeout(() => setSaving(false), 2000);
+      }
+    } else {
+      alert('fail');
+    }
+  }
+
+  const validateSpotlightUrl = (url: string) => {
+    var regExp = /^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+$/;
+    if (!regExp.test(url)) {
+      setUrlsValid(false);
+    } else {
+      setUrlsValid(true);
+    }
+    setUrls([url]);
   }
 
   return (
@@ -105,17 +121,21 @@ export default function ConfigSpotlight() {
 
         <div className="sm:col-span-4">
           <label htmlFor="spotlightUrl" className="block text-sm font-medium leading-6 text-gray-900">
-            Video URL (Use embed url)
+            YouTube Video URL
           </label>
           <div className="mt-2">
             <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 
-              focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-              <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm">https://</span>
+              focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md relative">
+                {!urlsValid && 
+                  <div className="absolute top-0 bottom-0 right-1 select-none text-red-500 flex flex-col items-center justify-center">
+                    <ExclamationTriangleIcon className="w-6 h-6"></ExclamationTriangleIcon>
+                  </div>
+                }
               <input type="text" name="spotlightUrl" id="spotlightUrl"
-                value={urls} onChange={e => setUrls([e.target.value])} disabled={!enabled}
-                className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 disabled:opacity-30
-                  placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                placeholder="https://www.youtube.com/embed/qVEOJzAYIW4"
+                value={urls} onChange={e => validateSpotlightUrl(e.target.value)} disabled={!enabled}
+                className="block flex-1 border-0 bg-transparent py-1.5 px-2 text-gray-900 disabled:opacity-30
+                  placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 mr-6 "
+                placeholder="https://www.youtube.com/watch?v=qVEOJzAYIW4"
               />
             </div>
           </div>

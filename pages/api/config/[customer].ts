@@ -59,6 +59,15 @@ const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
 
       await getDailyFunny(configuration);
       await getDailyVerse(configuration);
+
+      // fix spotlight url
+      if (configuration.sections?.spotlight) {
+        let spotlightUrl = configuration.sections?.spotlight?.urls[0];
+        if (spotlightUrl.indexOf('watch?v=') > 0) {
+          spotlightUrl = spotlightUrl.replace('watch?v=', 'embed/');
+          configuration.sections.spotlight.urls = [spotlightUrl];
+        }
+      }
       
       const { pin, __v, ...configurationRes} = configuration.toJSON();  
       res.status(200).json({ success: true, message: 'Message for you sir!', data: configurationRes });
