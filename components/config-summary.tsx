@@ -30,7 +30,8 @@ export default function ConfigSummary() {
 
   const [saving, setSaving] = useState(false);
   const [pickColor, setPickColor] = useState(false);
-
+  
+  const [summaryLoading, setSummaryLoading] = useState(true);
   const editorRef = useRef({} as any);
   const [dirty, setDirty] = useState(false);
   const [newSummary, setNewSummary] = useState(summary);
@@ -139,13 +140,32 @@ export default function ConfigSummary() {
 
             <label htmlFor="summary" className="block text-sm font-medium leading-6 text-gray-900">
               Summary - Summary text
-            </label>
-            
-            <div className="mt-2 grow xl:max-w-full w-full max-w-md ">
+            </label>           
+
+            <div className="mt-2 grow xl:max-w-full w-full max-w-md " >
+              {summaryLoading && 
+                <div role="status" 
+                  className="relative h-full flex flex-col gap-4 animate-pulse border-2 border-gray-200 p-4 rounded-lg">
+                  <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48"></div>
+                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px]"></div>
+                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px]"></div>
+                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px]"></div>
+                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px]"></div>
+                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+                  
+                  <span className="absolute inset-1/2 -mx-6 text-gray-500">Loading...</span>
+                </div>
+              }
+
               <Editor
                 id="summaryEditor"
                 tinymceScriptSrc={'/tinymce/tinymce.min.js'}
-                onInit={(evt, editor) => editorRef.current = editor}
+                onInit={(evt, editor) => { setSummaryLoading(false); editorRef.current = editor; }}
                 initialValue={summary}
                 onEditorChange={(newValue, editor) => setNewSummary(newValue)}
                 onDirty={() => setDirty(true)}
