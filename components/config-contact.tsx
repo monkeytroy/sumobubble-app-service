@@ -61,7 +61,7 @@ export default function ConfigContact() {
 
   return (
     <form onSubmit={submit} onReset={reset}>
-      <div className="flex flex-col gap-4 pb-8 select-none">
+      <div className="flex flex-col gap-6 pb-6 select-none">
 
         <div className="flex gap-4 items-baseline py-4">
           <span className="text-xl font-semibold text-gray-900">Contact</span>
@@ -79,9 +79,8 @@ export default function ConfigContact() {
           </div>
           <div className="text-sm leading-6">
             <label htmlFor="comments" className="font-medium text-gray-900">
-              Enable
+              Enable this section 
             </label>
-            <p className="text-gray-500">Enable / Disable this section.</p>
           </div>
         </div>
         
@@ -98,9 +97,6 @@ export default function ConfigContact() {
                 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:py-1.5 sm:text-sm sm:leading-6"
             />
           </div>
-          <p className="mt-3 text-sm leading-6 text-gray-600 flex gap-6">
-            Invite your guest to contact you.
-          </p>
         </div>
 
         <div className="sm:col-span-4">

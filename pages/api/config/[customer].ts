@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import Cors from 'cors';
 import { midware } from '@/services/midware';
-import copyright from './copyright.json';
+import { translations, type Translation } from '@/services/translations';
 import SimpleCrypto from "simple-crypto-js"
 import connectMongo from '@/services/mongoose';
 import Configuration from '@/models/config';
@@ -11,7 +11,6 @@ import Verse from '@/models/verse';
 import { log } from '@/services/log';
 
 const crypto = new SimpleCrypto(process.env.CRYPTO_KEY);
-const copyrights: Copyrights = copyright;
 
 const JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJCRUFDT04iLCJuYW1lIjoiR2xvYmFsIiwiaWF0IjoxNTE2MTM5MDIyfQ.eVrEhwKxF4Dfj2S5fFFMnwLAae-E1h3Ilo9PQKgPYic';
 
@@ -180,17 +179,17 @@ const getDailyVerse = async (custConfig: any) => {
     // copy the verse.
     const verse = JSON.parse(JSON.stringify(custConfig.sections.verse || {}));
 
-    if (verse) {
-      const trans = verse.translation || DEFAULT_TRANSLATION;
+    if (verse && verse.enabled) {
+      const trans = verse.props.translation || DEFAULT_TRANSLATION;
 
       // get translation copyright. 
-      verse.props.copyright = copyrights[trans] || '';
+      verse.props.copyright = translations[trans as Translation].copyright || '';
 
       log('copyright:', verse.props.copyright);
       log('verse:', verse);
 
       // if cust config does not have a verse set.. get daily
-      if (verse.enabled && (verse.props.autoFill)) {
+      if (verse.props.autoFill) {
         try {
           const verseRes = await Verse.find({day: { $lte: findToday }}).sort({ day: -1}).limit(1);
           log('verseRes:', verseRes);
@@ -202,14 +201,15 @@ const getDailyVerse = async (custConfig: any) => {
             // merge in the verse by the translation
             const content: string = daily.verses.get(trans);
             verse.content = content;
-
-            custConfig.sections.verse = {...verse};
-            log('getDailyVerse setting verse section: ', custConfig.sections.verse);
           }
         } catch(err) {
           console.log('Could not pull in funny for today.', err);
         }
       }
+
+      custConfig.sections.verse = {...verse};
+      log('getDailyVerse setting verse section: ', custConfig.sections.verse);
+
     }
   }
 }

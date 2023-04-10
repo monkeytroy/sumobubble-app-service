@@ -1,9 +1,11 @@
 //import { PhotoIcon } from "@heroicons/react/24/solid";
-import { FormEvent, useEffect, useState } from "react";
-import ConfigSubmit from "@/components/config-submit";
-import { saveConfig } from "@/services/config";
+import { FormEvent, useEffect, useRef, useState } from 'react';
+import ConfigSubmit from '@/components/config-submit';
+import { saveConfig } from '@/services/config';
 import { TwitterPicker } from 'react-color';
-import { IAppState, useAppStore } from "@/store/app-store";
+import { IAppState, useAppStore } from '@/store/app-store';
+import { Editor } from '@tinymce/tinymce-react';
+import ReactHtmlParser from 'react-html-parser';
 
 export default function ConfigSummary() {
 
@@ -29,10 +31,15 @@ export default function ConfigSummary() {
   const [saving, setSaving] = useState(false);
   const [pickColor, setPickColor] = useState(false);
 
+  const editorRef = useRef({} as any);
+  const [dirty, setDirty] = useState(false);
+  const [newSummary, setNewSummary] = useState(summary);
+
   const reset = () => {
     setTitle(configuration?.customer?.title || '');
     setLogo(configuration?.customer?.logo?.url || '');
     setSummary(configuration?.summary?.content || '');
+    setNewSummary(configuration?.summary?.content || '');
     setSpecial(configuration?.summary?.special || '');
     setThemePrimary(configuration?.customer?.theme?.primary || DEFAULT_THEME_COLOR)
   }
@@ -53,7 +60,7 @@ export default function ConfigSummary() {
       // create new section
       newConfiguration.customer.title = title;
       newConfiguration.customer.logo = { url: logo };
-      newConfiguration.summary.content = summary;
+      newConfiguration.summary.content = newSummary;
       newConfiguration.summary.special = special;
       newConfiguration.customer.theme = {
         primary: themePrimary
@@ -71,7 +78,7 @@ export default function ConfigSummary() {
 
   return (
     <form onSubmit={submit} onReset={() => reset()}>
-      <div className="flex flex-col gap-4 pb-8 select-none">
+      <div className="flex flex-col gap-6 pb-6 select-none">
 
         <div className="flex gap-4 items-baseline py-4">
           <span className="text-xl font-semibold text-gray-900">Customer Info</span>
@@ -80,10 +87,10 @@ export default function ConfigSummary() {
           </span>
         </div>
           
-        <div className="flex gap-4 w-full sm:w-full md:w-3/4">
+        <div className="flex gap-4 max-w-full sm:max-w-md w-full">
           <div className="flex-1">
             <label htmlFor="title" className="block text-sm font-medium leading-6 text-gray-900">
-              Title - Text in the Beacon header
+              Title - Pop up heading
             </label>
             <div className="mt-2">
               <input
@@ -104,7 +111,7 @@ export default function ConfigSummary() {
               <div className="w-24 h-9 rounded-md" style={{backgroundColor: themePrimary}} 
                 onClick={() => setPickColor(!pickColor)}></div>
               {pickColor && 
-                <div className="absolute mt-2 p-4 bg-gradient-to-t from-gray-100 bg-gray-50 border-gray-200 shadow-md shadow-gray-500 rounded-lg ">
+                <div className="z-50 absolute mt-2 p-4 bg-gradient-to-t from-gray-100 bg-gray-50 border-gray-200 shadow-md shadow-gray-500 rounded-lg ">
                   <TwitterPicker onChangeComplete={themeSelect} colors={COLORS}></TwitterPicker>
                 </div>
               }
@@ -112,7 +119,7 @@ export default function ConfigSummary() {
           </div>
         </div>
 
-        <div className="w-full sm:w-full md:w-3/4">
+        <div className="w-full sm:w-full md:w-3/4 hidden">
           <label htmlFor="logo" className="block text-sm font-medium leading-6 text-gray-900">
             Logo - URL to a logo appearing at the top of the summary.
           </label>
@@ -127,28 +134,63 @@ export default function ConfigSummary() {
           </div>
         </div>        
 
-        <div className="col-span-full">
-          <label htmlFor="summary" className="block text-sm font-medium leading-6 text-gray-900">
-            Summary - Summary text always displayed first! (Supports some markdown syntax)
-          </label>
-          <div className="mt-2">
-            <textarea
-              id="summary" name="summary" rows={4}
-              value={summary} onChange={e => setSummary(e.target.value)}
-              className="block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 
-                ring-inset ring-gray-300 placeholder:text-gray-400 
-                focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:py-1.5 sm:text-sm sm:leading-6"
-            />
+        <div className="flex gap-8">
+          <div className="h-160 flex flex-col grow">
+
+            <label htmlFor="summary" className="block text-sm font-medium leading-6 text-gray-900">
+              Summary - Summary text
+            </label>
+            
+            <div className="mt-2 grow xl:max-w-full w-full max-w-md ">
+              <Editor
+                id="summaryEditor"
+                tinymceScriptSrc={'/tinymce/tinymce.min.js'}
+                onInit={(evt, editor) => editorRef.current = editor}
+                initialValue={summary}
+                onEditorChange={(newValue, editor) => setNewSummary(newValue)}
+                onDirty={() => setDirty(true)}
+                init={{
+                  resize: false,
+                  height: '100%',
+                  statusbar: false,
+                  menu: {
+                    edit: { title: 'Edit', items: 'undo redo | cut copy paste pastetext | selectall | searchreplace code' },
+                    view: { title: 'View', items: '' }, // code visualaid visualchars visualblocks | spellchecker | preview fullscreen | showcomments
+                    insert: { title: 'Insert', items: 'image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor tableofcontents | insertdatetime' },
+                    format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontfamily fontsize align lineheight | forecolor backcolor | language | removeformat' },
+                    tools: { title: 'Tools', items: '' }, // a11ycheck spellcheckerlanguage spellchecker
+                    table: { title: 'Table', items: 'inserttable | cell row column | advtablesort | tableprops deletetable' },
+                    help: { title: 'Help', items: 'help' } // help
+                  },
+                  plugins: [
+                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
+                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                    'insertdatetime', 'media', 'table', 'help', 'emoticons'
+                  ],
+                  toolbar: 'undo redo | blocks | ' +
+                    'bold italic forecolor emoticons | alignleft aligncenter ' +
+                    'alignright alignjustify | bullist numlist outdent indent '
+                    //'image media | removeformat code | help'
+                }}
+              />
+            </div>
           </div>
-          <p className="text-xs leading-6 text-gray-600 flex gap-6">
-            <span>**Bold**</span>
-            <span>[Link Text](https://full-url.com)</span>
-          </p>
+
+          <div className="h-160 hidden xl:flex flex-col max-w-full sm:max-w-md w-full">
+            <label htmlFor="summaryContent" className="block text-sm font-medium leading-6 text-gray-900">
+              Summary Preview
+            </label>
+            
+            <div id="summaryContent" className="grow mt-2 overflow-y-auto
+              border-2 border-gray-200 p-4 rounded-lg">
+              {newSummary && ReactHtmlParser(newSummary)}
+            </div>
+          </div>
         </div>
 
-        <div className="col-span-full">
-          <label htmlFor="summary" className="block text-sm font-medium leading-6 text-gray-900">
-            Special - A highlighted special announcement (Supports some markdown syntax)
+        <div className="max-w-full sm:max-w-md w-full">
+          <label htmlFor="special" className="block text-sm font-medium leading-6 text-gray-900">
+            Special - A highlighted special announcement
           </label>
           <div className="mt-2">
             <textarea
@@ -160,7 +202,6 @@ export default function ConfigSummary() {
             />
           </div>
         </div>
-
       </div>
     
       <ConfigSubmit saving={saving}></ConfigSubmit>

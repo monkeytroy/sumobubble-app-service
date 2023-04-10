@@ -1,6 +1,8 @@
-import '@/styles/globals.css'
-import type { AppContext, AppInitialProps, AppLayoutProps, AppProps } from 'next/app'
-import { SessionProvider } from "next-auth/react"
+import '@/styles/globals.css';
+//@ts-ignore 
+import '@/styles/summary.scss';
+import type { AppContext, AppInitialProps, AppLayoutProps, AppProps } from 'next/app';
+import { SessionProvider } from 'next-auth/react';
 import 'react-toastify/dist/ReactToastify.css';
 import { ReactElement, ReactNode, ReactNodeArray } from 'react';
 import { NextComponentType } from 'next';

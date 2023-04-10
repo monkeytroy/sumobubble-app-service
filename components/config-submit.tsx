@@ -2,7 +2,7 @@
 export default function ConfigSubmit({ saving }: { saving: boolean}) {
 
   return (
-    <div className="mt-6 flex items-center justify-start gap-x-6">
+    <div className="flex items-center justify-start gap-x-6">
       <button type="reset" disabled={saving}
         className="text-sm font-semibold leading-6 text-gray-900 disabled:opacity-25">
         Cancel

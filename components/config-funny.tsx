@@ -65,7 +65,7 @@ export default function ConfigFunny() {
 
   return (
     <form onSubmit={submit} onReset={() => reset()}>
-      <div className="flex flex-col gap-4 pb-8 select-none">
+      <div className="flex flex-col gap-4 pb-6 select-none">
 
         <div className="flex gap-4 items-baseline py-4">
           <span className="text-xl font-semibold text-gray-900">Daily Funny</span>
@@ -83,9 +83,8 @@ export default function ConfigFunny() {
           </div>
           <div className="text-sm leading-6">
             <label htmlFor="funnyEnabled" className="font-medium text-gray-900">
-              Enable
+              Enable the section
             </label>
-            <p className="text-gray-500">Enable / Disable this section.</p>
           </div>
         </div>
 

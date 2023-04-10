@@ -2,6 +2,7 @@ import { saveConfig } from "@/services/config";
 import { IAppState, useAppStore } from "@/store/app-store";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { useState, FormEvent, useEffect } from "react";
+import { toast } from "react-toastify";
 import ConfigSubmit from "./config-submit";
 
 export default function ConfigSpotlight() {
@@ -29,39 +30,54 @@ export default function ConfigSpotlight() {
     reset();
   }, [configuration]);
 
+  useEffect(() => {
+    if (!enabled) {
+      setUrls(['']);
+    }
+  }, [enabled])
+
   const submit = async (e: FormEvent) => {
     e.preventDefault(); 
 
-    if (urlsValid) {
+    if (enabled && !urlsValid) {
+      toast.error('Bad link for YouTube video.', {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        });
+      return;
+    }
 
-      if (configuration && token) {
-        setSaving(true);
+    if (configuration && token) {
+      setSaving(true);
 
-        // copy configuration
-        const newConfiguration = JSON.parse(JSON.stringify(configuration));
+      // copy configuration
+      const newConfiguration = JSON.parse(JSON.stringify(configuration));
 
-        // create the new section
-        const spotlight: IBeaconSection = {
-          //title,
-          enabled,
-          content,
-          urls,
-          props: {
-          }
+      // create the new section
+      const spotlight: IBeaconSection = {
+        //title,
+        enabled,
+        content,
+        urls,
+        props: {
         }
-
-        // spread it out... old first
-        newConfiguration.sections = {
-          ...newConfiguration.sections,
-          spotlight: {...spotlight}
-        }
-
-        await saveConfig(newConfiguration, token);
-      
-        setTimeout(() => setSaving(false), 2000);
       }
-    } else {
-      alert('fail');
+
+      // spread it out... old first
+      newConfiguration.sections = {
+        ...newConfiguration.sections,
+        spotlight: {...spotlight}
+      }
+
+      await saveConfig(newConfiguration, token);
+    
+      setTimeout(() => setSaving(false), 2000);
     }
   }
 
@@ -77,7 +93,7 @@ export default function ConfigSpotlight() {
 
   return (
     <form onSubmit={submit} onReset={() => reset()}>
-      <div className="flex flex-col gap-4 pb-8 border-b border-gray-900/10  select-none">
+      <div className="flex flex-col gap-4 pb-6 select-none">
 
         <div className="flex gap-4 items-baseline py-4">
           <span className="text-xl font-semibold text-gray-900">Spotlight</span>
@@ -95,9 +111,8 @@ export default function ConfigSpotlight() {
           </div>
           <div className="text-sm leading-6">
             <label htmlFor="spotlightEnabled" className="font-medium text-gray-900">
-              Enable
+              Enable the section
             </label>
-            <p className="text-gray-500">Enable / Disable this section.</p>
           </div>
         </div>
 

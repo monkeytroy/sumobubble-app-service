@@ -1,5 +1,3 @@
-declare module "copyright.json" {
-}
 
 enum Sections {
   contact = 'contact'

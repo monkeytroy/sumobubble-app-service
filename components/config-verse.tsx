@@ -72,7 +72,7 @@ export default function ConfigVerse() {
 
   return (
     <form onSubmit={submit} onReset={reset}>
-      <div className="flex flex-col gap-4 pb-8 select-none">
+      <div className="flex flex-col gap-4 pb-6 select-none">
 
         <div className="flex gap-4 items-baseline py-4">
           <span className="text-xl font-semibold text-gray-900">Daily Verse</span>
@@ -90,9 +90,8 @@ export default function ConfigVerse() {
           </div>
           <div className="text-sm leading-6">
             <label htmlFor="verseEnabled" className="font-medium text-gray-900">
-              Enable
+              Enable the section
             </label>
-            <p className="text-gray-500">Enable / Disable this section.</p>
           </div>
         </div>
 
@@ -110,9 +109,8 @@ export default function ConfigVerse() {
           </div>
           <div className="text-sm leading-6">
             <label htmlFor="verseAuto" className="font-medium text-gray-900">
-              Auto Fill
+              Auto Fill <span className="font-normal text-gray-500">- Let Beacon provide a daily verse.</span>
             </label>
-            <p className="text-gray-500">Let Beacon provide a daily verse.</p>
           </div>
         </div>
 
