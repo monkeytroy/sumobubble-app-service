@@ -81,7 +81,7 @@ export default function SectionSelection() {
             <div className="grow-0">
               <div className="-mt-px flex divide-x divide-gray-200">
                 <div className="flex w-0 flex-1 px-2 py-4 items-center justify-center cursor-pointer hover:bg-gray-100"
-                  onClick={(e) => onSectionClick(section)} title="Click to enable or disable">
+                  onClick={() => onSectionClick(section)} title="Click to enable or disable">
                   {section.enabled && 'Enabled'}
                   {!section.enabled && 'Disabled'}
                 </div>

@@ -1,8 +1,7 @@
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "./auth/[...nextauth]"
-import { getToken } from "next-auth/jwt"
 
-export default async (req, res) => {
+export default async function restricted (req, res) {
   //const token = await getToken({ req })
   //console.log(token);
 

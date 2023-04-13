@@ -1,7 +1,7 @@
 import 'react-toastify/dist/ReactToastify.css';
 import { useEffect } from 'react';
 import { useAppStore } from '@/store/app-store';
-import { getServerSideProps, IAppProps } from '@/pages/server-side-props';
+import { getServerSideProps, IAppProps } from '@/server-side-props';
 import ConfigVerse from '@/components/config-verse';
 
 export default function VersePage(props: IAppProps) {
@@ -11,7 +11,7 @@ export default function VersePage(props: IAppProps) {
     
   useEffect(() => {
     setConfiguration(props.configuration);
-  }, []);
+  }, [setConfiguration, props.configuration]);
   
   return (
     <ConfigVerse></ConfigVerse>

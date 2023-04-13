@@ -14,7 +14,7 @@ const VerseTranslationSelect =
     onChangeTranslation: (translation: string) => void}) => {
 
   return (
-    <Listbox value={translation} onChange={(e) => onChangeTranslation(e)} disabled={disabled}>
+    <Listbox value={translation} onChange={(val) => onChangeTranslation(val)} disabled={disabled}>
       {({ open }) => (
         <>
           <Listbox.Label className="block text-sm font-medium leading-6 text-gray-900">Translation</Listbox.Label>

@@ -1,7 +1,7 @@
 
 import { saveConfig } from "@/services/config";
 import { IAppState, useAppStore } from "@/store/app-store";
-import { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent, useEffect, useCallback } from "react";
 import ConfigSubmit from "./config-submit";
 
 export default function ConfigFunny() {
@@ -18,16 +18,16 @@ export default function ConfigFunny() {
   
   const [saving, setSaving] = useState(false);
     
-  const reset = () => {
+  const reset = useCallback(() => {
     setEnabled(funny?.enabled || false);
     setAutoFill(typeof funny?.props?.autoFill !== 'undefined' ? funny?.props.autoFill : false);
     setContent(funny?.content || '');
     setUrls(funny?.urls || ['']);
-  }
+  }, [funny]);
 
   useEffect(() => {
     reset();
-  }, [configuration]);
+  }, [reset, configuration]);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();

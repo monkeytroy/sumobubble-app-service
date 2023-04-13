@@ -1,4 +1,4 @@
-import { getServerSideProps, IAppProps } from '@/pages/server-side-props';
+import { getServerSideProps, IAppProps } from '@/server-side-props';
 import ConfigSummary from '@/components/config-summary';
 import { useAppStore } from '@/store/app-store';
 import { useEffect } from 'react';
@@ -10,7 +10,7 @@ export default function Home(props: IAppProps) {
     
   useEffect(() => {
     setConfiguration(props.configuration);
-  }, []);
+  }, [setConfiguration, props.configuration]);
 
   return (
     <ConfigSummary></ConfigSummary>

@@ -1,6 +1,6 @@
 import { saveConfig } from "@/services/config";
 import { useAppStore, IAppState } from "@/store/app-store";
-import { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent, useEffect, useCallback } from "react";
 import ConfigSubmit from "./config-submit";
 
 export default function ConfigContact() {
@@ -16,15 +16,15 @@ export default function ConfigContact() {
   
   const [saving, setSaving] = useState(false);
 
-  const reset = () => {
+  const reset = useCallback(() => {
     setEnabled(typeof contact?.enabled !== 'undefined' ? contact.enabled : false);
     setContent(contact?.content || '');
     setEmail(contact?.props.email || '');
-  }
+  }, [contact]);
   
   useEffect(() => {
     reset();
-  },[configuration]);
+  }, [reset, configuration]);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault(); 

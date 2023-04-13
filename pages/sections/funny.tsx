@@ -1,7 +1,7 @@
 import 'react-toastify/dist/ReactToastify.css';
 import { useEffect } from 'react';
 import { useAppStore } from '@/store/app-store';
-import { getServerSideProps, IAppProps } from '@/pages/server-side-props';
+import { getServerSideProps, IAppProps } from '@/server-side-props';
 import ConfigFunny from '@/components/config-funny';
 
 export default function FunnyPage(props: IAppProps) {
@@ -11,7 +11,7 @@ export default function FunnyPage(props: IAppProps) {
     
   useEffect(() => {
     setConfiguration(props.configuration);
-  }, []);
+  }, [setConfiguration, props.configuration]);
   
   return (
     <ConfigFunny></ConfigFunny>

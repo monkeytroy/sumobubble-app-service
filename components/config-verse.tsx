@@ -1,6 +1,6 @@
 import { saveConfig } from "@/services/config";
 import { IAppState, useAppStore } from "@/store/app-store";
-import { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent, useEffect, useCallback } from "react";
 import ConfigSubmit from "./config-submit";
 import VerseTranslationSelect from "./verse-translation-select";
 
@@ -19,17 +19,17 @@ export default function ConfigVerse() {
   
   const [saving, setSaving] = useState(false);
   
-  const reset = () => {
+  const reset = useCallback(() => {
     setEnabled(typeof verse?.enabled !== 'undefined' ? verse?.enabled : false);
     setContent(verse?.content || '');
     setAutoFill(typeof verse?.props?.autoFill !== 'undefined' ? verse?.props?.autoFill : true);
     setVerseRef(verse?.props?.verseRef || '');
     setTranslation(verse?.props?.translation || 'ESV');
-  }
+  }, [verse]);
 
   useEffect(() => {
     reset();
-  }, [configuration]);
+  }, [reset, configuration]);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault(); 

@@ -1,5 +1,5 @@
 //import { PhotoIcon } from "@heroicons/react/24/solid";
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import ConfigSubmit from '@/components/config-submit';
 import { saveConfig } from '@/services/config';
 import { TwitterPicker } from 'react-color';
@@ -33,21 +33,21 @@ export default function ConfigSummary() {
   
   const [summaryLoading, setSummaryLoading] = useState(true);
   const editorRef = useRef({} as any);
-  const [dirty, setDirty] = useState(false);
+  //const [dirty, setDirty] = useState(false);
   const [newSummary, setNewSummary] = useState(summary);
 
-  const reset = () => {
+  const reset = useCallback(() => {
     setTitle(configuration?.customer?.title || '');
     setLogo(configuration?.customer?.logo?.url || '');
     setSummary(configuration?.summary?.content || '');
     setNewSummary(configuration?.summary?.content || '');
     setSpecial(configuration?.summary?.special || '');
     setThemePrimary(configuration?.customer?.theme?.primary || DEFAULT_THEME_COLOR)
-  }
+  }, [configuration]);
 
   useEffect(() => {
     reset();
-  }, [configuration]);
+  }, [reset, configuration]);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault(); 
@@ -77,7 +77,7 @@ export default function ConfigSummary() {
     setThemePrimary(color.hex);
   }
 
-  const onImagesUpload = (blobInfo:any, progress: any) => new Promise<string>(async (resolve, reject) => {
+  const onImagesUpload = (blobInfo:any) => new Promise<string>(async (resolve, reject) => {
     
     const res = await saveFile(configuration, blobInfo.blob());
 
@@ -179,8 +179,8 @@ export default function ConfigSummary() {
                 tinymceScriptSrc={'/tinymce/tinymce.min.js'}
                 onInit={(evt, editor) => { setSummaryLoading(false); editorRef.current = editor; }}
                 initialValue={summary}
-                onEditorChange={(newValue, editor) => setNewSummary(newValue)}
-                onDirty={() => setDirty(true)}
+                onEditorChange={(newValue) => setNewSummary(newValue)}
+                //onDirty={() => setDirty(true)}
                 init={{
                   images_upload_handler: onImagesUpload,
                   resize: false,

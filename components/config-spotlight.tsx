@@ -1,7 +1,7 @@
 import { saveConfig } from "@/services/config";
 import { IAppState, useAppStore } from "@/store/app-store";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-import { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import ConfigSubmit from "./config-submit";
 
@@ -19,15 +19,15 @@ export default function ConfigSpotlight() {
   
   const [saving, setSaving] = useState(false);
   
-  const reset = () => {
+  const reset = useCallback(() => {
     setEnabled(spotlight?.enabled || false);
     setContent(spotlight?.content || '');
     setUrls(spotlight?.urls || ['']);
-  }
+  }, [spotlight]);
 
   useEffect(() => {
     reset();
-  }, [configuration]);
+  }, [reset, configuration]);
 
   useEffect(() => {
     if (!enabled) {
