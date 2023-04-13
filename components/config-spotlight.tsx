@@ -8,7 +8,6 @@ import ConfigSubmit from "./config-submit";
 export default function ConfigSpotlight() {
 
   const configuration = useAppStore((state: IAppState) => state.configuration);
-  const token = useAppStore((state: IAppState) => state.token);
 
   const spotlight: IBeaconSection | undefined = configuration?.sections?.spotlight;
 
@@ -53,7 +52,7 @@ export default function ConfigSpotlight() {
       return;
     }
 
-    if (configuration && token) {
+    if (configuration) {
       setSaving(true);
 
       // copy configuration
@@ -75,7 +74,7 @@ export default function ConfigSpotlight() {
         spotlight: {...spotlight}
       }
 
-      await saveConfig(newConfiguration, token);
+      await saveConfig(newConfiguration);
     
       setTimeout(() => setSaving(false), 2000);
     }

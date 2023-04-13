@@ -6,6 +6,7 @@ import { TwitterPicker } from 'react-color';
 import { IAppState, useAppStore } from '@/store/app-store';
 import { Editor } from '@tinymce/tinymce-react';
 import ReactHtmlParser from 'react-html-parser';
+import { saveFile } from '@/services/file';
 
 export default function ConfigSummary() {
 
@@ -20,7 +21,6 @@ export default function ConfigSummary() {
   ];
 
   const configuration = useAppStore((state: IAppState) => state.configuration);
-  const token = useAppStore((state: IAppState) => state.token);
 
   const [title, setTitle] = useState('');
   const [logo, setLogo] = useState('');
@@ -52,7 +52,7 @@ export default function ConfigSummary() {
   const submit = async (e: FormEvent) => {
     e.preventDefault(); 
 
-    if (configuration && token) {
+    if (configuration) {
       setSaving(true);
 
       // copy configuration
@@ -67,7 +67,7 @@ export default function ConfigSummary() {
         primary: themePrimary
       }
 
-      await saveConfig(newConfiguration, token);
+      await saveConfig(newConfiguration);
 
       setTimeout(() => setSaving(false), 2000);
     }
@@ -76,6 +76,18 @@ export default function ConfigSummary() {
   const themeSelect = (color: any) => {
     setThemePrimary(color.hex);
   }
+
+  const onImagesUpload = (blobInfo:any, progress: any) => new Promise<string>(async (resolve, reject) => {
+    
+    const res = await saveFile(configuration, blobInfo.blob());
+
+    if (res.success) {
+      resolve(res.data.url);
+    } else {
+      reject('Oh no!');
+    }
+
+  });
 
   return (
     <form onSubmit={submit} onReset={() => reset()}>
@@ -170,10 +182,12 @@ export default function ConfigSummary() {
                 onEditorChange={(newValue, editor) => setNewSummary(newValue)}
                 onDirty={() => setDirty(true)}
                 init={{
+                  images_upload_handler: onImagesUpload,
                   resize: false,
                   height: '100%',
                   statusbar: false,
                   menu: {
+                    file: { title: 'File', items: ''},
                     edit: { title: 'Edit', items: 'undo redo | cut copy paste pastetext | selectall | searchreplace code' },
                     view: { title: 'View', items: '' }, // code visualaid visualchars visualblocks | spellchecker | preview fullscreen | showcomments
                     insert: { title: 'Insert', items: 'image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor tableofcontents | insertdatetime' },

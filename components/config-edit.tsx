@@ -6,7 +6,6 @@ import SectionSelection from './section-selection';
 export default function ConfigEdit() {
 
   const configuration = useAppStore((state: IAppState) => state.configuration);
-  const token = useAppStore((state: IAppState) => state.token);
 
   return (
     <div className="mx-auto max-w-5xl px-4 lg:px-10">

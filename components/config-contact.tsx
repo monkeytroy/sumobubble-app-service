@@ -6,7 +6,6 @@ import ConfigSubmit from "./config-submit";
 export default function ConfigContact() {
 
   const configuration = useAppStore((state: IAppState) => state.configuration);
-  const token = useAppStore((state: IAppState) => state.token);
 
   const contact: IBeaconSection | undefined = configuration?.sections?.contact;
 
@@ -30,7 +29,7 @@ export default function ConfigContact() {
   const submit = async (e: FormEvent) => {
     e.preventDefault(); 
 
-    if (configuration && token) {
+    if (configuration) {
       setSaving(true);
 
       // copy configuration
@@ -53,7 +52,7 @@ export default function ConfigContact() {
       };
 
       // save!
-      await saveConfig(newConfiguration, token);
+      await saveConfig(newConfiguration);
 
       setTimeout(() => setSaving(false), 2000);
     }

@@ -1,12 +1,12 @@
-import '@/styles/globals.css';
-//@ts-ignore 
-import '@/styles/summary.scss';
-import type { AppContext, AppInitialProps, AppLayoutProps, AppProps } from 'next/app';
+import type { AppContext, AppInitialProps, AppLayoutProps } from 'next/app';
 import { SessionProvider } from 'next-auth/react';
 import 'react-toastify/dist/ReactToastify.css';
-import { ReactElement, ReactNode, ReactNodeArray } from 'react';
+import { ReactElement } from 'react';
 import { NextComponentType } from 'next';
 import Layout from '@/components/layout';
+
+import '@/styles/globals.css';
+import '@/styles/summary.scss';
 
 const defaultGetLayout = (page: ReactElement) => {
   return (

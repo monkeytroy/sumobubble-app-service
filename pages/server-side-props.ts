@@ -1,11 +1,10 @@
 import Configuration from "@/models/config";
 import { CtxOrReq } from "next-auth/client/_utils";
 import { getSession } from "next-auth/react";
-import connectMongo from "./mongoose";
+import connectMongo from "../services/mongoose";
 
 export interface IAppProps {
   configuration?: IBeaconConfig;
-  token?: string;
 }
 
 export const getServerSideProps = async (context: CtxOrReq) => {
@@ -24,8 +23,7 @@ export const getServerSideProps = async (context: CtxOrReq) => {
 
     // Pass data to the page via props
     return { props: { 
-      configuration: configurationRes,
-      token: process.env.API_TOKEN
+      configuration: configurationRes
     } }
   } else {
     return { props: {

@@ -7,7 +7,6 @@ import VerseTranslationSelect from "./verse-translation-select";
 export default function ConfigVerse() {
 
   const configuration = useAppStore((state: IAppState) => state.configuration);
-  const token = useAppStore((state: IAppState) => state.token);
 
   const verse: IBeaconSection | undefined = configuration?.sections?.verse;
 
@@ -35,7 +34,7 @@ export default function ConfigVerse() {
   const submit = async (e: FormEvent) => {
     e.preventDefault(); 
     
-    if (configuration && token) {
+    if (configuration) {
       setSaving(true);
 
       // copy configuration
@@ -60,7 +59,7 @@ export default function ConfigVerse() {
       }
 
       // save!
-      await saveConfig(newConfiguration, token);
+      await saveConfig(newConfiguration);
     
       setTimeout(() => setSaving(false), 2000);
     }

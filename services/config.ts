@@ -1,11 +1,11 @@
 import { toast } from "react-toastify";
 
-export const saveConfig = async (config: IBeaconConfig, token: string) => {
-  
+export const saveConfig = async (config: IBeaconConfig) => {
+
   const res = await fetch(`/api/config/${config.customerId}`, {
     method: 'POST',
     headers: {
-      Authorization: token
+      //Authorization: 'Bearer ' + 
     },
     body: JSON.stringify(config)
   });

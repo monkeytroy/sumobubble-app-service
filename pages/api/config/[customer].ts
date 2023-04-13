@@ -9,10 +9,9 @@ import Configuration from '@/models/config';
 import Funny, { IFunny } from '@/models/funny';
 import Verse from '@/models/verse';
 import { log } from '@/services/log';
+import { getToken } from 'next-auth/jwt';
 
 const crypto = new SimpleCrypto(process.env.CRYPTO_KEY);
-
-const JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJCRUFDT04iLCJuYW1lIjoiR2xvYmFsIiwiaWF0IjoxNTE2MTM5MDIyfQ.eVrEhwKxF4Dfj2S5fFFMnwLAae-E1h3Ilo9PQKgPYic';
 
 const cors = Cors({
   methods: ['GET', 'GET', 'HEAD'],
@@ -127,8 +126,10 @@ const invalid = (res: NextApiResponse, reason: string) => {
 
 const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) => {
 
+  const session = await getToken({ req, secret: process.env.JWT_SECRET })
+
   // early exit if not authorized.
-  if (req.headers.authorization != JWT) {
+  if (!session) {
     res.status(403).send({ success: false, message: 'Unauthorized'});
     return 
   }

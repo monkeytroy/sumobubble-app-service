@@ -7,7 +7,6 @@ import ConfigSubmit from "./config-submit";
 export default function ConfigFunny() {
 
   const configuration = useAppStore((state: IAppState) => state.configuration);
-  const token = useAppStore((state: IAppState) => state.token);
   
   const funny: IBeaconSection | undefined = configuration?.sections?.funny;
 
@@ -33,7 +32,7 @@ export default function ConfigFunny() {
   const submit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (configuration && token) {
+    if (configuration) {
 
       setSaving(true);
 
@@ -57,7 +56,7 @@ export default function ConfigFunny() {
         funny: {...funny}
       }
 
-      await saveConfig(newConfiguration, token);
+      await saveConfig(newConfiguration);
 
       setTimeout(() => setSaving(false), 2000);
     }    
