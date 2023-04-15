@@ -2,9 +2,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useEffect } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { getServerSideProps, IAppProps } from '@/server-side-props';
-import ConfigContact from '@/components/config-contact';
+import { useRouter } from 'next/router';
+import { sections } from '@/components/sections/sections';
 
-export default function ContactPage(props: IAppProps) {
+export default function SectionPage(props: IAppProps) {
+
+  const router = useRouter();
+  const { section } = router.query || 'contact';
 
   // app props on app state
   const setConfiguration = useAppStore((state: any) => state.setConfiguration);
@@ -14,7 +18,9 @@ export default function ContactPage(props: IAppProps) {
   }, [setConfiguration, props.configuration]);
   
   return (
-    <ConfigContact></ConfigContact>
+    <>
+      {sections.find((val) => val.name.toLowerCase() == section)?.component}
+    </>
   )
 }
 

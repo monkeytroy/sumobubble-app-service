@@ -1,16 +1,29 @@
 import { saveConfig } from "@/services/config";
 import { IAppState, useAppStore } from "@/store/app-store";
-import { useState, FormEvent, useEffect, useCallback } from "react";
-import ConfigSubmit from "./config-submit";
-import VerseTranslationSelect from "./verse-translation-select";
+import { BookOpenIcon } from "@heroicons/react/24/outline";
+import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
+import ConfigSubmit from "../config-submit";
+import VerseTranslationSelect from "../verse-translation-select";
+import { ISection } from "./sections";
+
+export const section: ISection = {
+  name: 'verse',
+  title: 'Verse',
+  description: 'A custom static or automatic daily verse in the translation of your choice.',
+  href: '/sections/verse',
+  icon: <BookOpenIcon/>,
+  class: 'ml-2 text-xs',
+  component: <ConfigVerse/>
+};
 
 export default function ConfigVerse() {
 
   const configuration = useAppStore((state: IAppState) => state.configuration);
 
-  const verse: IBeaconSection | undefined = configuration?.sections?.verse;
+  // load this section.
+  const thisSection: IBeaconSection | undefined = configuration?.sections[section.name];
 
-  //const [title, setTitle] = useState('');
+  // setup local state for editing.
   const [enabled, setEnabled] = useState(false);
   const [content, setContent] = useState('');
   const [autoFill, setAutoFill] = useState(true);
@@ -18,14 +31,17 @@ export default function ConfigVerse() {
   const [translation, setTranslation] = useState('ESV');
   
   const [saving, setSaving] = useState(false);
-  
+  const [invalid, setInvalid] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // reset / init the content when thisSection is set
   const reset = useCallback(() => {
-    setEnabled(typeof verse?.enabled !== 'undefined' ? verse?.enabled : false);
-    setContent(verse?.content || '');
-    setAutoFill(typeof verse?.props?.autoFill !== 'undefined' ? verse?.props?.autoFill : true);
-    setVerseRef(verse?.props?.verseRef || '');
-    setTranslation(verse?.props?.translation || 'ESV');
-  }, [verse]);
+    setEnabled(typeof thisSection?.enabled !== 'undefined' ? thisSection?.enabled : false);
+    setContent(thisSection?.content || '');
+    setAutoFill(typeof thisSection?.props?.autoFill !== 'undefined' ? thisSection?.props?.autoFill : true);
+    setVerseRef(thisSection?.props?.verseRef || '');
+    setTranslation(thisSection?.props?.translation || 'ESV');
+  }, [thisSection]);
 
   useEffect(() => {
     reset();
@@ -41,8 +57,7 @@ export default function ConfigVerse() {
       const newConfiguration = JSON.parse(JSON.stringify(configuration));
 
       // create the new section
-      const verse: IBeaconSection = {
-        //title,
+      const newSection: IBeaconSection = {
         enabled,
         content,
         props: {
@@ -55,7 +70,7 @@ export default function ConfigVerse() {
       // spread it out... old first
       newConfiguration.sections = {
         ...newConfiguration.sections,
-        verse: {...verse}      
+        [section.name]: {...newSection}    
       }
 
       // save!
@@ -70,13 +85,13 @@ export default function ConfigVerse() {
   }
 
   return (
-    <form onSubmit={submit} onReset={reset}>
+    <form onSubmit={submit} onReset={reset} ref={formRef}>
       <div className="flex flex-col gap-4 pb-6 select-none">
 
         <div className="flex gap-4 items-baseline py-4">
-          <span className="text-xl font-semibold text-gray-900">Daily Verse</span>
+          <span className="text-xl font-semibold text-gray-900">{section.title}</span>
           <span className="text-sm text-gray-600">
-            An automatic or personal verse of the day in the translation of your choice.
+            {section.description}
           </span>
         </div>
 
@@ -144,7 +159,7 @@ export default function ConfigVerse() {
         </div>
       </div>
 
-      <ConfigSubmit saving={saving}></ConfigSubmit>
+      <ConfigSubmit saving={saving} invalid={invalid}></ConfigSubmit>
     </form>
   )
 }

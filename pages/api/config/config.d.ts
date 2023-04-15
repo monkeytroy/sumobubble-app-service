@@ -4,10 +4,7 @@ enum Sections {
 }
 
 interface IBeaconSections {
-  contact?: IBeaconSection,
-  verse?: IBeaconSection,
-  spotlight?: IBeaconSection,
-  funny?: IBeaconSection
+  [name: string]: IBeaconSection
 }
 
 interface IBeaconSection {
@@ -15,12 +12,13 @@ interface IBeaconSection {
   enabled: boolean;
   content: string;
   urls?: string[];
-  props: {
+  props?: {
     verseRef?: string;
     autoFill?: boolean;
     translation?: string;
-    email?: string;
+    email?: string[];
     copyright?: string;
+    categories?: IContactCategory[];
   }
 }
 
@@ -56,4 +54,9 @@ type ConfigRes = {
   success: boolean,
   message: string,
   data: IBeaconConfig
+}
+
+interface IContactCategory {
+  title: string,
+  email: string
 }

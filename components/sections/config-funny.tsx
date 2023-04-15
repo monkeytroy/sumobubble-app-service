@@ -1,14 +1,27 @@
 
 import { saveConfig } from "@/services/config";
 import { IAppState, useAppStore } from "@/store/app-store";
-import { useState, FormEvent, useEffect, useCallback } from "react";
-import ConfigSubmit from "./config-submit";
+import { FaceSmileIcon } from "@heroicons/react/24/outline";
+import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
+import ConfigSubmit from "../config-submit";
+import { ISection } from "./sections";
+
+export const section: ISection = {
+  name: 'funny',
+  title: 'Daily Funny',
+  description: 'A custom or automatic daily funny item!',
+  href: '/sections/funny',
+  icon: <FaceSmileIcon/>,
+  class: 'ml-2 text-xs',
+  component: <ConfigFunny/>
+};
 
 export default function ConfigFunny() {
 
   const configuration = useAppStore((state: IAppState) => state.configuration);
   
-  const funny: IBeaconSection | undefined = configuration?.sections?.funny;
+  // load this section.
+  const thisSection: IBeaconSection | undefined = configuration?.sections[section.name];
 
   //const [title, setTitle] = useState('');
   const [enabled, setEnabled] = useState(false);
@@ -17,13 +30,15 @@ export default function ConfigFunny() {
   const [urls, setUrls] = useState(['']);
   
   const [saving, setSaving] = useState(false);
-    
+  const [invalid, setInvalid] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  
   const reset = useCallback(() => {
-    setEnabled(funny?.enabled || false);
-    setAutoFill(typeof funny?.props?.autoFill !== 'undefined' ? funny?.props.autoFill : false);
-    setContent(funny?.content || '');
-    setUrls(funny?.urls || ['']);
-  }, [funny]);
+    setEnabled(thisSection?.enabled || false);
+    setAutoFill(typeof thisSection?.props?.autoFill !== 'undefined' ? thisSection?.props.autoFill : false);
+    setContent(thisSection?.content || '');
+    setUrls(thisSection?.urls || ['']);
+  }, [thisSection]);
 
   useEffect(() => {
     reset();
@@ -40,8 +55,7 @@ export default function ConfigFunny() {
       const newConfiguration = JSON.parse(JSON.stringify(configuration));
 
       // create the new section
-      const funny: IBeaconSection = {
-        //title,
+      const newSection: IBeaconSection = {
         enabled,
         content,
         urls,
@@ -53,7 +67,7 @@ export default function ConfigFunny() {
       // spread it out... old first
       newConfiguration.sections = {
         ...newConfiguration.sections,
-        funny: {...funny}
+        [section.name]: {...newSection}
       }
 
       await saveConfig(newConfiguration);
@@ -63,13 +77,13 @@ export default function ConfigFunny() {
   }
 
   return (
-    <form onSubmit={submit} onReset={() => reset()}>
+    <form onSubmit={submit} onReset={() => reset()} ref={formRef}>
       <div className="flex flex-col gap-4 pb-6 select-none">
 
         <div className="flex gap-4 items-baseline py-4">
-          <span className="text-xl font-semibold text-gray-900">Daily Funny</span>
+          <span className="text-xl font-semibold text-gray-900">{section.title}</span>
           <span className="text-sm text-gray-600">
-            An automatic or personal funny of the day.
+            {section.description}
           </span>
         </div>
         
@@ -138,7 +152,7 @@ export default function ConfigFunny() {
           </div>
         </div>
       </div>
-      <ConfigSubmit saving={saving}></ConfigSubmit>
+      <ConfigSubmit saving={saving} invalid={invalid}></ConfigSubmit>
     </form>
   )
 }

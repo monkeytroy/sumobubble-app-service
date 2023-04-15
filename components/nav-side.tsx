@@ -1,20 +1,31 @@
 import {
   BookmarkIcon,
-  BookOpenIcon,
-  DocumentDuplicateIcon,
   HomeIcon,
-  InformationCircleIcon,
-  TvIcon,
-  UsersIcon,
+  InformationCircleIcon
 } from '@heroicons/react/24/outline'
 
-const navigation = [
-  { name: 'Summary', href: '/', icon: HomeIcon, current: true},
-  { name: 'Sections', href: '/sections', icon: BookmarkIcon, current: false },
-  { name: 'Contact', href: '/sections/contact', icon: UsersIcon, current: false, sub: true },
-  { name: 'Verse', href: '/sections/verse', icon: BookOpenIcon, current: false, sub: true },
-  { name: 'Spotlight', href: '/sections/spotlight', icon: TvIcon, current: false, sub: true },
-  { name: 'Funny', href: '/sections/funny', icon: DocumentDuplicateIcon, current: false, sub: true }
+import { ISection, sections } from '@/components/sections/sections';
+import { useRouter } from 'next/router';
+
+// configuration so 'current' works.
+const navigation: Array<ISection> = [
+  { 
+    name: 'summary', 
+    title: 'Summary',
+    description: 'Summary info displayed when app is opened', 
+    href: '/', 
+    icon: <HomeIcon/>, 
+    class: 'text-sm' 
+  },
+  { 
+    name: 'sections', 
+    title: 'Sections',
+    description: 'All available sections', 
+    href: '/sections', 
+    icon: <BookmarkIcon/>, 
+    class: 'text-sm' 
+  },
+  ...sections
 ]
 
 function classNames(...classes: string[]) {
@@ -22,6 +33,15 @@ function classNames(...classes: string[]) {
 }
 
 export default function NavSide() {
+
+  const router = useRouter();
+  const { section } = router.query;
+  const currentRoute = router.route;
+
+  const current = (item: ISection) => {
+    return currentRoute == item.href || section == item.name.toLowerCase()
+  }
+
   return (
     <div className="flex shrink-0 flex-col gap-y-5 overflow-y-auto bg-indigo-600 px-6">
       <div className="flex h-16 shrink-0 items-center">
@@ -33,33 +53,23 @@ export default function NavSide() {
             <ul role="list" className="-mx-2 space-y-1">
               {navigation.map((item) => (
                 <li key={item.name}>
-                  <a
-                    href={item.href}
+                  <a href={item.href}
                     className={classNames(
-                      item.sub ? 'ml-2 text-xs' : 'text-sm',
-                      item.current
+                      item.class,
+                      current(item)
                         ? 'bg-indigo-700 text-white'
                         : 'text-indigo-200 hover:text-white hover:bg-indigo-700',
                       'group flex gap-x-3 rounded-md p-2 leading-6 font-semibold'
                     )}
                   >
-                    <item.icon
-                      className={classNames(
-                        item.current ? 'text-white' : 'text-indigo-200 group-hover:text-white',
+                    <span className={classNames(
+                        current(item) ? 'text-white' : 'text-indigo-200 group-hover:text-white',
                         'h-6 w-6 shrink-0'
                       )}
                       aria-hidden="true"
-                    />
-                    {item.name}
-                  
-                    {/* {item.count ? (
-                      <span
-                        className="ml-auto w-9 min-w-max whitespace-nowrap rounded-full bg-indigo-600 px-2.5 py-0.5 text-center text-xs font-medium leading-5 text-white ring-1 ring-inset ring-indigo-500"
-                        aria-hidden="true"
-                      >
-                        {item.count}
-                      </span>
-                    ) : null} */}
+                    >{item.icon}
+                    </span>
+                    {item.title}
                   </a>
                 </li>
               ))}

@@ -1,6 +1,7 @@
  
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
+import { log } from './services/log';
 
 const UNAUTH_PAGE = '/login';
 
@@ -46,8 +47,17 @@ export const middleware = async (req: NextRequest, res: NextResponse) => {
     )
   }
 
+  log('pathname: ' + req.nextUrl.pathname);
+
+  const pathname = req.nextUrl.pathname;
+
   // validate page routes
-  if (!session && protectedRoutes.includes(req.nextUrl.pathname)) {
+  if (!session && 
+      (
+        protectedRoutes.includes(pathname) || 
+        protectedRoutes.filter((val) => (val.endsWith('*') && pathname.startsWith(val.replace('*', '')))).length > 0
+      )
+    ) {
     return NextResponse.redirect(new URL(UNAUTH_PAGE, req.url));
   }
 

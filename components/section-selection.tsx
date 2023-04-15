@@ -1,57 +1,17 @@
 import { useAppStore, IAppState } from '@/store/app-store';
-import { AtSymbolIcon, BookOpenIcon,  
-    FaceSmileIcon, VideoCameraIcon } from '@heroicons/react/24/outline';
 import router from 'next/router';
-import { useMemo } from 'react';
-
-interface ISectionRender {
-  name: string,
-  title: string,
-  enabled: boolean,
-  url?: string,
-  icon: any
-}
+import { ISection, sections } from '@/components/sections/sections';
 
 export default function SectionSelection() {
 
   const configuration = useAppStore((state: IAppState) => state.configuration);
   const enableSection = useAppStore((state: IAppState) => state.enableSection);
 
-  const sections = useMemo((): Array<ISectionRender> => {
-    return [
-      {
-        name: 'Contact',
-        title: 'Contact form with customizable intro.',
-        enabled: configuration?.sections?.contact?.enabled || false,
-        url: '/sections/contact',
-        icon: <AtSymbolIcon className="color-gray-600"></AtSymbolIcon>
-      },
-      {
-        name: 'Verse',
-        title: 'A custom static or automatic daily verse in the translation of your choice.',
-        enabled: configuration?.sections?.verse?.enabled || false,
-        url: '/sections/verse',
-        icon: <BookOpenIcon></BookOpenIcon>
-      },
-      {
-        name: 'Spotlight',
-        title: 'A video or channel to spotlight for your guests.',
-        enabled: configuration?.sections?.spotlight?.enabled || false,
-        url: '/sections/spotlight',
-        icon: <VideoCameraIcon></VideoCameraIcon>
-      },
-      {
-        name: 'Funny',
-        title: 'A custom or automatic daily funny item!',
-        enabled: configuration?.sections?.funny?.enabled || false,
-        url: '/sections/funny',
-        icon: <FaceSmileIcon></FaceSmileIcon>
-      }
-    ];
-  }, [configuration]);
-
-  const onSectionClick = (section: ISectionRender) => {
-    enableSection(!section.enabled, section.name.toLowerCase());
+  const onSectionClick = (section: ISection) => {
+    enableSection(
+      !(!!configuration?.sections[section.name.toLowerCase() as keyof IBeaconSections]),
+      section.name.toLowerCase()
+    );
   }
 
   return (
@@ -82,11 +42,11 @@ export default function SectionSelection() {
               <div className="-mt-px flex divide-x divide-gray-200">
                 <div className="flex w-0 flex-1 px-2 py-4 items-center justify-center cursor-pointer hover:bg-gray-100"
                   onClick={() => onSectionClick(section)} title="Click to enable or disable">
-                  {section.enabled && 'Enabled'}
-                  {!section.enabled && 'Disabled'}
+                  {!!configuration?.sections[section.name.toLowerCase() as keyof IBeaconSections]?.enabled && 'Enabled'}
+                  {!(!!configuration?.sections[section.name.toLowerCase() as keyof IBeaconSections]?.enabled) && 'Disabled'}
                 </div>
                 <div className="flex w-0 flex-1 px-2 py-4 items-center justify-center cursor-pointer hover:bg-gray-100"
-                  onClick={() => section.url ? router.push(section.url) : null}>
+                  onClick={() => section.href ? router.push(section.href) : null}>
                   Configure
                 </div>
               </div>

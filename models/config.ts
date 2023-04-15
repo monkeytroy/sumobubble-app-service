@@ -4,7 +4,11 @@ const sectionSchema = new Schema<IBeaconSection>({
   title: { type: String, required: true},
   enabled: { type: Boolean, required: true },
   content: { type: String, trim: true },
-  urls: [{ type: String, trim: true }],
+  urls: {
+    type: Array<String>,
+    trim: true, 
+    required: false
+  },
   props: {
     verseRef: String,
     autoFill: Boolean,
@@ -15,7 +19,7 @@ const sectionSchema = new Schema<IBeaconSection>({
       min: 3
     },
     email: {
-      type: [String], 
+      type: Array<String>, 
       default: undefined,
       validate: {
         validator: (val: string) => {
@@ -24,6 +28,11 @@ const sectionSchema = new Schema<IBeaconSection>({
         message: 'Contact is not a valid email failed'
       }
     },
+    categories: {
+      type: Array<IContactCategory>,
+      default: undefined,
+      required: false
+    }
   }
 });
 
@@ -52,12 +61,8 @@ const configSchema = new Schema<IBeaconConfig>({
     required: true
   },
   sections: {
-    type: {
-      contact: sectionSchema,
-      verse: sectionSchema,
-      spotlight: sectionSchema,
-      funny: sectionSchema
-    },
+    type: Map,
+    of: sectionSchema,
     required: true
   }
 });

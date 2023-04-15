@@ -1,26 +1,42 @@
 import { saveConfig } from "@/services/config";
 import { useAppStore, IAppState } from "@/store/app-store";
-import { useState, FormEvent, useEffect, useCallback } from "react";
-import ConfigSubmit from "./config-submit";
+import { ExclamationCircleIcon, UsersIcon } from "@heroicons/react/24/outline";
+import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
+import ConfigSubmit from "../config-submit";
+import { ISection } from "./sections";
+
+export const section: ISection = {
+  name: 'contact',
+  title: 'Contact Us',
+  description: 'Contact form with customizable intro.',
+  href: '/sections/contact',
+  icon: <UsersIcon/>,
+  class: 'ml-2 text-xs',
+  component: <ConfigContact/>
+};
 
 export default function ConfigContact() {
 
   const configuration = useAppStore((state: IAppState) => state.configuration);
 
-  const contact: IBeaconSection | undefined = configuration?.sections?.contact;
+  // load this section.
+  const thisSection: IBeaconSection | undefined = configuration?.sections[section.name];
 
-  //const [title, setTitle] = useState('');
+  // setup local state for editing.
   const [enabled, setEnabled] = useState(false);
   const [content, setContent] = useState('');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState([] as Array<string>);
   
   const [saving, setSaving] = useState(false);
+  const [invalid, setInvalid] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
+  // reset / init the content when thisSection is set
   const reset = useCallback(() => {
-    setEnabled(typeof contact?.enabled !== 'undefined' ? contact.enabled : false);
-    setContent(contact?.content || '');
-    setEmail(contact?.props.email || '');
-  }, [contact]);
+    setEnabled(typeof thisSection?.enabled !== 'undefined' ? thisSection.enabled : false);
+    setContent(thisSection?.content || '');
+    setEmail(thisSection?.props?.email || []);
+  }, [thisSection]);
   
   useEffect(() => {
     reset();
@@ -29,6 +45,12 @@ export default function ConfigContact() {
   const submit = async (e: FormEvent) => {
     e.preventDefault(); 
 
+    setInvalid(false);
+    if (enabled && !email) {
+      setInvalid(true);
+      return;
+    }
+
     if (configuration) {
       setSaving(true);
 
@@ -36,8 +58,7 @@ export default function ConfigContact() {
       const newConfiguration = JSON.parse(JSON.stringify(configuration));
 
       // create the new section
-      const contact: IBeaconSection = {
-        //title,
+      const newSection: IBeaconSection = {
         enabled,
         content,
         props: {
@@ -47,9 +68,9 @@ export default function ConfigContact() {
 
       // spread it out...  old first
       newConfiguration.sections = {
-        ...configuration.sections,
-        contact: {...contact}
-      };
+        ...newConfiguration.sections,
+        [section.name]: {...newSection}
+      }
 
       // save!
       await saveConfig(newConfiguration);
@@ -58,14 +79,18 @@ export default function ConfigContact() {
     }
   }
 
+  useEffect(() => {
+    setInvalid(enabled && (email.length == 0 || !formRef.current?.checkValidity()));
+  }, [email, enabled])
+
   return (
-    <form onSubmit={submit} onReset={reset}>
+    <form onSubmit={submit} onReset={reset} ref={formRef}>
       <div className="flex flex-col gap-6 pb-6 select-none">
 
         <div className="flex gap-4 items-baseline py-4">
-          <span className="text-xl font-semibold text-gray-900">Contact</span>
+          <span className="text-xl font-semibold text-gray-900">{section.title}</span>
           <span className="text-sm text-gray-600">
-            Configure the Contact Panel
+            {section.description}
           </span>
         </div>
 
@@ -102,20 +127,29 @@ export default function ConfigContact() {
           <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
             Target email address(s) - Comma separated
           </label>
-          <div className="mt-2">
-            <input
+          <div className="relative mt-2">
+            <input required
               id="email" name="email" type="email"
-              value={email} onChange={e => setEmail(e.target.value)} disabled={!enabled}
+              value={email} 
+              onChange={e => setEmail([e.target.value])} 
+              disabled={!enabled}
+              placeholder="you@example.com"
+              aria-invalid={invalid}
+              aria-describedby="email-error"
               autoComplete="email"
-              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm 
-                ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 disabled:opacity-30
-                focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              className="peer disabled:opacity-30
+              block w-full rounded-md border-0 text-gray-900 invalid:text-red-900 shadow-sm py-1.5 pr-10 
+              ring-1 ring-inset ring-gray-300 invalid:ring-red-300 placeholder:text-gray-300 
+              focus:ring-2 focus:ring-inset focus:ring-indigo-600 invalid:focus:ring-red-500 sm:py-1.5 sm:text-sm sm:leading-6"
             />
+            <div className="hidden peer-invalid:flex pointer-events-none absolute inset-y-0 right-0 items-center pr-3">
+              <ExclamationCircleIcon className="h-5 w-5 text-red-500" aria-hidden="true" />
+            </div>
           </div>
         </div>
       </div>
 
-      <ConfigSubmit saving={saving}></ConfigSubmit>
+      <ConfigSubmit saving={saving} invalid={invalid}></ConfigSubmit>
         
     </form>
   )
