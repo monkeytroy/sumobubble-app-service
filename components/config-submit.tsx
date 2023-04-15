@@ -1,5 +1,5 @@
 
-export default function ConfigSubmit({ saving, invalid }: { saving: boolean, invalid: boolean}) {
+export default function ConfigSubmit({ saving, invalid }: { saving: boolean, invalid?: boolean}) {
 
   return (
     <div className="flex items-center justify-start gap-x-6">
