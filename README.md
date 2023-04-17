@@ -37,7 +37,7 @@ DB config manually created to start.  At some point will be schema based...
     "content": "***There is no student service this week.*** &#x1F600; \n\n No '<b>html</b>' allowed."
   },
   "contact": {
-    "content": "Please let us know how we can server you.",
+    "content": "Please let us know how we can serve you.",
     "contact": "fredarters@gmail.com"
   },  
   "social": {

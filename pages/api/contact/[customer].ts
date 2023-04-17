@@ -18,10 +18,12 @@ type ContactRes = {
 
 type ContactData = {
   section: string,
-  category: string,
+  category?: string,
   email: string,
   name: string,  
   message: string,
+  phone?: string,
+  moreInfo?: boolean,
   token: string
 }
 
@@ -49,6 +51,8 @@ export default async function handler(
       category,
       email,
       name,
+      phone,
+      moreInfo,
       message, 
       token
     }: ContactData = JSON.parse(req.body);
@@ -70,21 +74,34 @@ export default async function handler(
         log(`Section: ${sectionRec}`);
 
         if (sectionRec) {
+
+          // setup email message
+          let bodyText = `A message from <b>${name} ${email} ${phone}</b> <br/> `;
+          if (moreInfo) {
+            bodyText += '<p>Who would like to be added to newsletter or mailing list to receive updates and information.';
+          } else {
+            bodyText += '<p>Do NOT add to newsletter or mailing list to receive updates and information';
+          }
+          bodyText += `<p>${message}</p>`;
+
+          const mailBody = {
+            emailTo: '',
+            name,
+            subject: `Beacon contact from ${name}`,
+            body: bodyText
+          }
+
           // if category was provided.. get contact info.
           if (category) {
             const categoryRec = sectionRec?.props.categories.find((val: IContactCategory) => val.title.toLowerCase() == category.toLowerCase());
             log(`Category: ${JSON.stringify(categoryRec)}`);
 
             if (categoryRec) {
+              log('we made it! ' + JSON.stringify(categoryRec.email));
+              
+              mailBody.emailTo = categoryRec;
 
-              console.log('we made it! ' + JSON.stringify(categoryRec.email));
-
-              mailIt({
-                emailTo: categoryRec.email,
-                name,
-                subject: `Beacon contact from ${name}`,
-                body: `A message from <b>${name} ${email}</b> <br/> <p>${message}</p>`
-              });
+              mailIt(mailBody);
 
               resultStatus = 200;
               result.success = true;
@@ -96,14 +113,11 @@ export default async function handler(
             log(`Email destination: ${JSON.stringify(sectionRec?.props)}`);
 
             if (emailRec && emailRec[0]) {
-              console.log('we made it using email ' + JSON.stringify(emailRec[0]));
+              log('we made it using email ' + JSON.stringify(emailRec[0]));
 
-              mailIt({
-                emailTo: emailRec[0],
-                name,
-                subject: `Beacon contact from ${name}`,
-                body: `A message from <b>${name} ${email}</b> <br/> <p>${message}</p>`
-              });
+              mailBody.emailTo = emailRec[0];
+
+              mailIt(mailBody);
 
               resultStatus = 200;
               result.success = true;
