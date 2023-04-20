@@ -1,7 +1,7 @@
 name: Daily VoD check cron job
 on:
   schedule:
-    - cron: '45 2,4 * * *'
+    - cron: '45 2,3 * * *'
 jobs:
   cron:
     runs-on: ubuntu-latest
