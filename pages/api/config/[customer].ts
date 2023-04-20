@@ -50,7 +50,7 @@ const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
   
     const configuration = await Configuration.findOne({ customerId: customer });
 
-    const resTest = await Configuration.find();
+    //const resTest = await Configuration.find();
 
     // fetch the customer
     if (configuration) {
@@ -59,11 +59,14 @@ const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
       await getDailyVerse(configuration);
 
       // fix spotlight url
-      if (configuration.sections?.spotlight) {
-        let spotlightUrl = configuration.sections?.spotlight?.urls[0];
+      //log(`Checking spotlight url. ` + configuration);
+      const spotlight = configuration.sections?.get('spotlight');
+      if (spotlight) {
+        let spotlightUrl = spotlight?.urls[0];
+        //log(`Spotlight url: ${spotlightUrl}`);
         if (spotlightUrl.indexOf('watch?v=') > 0) {
           spotlightUrl = spotlightUrl.replace('watch?v=', 'embed/');
-          configuration.sections.spotlight.urls = [spotlightUrl];
+          spotlight.urls = [spotlightUrl];
         }
       }
       
@@ -173,62 +176,66 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
 
 const getDailyVerse = async (custConfig: any) => {
   
-  if (custConfig.sections.verse) {
+  log('getDailyVerse -------------------------------------------------------');
+  const verse = JSON.parse(JSON.stringify(custConfig.sections.get('verse') || {}));
+  if (verse && verse.enabled) {
+
+    log('verse:', verse);
+
     const d = new Date();
     const findToday = parseInt((d.toISOString().split('T')[0]).replace(/\-/g, ''));
 
-    // copy the verse.
-    const verse = JSON.parse(JSON.stringify(custConfig.sections.verse || {}));
+    const trans = verse.props.translation || DEFAULT_TRANSLATION;
 
-    if (verse && verse.enabled) {
-      const trans = verse.props.translation || DEFAULT_TRANSLATION;
+    // get translation copyright. 
+    verse.props.copyright = translations[trans as Translation].copyright || '';
+    log('copyright:', verse.props.copyright);
+    
+    // if cust config does not have a verse set.. get daily
+    if (verse.props.autoFill) {
+      try {
+        const verseRes = await Verse.find({day: { $lte: findToday }}).sort({ day: -1}).limit(1);
+        log('verseRes:', verseRes);
 
-      // get translation copyright. 
-      verse.props.copyright = translations[trans as Translation].copyright || '';
+        if (verseRes[0]) {
+          const daily = verseRes[0];          
+          verse.props.verseRef = daily.verseRef;
 
-      log('copyright:', verse.props.copyright);
-      log('verse:', verse);
-
-      // if cust config does not have a verse set.. get daily
-      if (verse.props.autoFill) {
-        try {
-          const verseRes = await Verse.find({day: { $lte: findToday }}).sort({ day: -1}).limit(1);
-          log('verseRes:', verseRes);
-
-          if (verseRes[0]) {
-            const daily = verseRes[0];          
-            verse.props.verseRef = daily.verseRef;
-
-            // merge in the verse by the translation
-            const content: string = daily.verses.get(trans);
+          // merge in the verse by the translation
+          const content: string = daily.verses.get(trans);
+          if (content) {
             verse.content = content;
+          } else {
+            verse.content = 'Verse translation unavailable.';
           }
-        } catch(err) {
-          console.log('Could not pull in funny for today.', err);
         }
+      } catch(err) {
+        console.log('Could not pull in verse for today.', err);
       }
-
-      custConfig.sections.verse = {...verse};
-      log('getDailyVerse setting verse section: ', custConfig.sections.verse);
-
     }
+
+    custConfig.sections.set('verse', verse);
+    log('getDailyVerse setting verse section: ', verse);
   }
+  log('getDailyVerse -------------------------------------------------------');
 }
 
 const getDailyFunny = async (custConfig: any) => {
+  log('getDailyFunny -------------------------------------------------------');
+  const funny = JSON.parse(JSON.stringify(custConfig.sections.get('funny') || {}));
 
-  if (custConfig.sections.funny) {
+  if (funny && funny.enabled) {
     const d = new Date();
     const findToday = parseInt((d.toISOString().split('T')[0]).replace(/\-/g, ''));
 
-    const funny: IBeaconSection = JSON.parse(JSON.stringify(custConfig.sections.funny || {}));
     log('funny: ', funny);
 
-    if (funny?.enabled && funny?.props?.autoFill) {
+    if (funny?.props?.autoFill) {
+      // fall back on disabled
+      funny.enabled = false;
       try {
-
         const funnyRes: Array<IFunny> = await Funny.find({day: { $lte: findToday }}).sort({ day: -1}).limit(1);
-        log('funnyRes: ', funnyRes);
+        //log('funnyRes: ', funnyRes);
 
         if (funnyRes[0]) {
           const daily = funnyRes[0];
@@ -239,8 +246,9 @@ const getDailyFunny = async (custConfig: any) => {
           funny.urls = [...daily.urls];
           log('funny: ', funny);
 
-          custConfig.sections.funny = {...funny};
-          log('getDailyFunny setting funny section: ', custConfig.sections.funny);
+          funny.enabled = true;
+          custConfig.sections.set('funny', funny);
+          log('getDailyFunny is setting funny section to: ', custConfig);
         }
       } catch(err) {
         console.log('Could not pull in funny for today.', err);
