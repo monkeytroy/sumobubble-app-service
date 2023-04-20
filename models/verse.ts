@@ -1,6 +1,6 @@
 import { Schema, model, models } from 'mongoose';
 
-const verseSchema = new Schema({
+const verseSchema = new Schema<IVod>({
   verseRef: { type: String, required: true },
   day: Number,
   verses: { type: Map, of: String }

@@ -1,5 +1,9 @@
 
-export type Translation = 'ESV' | 'ASV' | 'KJV';
+export enum Translation {
+  ESV = 'ESV',
+  ASV = 'ASV',
+  KJV = 'KJV'
+}
 
 export interface ITranslation {
   title: string,
@@ -11,15 +15,15 @@ export type Translations = {
 }
 
 export const translations: Translations = {
-  "ESV": {
+  ESV: {
     title: "English Standard Version",
     copyright: "Scripture quotations are from the ESV® Bible (The Holy Bible, English Standard Version®), copyright © 2001 by Crossway, a publishing ministry of Good News Publishers."
   },
-  "ASV": {
+  ASV: {
     title: "American Standard Version",
     copyright: "Scripture quotations are from the ASV® Bible." 
   },
-  "KJV": {
+  KJV: {
     title: "King James Version",
     copyright: "The king doeth proclaim this version be legit."
   }
