@@ -70,8 +70,8 @@ const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
         const vodRes = await fetch(`https://www.biblegateway.com/votd/get/?format=json&version=${trans}`);
         const vodResJson = await vodRes.json();
 
-        if (vodResJson?.votd?.text && vodResJson?.votd?.reference) {
-          vod.verses.set(trans, vodResJson?.votd?.text);
+        if (vodResJson?.votd?.content && vodResJson?.votd?.reference) {
+          vod.verses.set(trans, vodResJson?.votd?.content);
           vod.verseRef = vodResJson?.votd?.reference;
         }
 
@@ -80,9 +80,10 @@ const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
 
       console.log(vod);
 
-      const vodCreated =Verse.create(vod);
+      const vodCreated = await Verse.create(vod);
+      const { __v, ...configurationRes} = vodCreated.toJSON();  
 
-      res.status(200).send({ success: false, message: 'Created', data: vodCreated })  
+      res.status(200).send({ success: false, message: 'Created', data: configurationRes })  
 
     } else {
       res.status(200).send({ success: false, message: 'Already updated' })  
