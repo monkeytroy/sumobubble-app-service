@@ -53,10 +53,10 @@ const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
     const findToday = parseInt((d.toISOString().split('T')[0]).replace(/\-/g, ''));
 
     // try to get todays verse.
-    const verseRes = await Verse.find({day: { $lte: findToday }}).sort({ day: -1}).limit(1);
+    const verseRes = await Verse.findOne({day: findToday });
     log('verseRes:', verseRes);
 
-    if (!verseRes[0]) {
+    if (!verseRes) {
         
       const vod: IVod = {
         verseRef: '',
