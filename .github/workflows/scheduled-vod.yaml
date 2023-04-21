@@ -1,7 +1,10 @@
 name: Daily VoD check cron job
+
 on:
   schedule:
-    - cron: '45 2,3 * * *'
+    - cron: '0,15,30,45 * * * *'
+  workflow_dispatch:
+  
 jobs:
   cron:
     runs-on: ubuntu-latest
