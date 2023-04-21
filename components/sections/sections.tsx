@@ -1,4 +1,3 @@
-import { UsersIcon, StarIcon, BookOpenIcon, TvIcon, DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import { ReactElement } from "react";
 
 //import { section as sectionTest } from '@/components/sections/config-test';

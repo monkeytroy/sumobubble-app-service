@@ -13,7 +13,7 @@ export default function ConfigSummary() {
   const DEFAULT_THEME_COLOR = '#8ED1FC';
   
   const COLORS = [
-    '#000000', '#EFEFEF', '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', 
+    '#000000', '#EFEFEF', '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#0039e6', 
     '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', 
     '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#607D8B', 
     '#F8BBD0', '#E6EE9C', '#B2DFDB', '#80CBC4', '#BBDEFB', '#90CAF9', '#CE93D8', 
