@@ -1,4 +1,4 @@
-import { getServerSideProps, IAppProps } from '@/pages/server-side-props';
+import { getServerSideProps, IAppProps } from '@/services/server-side-props';
 import ConfigSummary from '@/components/config-summary';
 import { useAppStore } from '@/store/app-store';
 import { useEffect } from 'react';

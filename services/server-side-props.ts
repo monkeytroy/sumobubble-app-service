@@ -2,7 +2,7 @@ import Configuration from "@/models/config";
 import { CtxOrReq } from "next-auth/client/_utils";
 import { getToken } from "next-auth/jwt";
 import { getSession } from "next-auth/react";
-import connectMongo from "../services/mongoose";
+import connectMongo from "./mongoose";
 
 export interface IAppProps {
   configuration?: IBeaconConfig;
