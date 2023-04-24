@@ -10,6 +10,7 @@ declare module "next-auth" {
   interface MyUser extends DefaultUser {
     // custom values can be added here for users.
     id: string;
+    name: string;
   }
 
   interface Session {
@@ -19,7 +20,7 @@ declare module "next-auth" {
 
 declare module "next-auth/jwt" {
   interface JWT {
-    user?: User;
+    user?: MyUser;
     role?: Role;
     subscribed: boolean;
   }
