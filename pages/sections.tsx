@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useAppStore } from '@/store/app-store';
-import { getServerSideProps, IAppProps } from '@/server-side-props';
+import { getServerSideProps, IAppProps } from '@/pages/server-side-props';
 import SectionSelection from '@/components/section-selection';
 
 export default function Sections(props: IAppProps) {

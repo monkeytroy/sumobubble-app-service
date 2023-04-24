@@ -19,15 +19,16 @@ export default function LoginForm() {
         customerId, customerPin, 
         callbackUrl: `${window.location.origin}`, redirect: false 
     });
-    
-    if (result?.error !== null) {
+
+    // check login.  reroute. 
+    if (result?.error) {
       if (result?.status === 401) {
         setLoginError("Your login was incorrect. Please try again");
       } else {
         setLoginError(result?.error || 'Oops.');
       }
     } else {
-      router.push(result.url || '');
+      router.push(result?.url || '');
     }
   }
 

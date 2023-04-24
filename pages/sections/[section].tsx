@@ -1,7 +1,7 @@
 import 'react-toastify/dist/ReactToastify.css';
 import { useEffect } from 'react';
 import { useAppStore } from '@/store/app-store';
-import { getServerSideProps, IAppProps } from '@/server-side-props';
+import { getServerSideProps, IAppProps } from '@/pages/server-side-props';
 import { useRouter } from 'next/router';
 import { sections } from '@/components/sections/sections';
 

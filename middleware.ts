@@ -34,31 +34,37 @@ const protectedApi = [
  */
 export const middleware = async (req: NextRequest, res: NextResponse) => {
 
-  const session = await getToken({ req, secret: process.env.JWT_SECRET })
+  const authHeader = req.headers.get('authorization');
+
+  const jwt = await getToken({ req, secret: process.env.JWT_SECRET });
 
   // validate api
-  if (!session && protectedApi.filter((v) => v.method == req.method && req.nextUrl.pathname.startsWith(v.route)).length > 0) {
-    return new NextResponse(
-      JSON.stringify({ success: false, message: 'Unauthorized' }),
-       { 
-        status: 403, 
-        headers: { 'content-type': 'application/json' } 
-      }
-    )
+  if (protectedApi.filter((v) => v.method == req.method && req.nextUrl.pathname.startsWith(v.route)).length > 0) {
+
+    log('In protected route ', jwt, authHeader);
+
+    if (!jwt && authHeader !== 'Bearer ' + process.env.API_TOKEN) {    
+      return new NextResponse(
+        JSON.stringify({ success: false, message: 'Unauthorized' }),
+        { 
+          status: 403, 
+          headers: { 'content-type': 'application/json' } 
+        }
+      )
+    }
+
   }
 
-  log('pathname: ' + req.nextUrl.pathname);
-
+  //log('pathname: ' + req.nextUrl.pathname);
   const pathname = req.nextUrl.pathname;
-
+  
   // validate page routes
-  if (!session && 
-      (
-        protectedRoutes.includes(pathname) || 
-        protectedRoutes.filter((val) => (val.endsWith('*') && pathname.startsWith(val.replace('*', '')))).length > 0
-      )
-    ) {
-    return NextResponse.redirect(new URL(UNAUTH_PAGE, req.url));
+  if (protectedRoutes.includes(pathname) || 
+      protectedRoutes.filter((val) => (val.endsWith('*') && pathname.startsWith(val.replace('*', '')))).length > 0) {
+
+    if (!jwt) {
+      return NextResponse.redirect(new URL(UNAUTH_PAGE, req.url));
+    }
   }
 
   return NextResponse.next();
