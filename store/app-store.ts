@@ -75,7 +75,7 @@ export const useAppStore = create<IAppState>((set, get) => ({
 
     const config = get().configuration;
     if (config) {
-      let selectedSection = config?.sections[section as keyof IBeaconSections];
+      let selectedSection = config?.sections[section as keyof ISiteSections];
 
       if (selectedSection) {
         selectedSection.enabled = val;
@@ -87,7 +87,7 @@ export const useAppStore = create<IAppState>((set, get) => ({
         }
       }
 
-      config.sections[section as keyof IBeaconSections] = {...selectedSection};
+      config.sections[section as keyof ISiteSections] = {...selectedSection};
       
       const res = await saveSite(config);
 

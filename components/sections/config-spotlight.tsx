@@ -21,7 +21,7 @@ export default function ConfigSpotlight() {
   const configuration = useAppStore((state: IAppState) => state.configuration);
 
   // load this section.
-  const thisSection: IBeaconSection | undefined = configuration?.sections[section.name];
+  const thisSection: ISiteSection | undefined = configuration?.sections[section.name];
 
   // setup local state for editing.
   const [enabled, setEnabled] = useState(false);
@@ -62,7 +62,7 @@ export default function ConfigSpotlight() {
       const newConfiguration = JSON.parse(JSON.stringify(configuration));
 
       // create the new section
-      const newSection: IBeaconSection = {
+      const newSection: ISiteSection = {
         enabled,
         content,
         urls,

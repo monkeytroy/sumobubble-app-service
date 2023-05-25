@@ -22,14 +22,14 @@ interface IBeaconSite {
     content: string;
     special?: string;
   }
-  sections: IBeaconSections
+  sections: ISiteSections
 }
 
-interface IBeaconSections {
-  [name: string]: IBeaconSection
+interface ISiteSections {
+  [name: string]: ISiteSection
 }
 
-interface IBeaconSection {
+interface ISiteSection {
   title?: string;
   enabled: boolean;
   content: string;

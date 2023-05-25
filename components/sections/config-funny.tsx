@@ -21,7 +21,7 @@ export default function ConfigFunny() {
   const configuration = useAppStore((state: IAppState) => state.configuration);
   
   // load this section.
-  const thisSection: IBeaconSection | undefined = configuration?.sections[section.name];
+  const thisSection: ISiteSection | undefined = configuration?.sections[section.name];
 
   //const [title, setTitle] = useState('');
   const [enabled, setEnabled] = useState(false);
@@ -55,7 +55,7 @@ export default function ConfigFunny() {
       const newConfiguration = JSON.parse(JSON.stringify(configuration));
 
       // create the new section
-      const newSection: IBeaconSection = {
+      const newSection: ISiteSection = {
         enabled,
         content,
         urls,

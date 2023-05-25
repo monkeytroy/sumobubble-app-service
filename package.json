@@ -1,6 +1,6 @@
 {
-  "name": "beacon-service",
-  "version": "0.1.0",
+  "name": "infochat-service",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",

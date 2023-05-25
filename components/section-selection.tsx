@@ -9,7 +9,7 @@ export default function SectionSelection() {
 
   const onSectionClick = (section: ISection) => {
     enableSection(
-      !(!!configuration?.sections[section.name.toLowerCase() as keyof IBeaconSections]),
+      !(!!configuration?.sections[section.name.toLowerCase() as keyof ISiteSections]),
       section.name.toLowerCase()
     );
   }
@@ -43,8 +43,8 @@ export default function SectionSelection() {
                 <div className="-mt-px flex divide-x divide-gray-200">
                   <div className="flex w-0 flex-1 px-2 py-4 items-center justify-center cursor-pointer hover:bg-gray-100"
                     onClick={() => onSectionClick(section)} title="Click to enable or disable">
-                    {!!configuration?.sections[section.name.toLowerCase() as keyof IBeaconSections]?.enabled && 'Enabled'}
-                    {!(!!configuration?.sections[section.name.toLowerCase() as keyof IBeaconSections]?.enabled) && 'Disabled'}
+                    {!!configuration?.sections[section.name.toLowerCase() as keyof ISiteSections]?.enabled && 'Enabled'}
+                    {!(!!configuration?.sections[section.name.toLowerCase() as keyof ISiteSections]?.enabled) && 'Disabled'}
                   </div>
                   <div className="flex w-0 flex-1 px-2 py-4 items-center justify-center cursor-pointer hover:bg-gray-100"
                     onClick={() => section.href ? router.push(section.href) : null}>

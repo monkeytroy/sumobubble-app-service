@@ -1,6 +1,6 @@
 import { Schema, model, models } from 'mongoose';
 
-const sectionSchema = new Schema<IBeaconSection>({
+const sectionSchema = new Schema<ISiteSection>({
   title: { type: String, required: false},
   enabled: { type: Boolean, required: true },
   content: { type: String, trim: true },
