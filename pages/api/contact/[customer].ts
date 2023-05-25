@@ -2,9 +2,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import Cors from 'cors';
 import { mailIt } from '@/services/mail';
-import { midware } from '@/services/midware';
+import { apiMiddleware } from '@/services/api-middleware';
 import connectMongo from '@/services/mongoose';
-import Configuration from '@/models/config';
+import Configuration from '@/models/site';
 import { log } from '@/services/log';
 
 const cors = Cors({
@@ -38,7 +38,7 @@ export default async function handler(
     message: 'Could not send message'
   }
 
-  await midware(req, res, cors);
+  await apiMiddleware(req, res, cors);
 
   if (req.method !== 'POST') {
     res.status(405).send({ success: false, message: 'Only POST requests allowed' })

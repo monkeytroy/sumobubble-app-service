@@ -1,5 +1,3 @@
-import { ReactElement } from "react";
-import LayoutPlain from "@/components/layout-plain";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 export default function Error() {
@@ -21,13 +19,5 @@ export default function Error() {
         </div>
       </div>
     </div>
-  )
-}
-
-Error.getLayout = function getLayout(page: ReactElement) {
-  return (
-    <LayoutPlain>
-      {page}
-    </LayoutPlain>
   )
 }

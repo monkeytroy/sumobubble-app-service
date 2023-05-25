@@ -1,13 +1,11 @@
-import Configuration from '@/models/config';
-import connectMongo from '@/services/mongoose';
-import NextAuth, { Session, User } from 'next-auth';
-import type { JWT } from 'next-auth/jwt';
-import CredentialsProvider from 'next-auth/providers/credentials';
+import NextAuth, { IUser, Session, User } from 'next-auth';
 import SimpleCrypto from 'simple-crypto-js'
-import GoogleProvider from 'next-auth/providers/google';
 import clientPromise from './lib/mongo-client';
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
 import { log } from '@/services/log';
+import { JWT } from 'next-auth/jwt/types';
+import Auth0Provider from "next-auth/providers/auth0";
+
 
 const crypto = new SimpleCrypto(process.env.CRYPTO_KEY);
 
@@ -15,6 +13,7 @@ export const authOptions = {
   // Configure one or more authentication providers
   cookie: {
     secure: process.env.NODE_ENV && process.env.NODE_ENV === 'production',
+    sameSite: 'Strict'
   },
   session: {
     strategy: 'jwt' as const,
@@ -22,53 +21,16 @@ export const authOptions = {
   },
   secret: process.env.JWT_SECRET,
   pages: {
-    signIn: '/login',
+    //signIn: '/login',
+    error: '/error'
   },
   adapter: MongoDBAdapter(clientPromise),
   providers: [
-    // GoogleProvider({
-    //   clientId: process.env.GOOGLE_ID || '',
-    //   clientSecret: process.env.GOOGLE_SECRET || ''
-    // }),
-    CredentialsProvider({
-      name: 'Creds', 
-      credentials: {
-        customerId: { label: 'BeaconId', type: 'text', placeholder: 'xxxx' },
-        customerPin: {  label: 'PIN', type: 'password' }
-      },
-      async authorize(credentials, req: any) {
-        log('cred provider authorize =================================================');
-        const customerId = credentials?.customerId;
-        const customerPin = credentials?.customerPin;
-
-        try {      
-          await connectMongo();
-          
-          // fetch the customer    
-          const configuration = await Configuration.findOne({ customerId: customerId });
-          if (configuration) {
-            
-            const pin = crypto.decrypt(configuration.pin + '');
-
-            if (pin == customerPin) {
-
-              // this is the user used in jwt
-              const user: User = {
-                id: configuration.customerId,
-                name: configuration.customer.title
-              };
-
-              log(`Setting authorized user to ${JSON.stringify(user)}`)
-
-              return user;
-            }
-          }  
-        } catch(err) {
-          console.log(err);
-        }
-
-        return null;
-      }
+    Auth0Provider({
+      clientId: process.env.AUTH0_CLIENT_ID || '',
+      clientSecret: process.env.AUTH0_CLIENT_SECRET || '',
+      issuer: process.env.AUTH0_ISSUER,
+      authorization: `https://${process.env.AUTH0_ISSUER}/authorize?response_type=code&prompt=login`
     })
   ],
   callbacks: {
@@ -91,23 +53,21 @@ export const authOptions = {
       }
     },
 
-    async jwt({ token, user, account, profile }: 
-      { token: JWT, account?: any, profile?: any, user?: any}) {
+    async jwt({ token, user, account, profile }: { token: JWT, account?: any, profile?: any, user?: IUser }) {
 
-      console.log('jwt ----------------------------------------------------');
-      console.log(`JWT token: `, token);
-
+      //console.log('jwt ----------------------------------------------------');
+      //console.log(`JWT token: `, token);
       // only provided the first time after sign in. 
       //console.log(`JWT user: `, user);
       //console.log(`JWT account: `, account);
       //console.log(`JWT profile: `, profile);
-      
-      if (account) {
-        //token.user.provider = account.provider;
-        token.provider = account.provider;
-      }
+
+      // any custom fields here.
+      // if (user) {
+      //   token.role = user.role;
+      // }
  
-      console.log(`Final JWT token: `, token);
+      //log(`Final JWT token: `, token);
       return token;
     },
 
@@ -117,28 +77,29 @@ export const authOptions = {
      * @returns 
      */
     async session({ session, token }: {session: Session, token: JWT}) {
-      console.log('session ----------------------------------------------------');
-      // populated already for google.. custom auth too?
+      log('session ----------------------------------------------------');
 
-      if (session.user) {
+      if (session?.user) {
         session.user.id = token.sub || '';
+        // any custom role here. 
+        //session.user.role = token.role as Role;
       }
 
-      console.log('session ==> ', session);
-      console.log('token ==>', token);
+      //log('session ==> ', session);
+      //log('token ==>', token);
 
       return session;
     },
 
-    createUser() {
-      console.log('crete user');
-    },
-    updateUser() {
-      console.log('update user');
-    },
-    linkAccount() {
-      console.log('link user');
-    }
+    // createUser() {
+    //   console.log('crete user');
+    // },
+    // updateUser() {
+    //   console.log('update user');
+    // },
+    // linkAccount() {
+    //   console.log('link user');
+    // }
   },
   logger: {
     error(code: any, metadata: any) {

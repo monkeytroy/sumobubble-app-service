@@ -1,15 +1,16 @@
 //import { PhotoIcon } from "@heroicons/react/24/solid";
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
 import ConfigSubmit from '@/components/config-submit';
-import { saveConfig } from '@/services/config';
+import { saveSite } from '@/services/site';
 import { TwitterPicker } from 'react-color';
 import { IAppState, useAppStore } from '@/store/app-store';
 import { Editor } from '@tinymce/tinymce-react';
 import ReactHtmlParser from 'react-html-parser';
 import { saveFile } from '@/services/file';
+import { IAppProps } from '@/services/ssp-default';
 
-export default function ConfigSummary() {
-
+export default function ConfigSummary(props: IAppProps) {
+  
   const DEFAULT_THEME_COLOR = '#8ED1FC';
   
   const COLORS = [
@@ -37,12 +38,12 @@ export default function ConfigSummary() {
   const [newSummary, setNewSummary] = useState(summary);
 
   const reset = useCallback(() => {
-    setTitle(configuration?.customer?.title || '');
-    setLogo(configuration?.customer?.logo?.url || '');
+    setTitle(configuration?.title || '');
+    setLogo(configuration?.logo?.url || '');
     setSummary(configuration?.summary?.content || '');
     setNewSummary(configuration?.summary?.content || '');
     setSpecial(configuration?.summary?.special || '');
-    setThemePrimary(configuration?.customer?.theme?.primary || DEFAULT_THEME_COLOR)
+    setThemePrimary(configuration?.theme?.primary || DEFAULT_THEME_COLOR)
   }, [configuration]);
 
   useEffect(() => {
@@ -59,15 +60,15 @@ export default function ConfigSummary() {
       const newConfiguration = JSON.parse(JSON.stringify(configuration));
 
       // create new section
-      newConfiguration.customer.title = title;
-      newConfiguration.customer.logo = { url: logo };
-      newConfiguration.summary.content = newSummary;
-      newConfiguration.summary.special = special;
-      newConfiguration.customer.theme = {
+      newConfiguration.title = title;
+      newConfiguration.logo = { url: logo };
+      newConfiguration.theme = {
         primary: themePrimary
       }
+      newConfiguration.summary.content = newSummary;
+      newConfiguration.summary.special = special;
 
-      await saveConfig(newConfiguration);
+      await saveSite(newConfiguration);
 
       setTimeout(() => setSaving(false), 2000);
     }
@@ -93,7 +94,7 @@ export default function ConfigSummary() {
     <form onSubmit={submit} onReset={() => reset()}>
       <div className="flex flex-col gap-6 pb-6 select-none">
 
-        <div className="flex gap-4 items-baseline py-4">
+        <div className="flex gap-4 items-baseline">
           <span className="text-xl font-semibold text-gray-900">Customer Info</span>
           <span className="text-sm text-gray-600">
             All about your organization!

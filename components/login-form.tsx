@@ -17,7 +17,7 @@ export default function LoginForm() {
   
     const result = await signIn("credentials", {
         customerId, customerPin, 
-        callbackUrl: `${window.location.origin}`, redirect: false 
+        callbackUrl: `${window.location.origin}/`, redirect: false 
     });
 
     // check login.  reroute. 

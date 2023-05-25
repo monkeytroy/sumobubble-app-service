@@ -1,4 +1,4 @@
-import { saveConfig } from "@/services/config";
+import { saveSite } from "@/services/site";
 import { useAppStore, IAppState } from "@/store/app-store";
 import { ExclamationCircleIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
@@ -9,7 +9,7 @@ export const section: ISection = {
   name: 'contact',
   title: 'Contact Us',
   description: 'Contact form with customizable intro.',
-  href: '/sections/contact',
+  route: 'sections/contact',
   icon: <UsersIcon/>,
   class: 'ml-2 text-xs',
   component: <ConfigContact/>
@@ -73,7 +73,7 @@ export default function ConfigContact() {
       }
 
       // save!
-      await saveConfig(newConfiguration);
+      await saveSite(newConfiguration);
 
       setTimeout(() => setSaving(false), 2000);
     }
@@ -87,7 +87,7 @@ export default function ConfigContact() {
     <form onSubmit={submit} onReset={reset} ref={formRef}>
       <div className="flex flex-col gap-6 pb-6 select-none">
 
-        <div className="flex gap-4 items-baseline py-4">
+        <div className="flex gap-4 items-baseline">
           <span className="text-xl font-semibold text-gray-900">{section.title}</span>
           <span className="text-sm text-gray-600">
             {section.description}

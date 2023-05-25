@@ -2,7 +2,7 @@ import connectMongo from "@/services/mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 import { PutObjectCommand, S3 } from "@aws-sdk/client-s3";
 import Cors from 'cors';
-import { midware } from "@/services/midware";
+import { apiMiddleware } from "@/services/api-middleware";
 import formidable from "formidable";
 import fs from 'fs';
 import { log } from "@/services/log";
@@ -24,7 +24,7 @@ export default async function handler(
   req: NextApiRequest, res: NextApiResponse<ConfigRes | any>
 ) {
 
-  await midware(req, res, cors);
+  await apiMiddleware(req, res, cors);
 
   switch (req.method) {
     case 'GET': 

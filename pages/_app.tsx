@@ -3,27 +3,50 @@ import { SessionProvider } from 'next-auth/react';
 import 'react-toastify/dist/ReactToastify.css';
 import { ReactElement } from 'react';
 import { NextComponentType } from 'next';
-import Layout from '@/components/layout';
+import LayoutPlain from '@/layouts/layout-plain';
+import LayoutConsole from '@/layouts/layout-console';
+import { useRouter } from 'next/router';
+import Head from 'next/head';
 
 import '@/styles/globals.css';
 import '@/styles/summary.scss';
 
-const defaultGetLayout = (page: ReactElement) => {
+const getLayoutPlain = (page: ReactElement) => {
   return (
-    <Layout>
+    <LayoutPlain>
       {page}
-    </Layout>
+    </LayoutPlain>
   )
 }
 
-const App:NextComponentType<AppContext, AppInitialProps, AppLayoutProps> = ({ Component, pageProps: {session, ...pageProps} }: AppLayoutProps) => {
+const getLayoutConsole = (page: ReactElement) => {
+  return (
+    <LayoutConsole>
+      {page}
+    </LayoutConsole>
+  )
+}
 
-  const getLayout = Component.getLayout || defaultGetLayout; //((page: ReactElement) => page)
+const App:NextComponentType<AppContext, AppInitialProps, AppLayoutProps> = 
+    ({ Component, pageProps: {session, ...pageProps} }: AppLayoutProps) => {
+
+  const router = useRouter();
+
+  const getLayout = Component.getLayout || 
+    (router.route.startsWith('/console') ? getLayoutConsole : getLayoutPlain)
 
   return (
+    <>
+    <Head>
+      <title>InfoChat</title>
+      <meta name='description' content='Welcome. InfoChat is a powerful and easy to use helper for your website providing AI Q&A and simple summary details to your visitors.' />
+    </Head>
     <SessionProvider session={session}>
-      {getLayout(<Component {...pageProps} />)}
+      {getLayout(
+        <Component {...pageProps} />
+      )}
     </SessionProvider>
+    </>
   )
 
 }

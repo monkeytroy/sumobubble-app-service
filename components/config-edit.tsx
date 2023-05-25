@@ -1,6 +1,6 @@
 
 import { IAppState, useAppStore } from '@/store/app-store';
-import ConfigSummary from './config-summary';
+import ConfigSummary from './site-summary';
 import SectionSelection from './section-selection';
 
 export default function ConfigEdit() {

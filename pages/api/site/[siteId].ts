@@ -1,20 +1,16 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next'
 import Cors from 'cors';
-import { midware } from '@/services/midware';
+import { apiMiddleware } from '@/services/api-middleware';
 import { translations, type Translation } from '@/services/translations';
-import SimpleCrypto from "simple-crypto-js"
 import connectMongo from '@/services/mongoose';
-import Configuration from '@/models/config';
 import Funny, { IFunny } from '@/models/funny';
 import Verse from '@/models/verse';
 import { log } from '@/services/log';
-import { getToken } from 'next-auth/jwt';
-
-const crypto = new SimpleCrypto(process.env.CRYPTO_KEY);
+import Site from '@/models/site';
 
 const cors = Cors({
-  methods: ['GET', 'GET', 'HEAD'],
+  methods: ['GET', 'POST', 'PUT', 'DELET', 'HEAD'],
 });
 
 const DEFAULT_TRANSLATION = 'ASV';
@@ -23,17 +19,17 @@ export default async function handler(
   req: NextApiRequest, res: NextApiResponse<ConfigRes | any>
 ) {
 
-  await midware(req, res, cors);
+  await apiMiddleware(req, res, cors);
 
   switch (req.method) {
     case 'GET': 
       await get(req, res);
       break;
-    case 'PUT':
-      await put(req, res);
-      break;
     case 'POST':
       await post(req, res);
+      break;
+    case 'DELETE': 
+      await deleteSite(req, res);
       break;
     default: 
       res.status(405).send({ success: false, message: 'Method unsupported' })  
@@ -46,21 +42,18 @@ const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
   try {
     await connectMongo();
 
-    const { customer } = req.query;
+    const { siteId } = req.query;
   
-    const configuration = await Configuration.findOne({ customerId: customer });
-
-    //const resTest = await Configuration.find();
+    const site = await Site.findById(siteId).select('-__v');
 
     // fetch the customer
-    if (configuration) {
+    if (site) {
 
-      await getDailyFunny(configuration);
-      await getDailyVerse(configuration);
+      await getDailyFunny(site);
+      await getDailyVerse(site);
 
       // fix spotlight url
-      //log(`Checking spotlight url. ` + configuration);
-      const spotlight = configuration.sections?.get('spotlight');
+      const spotlight = site.sections?.get('spotlight');
       if (spotlight) {
         let spotlightUrl = spotlight?.urls[0];
         //log(`Spotlight url: ${spotlightUrl}`);
@@ -70,12 +63,11 @@ const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
         }
       }
       
-      const { pin, __v, ...configurationRes} = configuration.toJSON();  
-      res.status(200).json({ success: true, message: 'Message for you sir!', data: configurationRes });
+      res.status(200).json({ success: true, message: 'Message for you sir!', data: site.toJSON() });
 
      } else {
-       console.log('Could not get config for client: ' + customer);
-       res.status(400).send({ success: false, message: 'No config found'});
+       console.log('Could not get config for site: ' + site);
+       res.status(400).send({ success: false, message: 'No site config found'});
      }
 
   } catch(err) {
@@ -84,44 +76,6 @@ const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
   }
 }
 
-/**
- * Create a new record.
- * @param req 
- * @param res 
- * @returns 
- */
-const put = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) => {
-
-  try {
-    await connectMongo();
-    
-    const { customer } = req.query;
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-
-    // encrypt pin
-    if (typeof body.pin !== 'undefined') {
-      const pin = body.pin;
-      if (typeof pin != 'string' || pin.length != 4) {
-        invalid(res, 'pin must be a string of 4 characters.');
-        return;
-      }
-      const encPin = crypto.encrypt(pin + '');
-      body.pin = encPin;
-    }
-    
-    body.customerId = customer;
-
-    const configuration = await Configuration.create(body);
-    const { pin, __v, ...configurationRes} = configuration.toJSON();  
-
-    res.json({ success: true, message: 'Created', data: configurationRes });
-
-  } catch (err: any) {
-    console.log(err);
-    res.status(400).send({ success: false, message: err?.message || 'Something went wrong.'});
-  }
-
-}
 
 const invalid = (res: NextApiResponse, reason: string) => {
   res.status(400).send({ success: false, message: reason});
@@ -129,41 +83,40 @@ const invalid = (res: NextApiResponse, reason: string) => {
 
 const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) => {
 
-  const session = await getToken({ req, secret: process.env.JWT_SECRET })
+  // route should be protected in middleware.
+  //const session = await getToken({ req, secret: process.env.JWT_SECRET })
+  // // early exit if not authorized.
+  // if (!session) {
+  //   res.status(403).send({ success: false, message: 'Unauthorized'});
+  //   return 
+  // }
 
-  // early exit if not authorized.
-  if (!session) {
-    res.status(403).send({ success: false, message: 'Unauthorized'});
-    return 
-  }
+  const { siteId } = req.query;
+  
+  log(`api/site/${siteId}/post`);
 
   try {
     await connectMongo();
 
-    const { customer } = req.query;
+    // const session = await getToken({ req, secret: process.env.JWT_SECRET });
+    // const customerId = session?.sub;
+    // if (!customerId) {
+    //   invalid(res, 'Could not get the customer ID');
+    //   return;
+    // }
+
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
-    // encrypt pin
-    if (typeof body.pin !== 'undefined') {
-      const pin = body.pin;
-      if (typeof pin != 'string' || pin.length != 4) {
-        invalid(res, 'pin must be a string of 4 characters.');
-        return;
-      }
-      const encPin = crypto.encrypt(pin + '');
-      body.pin = encPin;
-    }
-
-    const configuration = await Configuration.findOneAndUpdate({ customerId: customer }, body, {
+    const site = await Site.findOneAndUpdate({ _id: siteId }, body, {
       new: true
     }); 
 
-    if (configuration) {
-      const { pin, __v, ...configurationRes} = configuration.toJSON();
-      res.status(200).json({ success: true, message: 'Updated', data: configurationRes });  
+    if (site) {
+      const { __v, ...siteRes} = site.toJSON();
+      res.status(200).json({ success: true, message: 'Updated', data: siteRes });  
     } else {
-      console.log('Could not update customer ' + customer);
-      res.status(400).send({ success: false, message: 'Failed to update.'});
+      log('Could not update siteId: ' + siteId);
+      invalid(res, 'Failed to update.');
       return;
     }
 
@@ -174,10 +127,34 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
 
 }
 
-const getDailyVerse = async (custConfig: any) => {
+const deleteSite = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) => {
+
+  const { siteId } = req.query;
+
+  try {
+    await connectMongo();
+
+    const deleteRes = await Site.findOneAndDelete({ _id: siteId }); 
+
+    if (deleteRes) {
+      res.status(200).json({ success: true, message: 'Updated', data: deleteRes });  
+    } else {
+      log('Could not remove site');
+      invalid(res, 'Could not remove site.');
+      return;
+    }
+
+  } catch(err) {
+    res.status(405).send({ success: false, message: `Error ${(<Error>err)?.message}`});
+    return;
+  }
+
+}
+
+const getDailyVerse = async (siteConfig: any) => {
   
   log('getDailyVerse -------------------------------------------------------');
-  const verse = JSON.parse(JSON.stringify(custConfig.sections.get('verse') || {}));
+  const verse = JSON.parse(JSON.stringify(siteConfig.sections.get('verse') || {}));
   if (verse && verse.enabled) {
 
     log('verse:', verse);
@@ -214,15 +191,15 @@ const getDailyVerse = async (custConfig: any) => {
       }
     }
 
-    custConfig.sections.set('verse', verse);
+    siteConfig.sections.set('verse', verse);
     log('getDailyVerse setting verse section: ', verse);
   }
   log('getDailyVerse -------------------------------------------------------');
 }
 
-const getDailyFunny = async (custConfig: any) => {
+const getDailyFunny = async (siteConfig: any) => {
   log('getDailyFunny -------------------------------------------------------');
-  const funny = JSON.parse(JSON.stringify(custConfig.sections.get('funny') || {}));
+  const funny = JSON.parse(JSON.stringify(siteConfig.sections.get('funny') || {}));
 
   if (funny && funny.enabled) {
     const d = new Date();
@@ -247,8 +224,8 @@ const getDailyFunny = async (custConfig: any) => {
           log('funny: ', funny);
 
           funny.enabled = true;
-          custConfig.sections.set('funny', funny);
-          log('getDailyFunny is setting funny section to: ', custConfig);
+          siteConfig.sections.set('funny', funny);
+          log('getDailyFunny is setting funny section to: ', siteConfig);
         }
       } catch(err) {
         console.log('Could not pull in funny for today.', err);

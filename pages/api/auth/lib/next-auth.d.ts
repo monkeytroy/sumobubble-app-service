@@ -1,27 +1,18 @@
-import NextAuth from "next-auth"
-
-export enum Role {
-  user = "user",
-  admin = "admin",
-}
+import { DefaultSession, DefaultUser } from "next-auth";
 
 declare module "next-auth" {
 
-  interface MyUser extends DefaultUser {
-    // custom values can be added here for users.
-    id: string;
-    name: string;
+  interface IUser extends DefaultUser  {
+    // any custom fields here.
   }
 
   interface Session {
-    user: MyUser
+     user: IUser
   }
+
 }
 
 declare module "next-auth/jwt" {
-  interface JWT {
-    user?: MyUser;
-    role?: Role;
-    subscribed: boolean;
+  interface JWT extends IUser {
   }
 }

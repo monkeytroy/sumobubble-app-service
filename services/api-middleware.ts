@@ -1,7 +1,7 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-export const midware = async (
+export const apiMiddleware = async (
   req: NextApiRequest,
   res: NextApiResponse,
   fn: Function

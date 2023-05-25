@@ -1,4 +1,4 @@
-import { saveConfig } from "@/services/config";
+import { saveSite } from "@/services/site";
 import { useAppStore, IAppState } from "@/store/app-store";
 import { ExclamationCircleIcon, MinusCircleIcon, StarIcon } from "@heroicons/react/24/outline";
 import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
@@ -6,16 +6,16 @@ import ConfigSubmit from "../config-submit";
 import { ISection } from "./sections";
 
 export const section: ISection = {
-  name: 'prayer',
-  title: 'Prayer Request',
-  description: 'Contact form specifically for prayer requests.',
-  href: '/sections/prayer',
+  name: 'info',
+  title: 'Info Request',
+  description: 'Configurable information requests.',
+  route: 'sections/info',
   icon: <StarIcon/>,
   class: 'ml-2 text-xs',
-  component: <ConfigPrayer/>
+  component: <ConfigInfoRequest/>
 };
 
-export default function ConfigPrayer() {
+export default function ConfigInfoRequest() {
 
   const configuration = useAppStore((state: IAppState) => state.configuration);
 
@@ -78,7 +78,7 @@ export default function ConfigPrayer() {
       };
 
       // save!
-      await saveConfig(newConfiguration);
+      await saveSite(newConfiguration);
  
       setTimeout(() => setSaving(false), 2000);
     }
@@ -119,7 +119,7 @@ export default function ConfigPrayer() {
     <form onSubmit={submit} onReset={reset} ref={formRef}>
       <div className="flex flex-col gap-6 pb-6 select-none">
 
-        <div className="flex gap-4 items-baseline py-4">
+        <div className="flex gap-4 items-baseline">
           <span className="text-xl font-semibold text-gray-900">{section.title}</span>
           <span className="text-sm text-gray-600">
             {section.description}
@@ -128,7 +128,7 @@ export default function ConfigPrayer() {
 
         <div className="col-span-full flex gap-x-3">
           <div className="flex h-6 items-center">
-            <input id="prayerEnabled" name="prayerEnabled" type="checkbox"
+            <input id="sectionEnabled" name="sectionEnabled" type="checkbox"
               checked={enabled} onChange={(e) => setEnabled(e.target.checked)}
               className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
             />
@@ -186,7 +186,7 @@ export default function ConfigPrayer() {
         <div>
           <label htmlFor="contact" 
             className="block text-sm font-medium leading-6 text-gray-900">
-              Prayer Categories
+              Categories
           </label>
         
           <div className="mt-2 rounded-md border border-gray-300 shadow-sm flex flex-wrap divide-x divide-gray-300">

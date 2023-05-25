@@ -6,11 +6,11 @@ declare global {
 }
 globalThis._mongoClientPromise = null;
 
-if (!process.env.MONGO_CONNECT_ADMIN) {
-  throw new Error('Invalid/Missing environment variable: "MONGO_CONNECT_ADMIN"');
+if (!process.env.MONGO_CONNECT) {
+  throw new Error('Invalid/Missing environment variable: "MONGO_CONNECT"');
 }
 
-const uri = process.env.MONGO_CONNECT_ADMIN;
+const uri = process.env.MONGO_CONNECT;
 const options = {};
 
 let client;

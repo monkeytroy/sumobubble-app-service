@@ -1,7 +1,7 @@
 import { Schema, model, models } from 'mongoose';
 
 const sectionSchema = new Schema<IBeaconSection>({
-  title: { type: String, required: true},
+  title: { type: String, required: false},
   enabled: { type: Boolean, required: true },
   content: { type: String, trim: true },
   urls: {
@@ -10,6 +10,8 @@ const sectionSchema = new Schema<IBeaconSection>({
     required: false
   },
   props: {
+    chatsite: String,
+    chatbaseId: String,
     verseRef: String,
     autoFill: Boolean,
     copyright: String,
@@ -23,7 +25,7 @@ const sectionSchema = new Schema<IBeaconSection>({
       default: undefined,
       validate: {
         validator: (val: string) => {
-          return val.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) && val.length <= 320;
+          return (!val?.match || (val?.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) && val?.length <= 320));
         },
         message: 'Contact is not a valid email failed'
       }
@@ -36,22 +38,19 @@ const sectionSchema = new Schema<IBeaconSection>({
   }
 });
 
-const configSchema = new Schema<IBeaconConfig>({
-  customerId: { type: String, required: true, index: true, unique: true },
-  pin: { type: String, required: true },
-  isDev: Boolean,
-  customer: {
-    title: { type: String, required: true },
-    theme: {
-      primary: String
-    },
-    logo: {
-      url: String,
-      align: String
-    },
-    social: {
-      youtube: String
-    }
+const siteSchema = new Schema<IBeaconSite>({
+  customerId: { type: String, required: true },
+  customerEmail: { type: String, required: true },
+  title: { type: String, required: true },
+  theme: {
+    primary: String
+  },
+  logo: {                            // depricated
+    url: String,
+    align: String
+  },
+  social: {                          // unused?
+    youtube: String
   },
   summary: {
     type: {
@@ -67,11 +66,6 @@ const configSchema = new Schema<IBeaconConfig>({
   }
 });
 
-let collectionName = 'configurations';
-if (process.env.IS_DEV) {
-  collectionName += '_dev';
-}
+const Site = models?.Site || model('Site', siteSchema, 'sites');
 
-const Configuration = models?.Configuration || model('Configuration', configSchema, collectionName);
-
-export default Configuration;
+export default Site;

@@ -1,4 +1,4 @@
-import { saveConfig } from "@/services/config";
+import { saveSite } from "@/services/site";
 import { IAppState, useAppStore } from "@/store/app-store";
 import { ExclamationCircleIcon, ExclamationTriangleIcon, TvIcon } from "@heroicons/react/24/outline";
 import { useState, FormEvent, useEffect, useCallback } from "react";
@@ -10,7 +10,7 @@ export const section: ISection = {
   name: 'spotlight',
   title: 'Spotlight',
   description: 'A video or channel to spotlight for your guests.',
-  href: '/sections/spotlight',
+  route: 'sections/spotlight',
   icon: <TvIcon/>,
   class: 'ml-2 text-xs',
   component: <ConfigSpotlight/>
@@ -76,7 +76,7 @@ export default function ConfigSpotlight() {
         [section.name]: {...newSection}
       }
 
-      await saveConfig(newConfiguration);
+      await saveSite(newConfiguration);
     
       setTimeout(() => setSaving(false), 2000);
     }
@@ -92,7 +92,7 @@ export default function ConfigSpotlight() {
     <form onSubmit={submit} onReset={() => reset()}>
       <div className="flex flex-col gap-4 pb-6 select-none">
 
-        <div className="flex gap-4 items-baseline py-4">
+        <div className="flex gap-4 items-baseline">
           <span className="text-xl font-semibold text-gray-900">{section.title}</span>
           <span className="text-sm text-gray-600">
             {section.description}

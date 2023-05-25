@@ -1,5 +1,5 @@
 
-import { saveConfig } from "@/services/config";
+import { saveSite } from "@/services/site";
 import { IAppState, useAppStore } from "@/store/app-store";
 import { FaceSmileIcon } from "@heroicons/react/24/outline";
 import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
@@ -10,7 +10,7 @@ export const section: ISection = {
   name: 'funny',
   title: 'Daily Funny',
   description: 'A custom or automatic daily funny item!',
-  href: '/sections/funny',
+  route: 'sections/funny',
   icon: <FaceSmileIcon/>,
   class: 'ml-2 text-xs',
   component: <ConfigFunny/>
@@ -70,7 +70,7 @@ export default function ConfigFunny() {
         [section.name]: {...newSection}
       }
 
-      await saveConfig(newConfiguration);
+      await saveSite(newConfiguration);
 
       setTimeout(() => setSaving(false), 2000);
     }    
@@ -80,7 +80,7 @@ export default function ConfigFunny() {
     <form onSubmit={submit} onReset={() => reset()} ref={formRef}>
       <div className="flex flex-col gap-4 pb-6 select-none">
 
-        <div className="flex gap-4 items-baseline py-4">
+        <div className="flex gap-4 items-baseline">
           <span className="text-xl font-semibold text-gray-900">{section.title}</span>
           <span className="text-sm text-gray-600">
             {section.description}

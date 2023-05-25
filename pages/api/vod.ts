@@ -1,11 +1,11 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next'
 import Cors from 'cors';
-import { midware } from '@/services/midware';
+import { apiMiddleware } from '@/services/api-middleware';
 import { Translation, translations } from '@/services/translations';
 import SimpleCrypto from "simple-crypto-js"
 import connectMongo from '@/services/mongoose';
-import Verse from '@/models/verse';
+import Verse, { IVod } from '@/models/verse';
 import { log } from '@/services/log';
 
 const crypto = new SimpleCrypto(process.env.CRYPTO_KEY);
@@ -18,7 +18,7 @@ export default async function handler(
   req: NextApiRequest, res: NextApiResponse<ConfigRes | any>
 ) {
 
-  await midware(req, res, cors);
+  await apiMiddleware(req, res, cors);
 
   switch (req.method) {
     case 'GET': 

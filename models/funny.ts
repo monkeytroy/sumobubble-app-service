@@ -12,11 +12,6 @@ const funnySchema = new Schema({
   urls: [String]
 });
 
-let collectionName = 'funnys';
-if (process.env.IS_DEV) {
-  collectionName += '_dev';
-}
-
-const Funny = models.Funny || model<IFunny>('Funny', funnySchema, collectionName);
+const Funny = models.Funny || model<IFunny>('Funny', funnySchema, 'funnys');
 
 export default Funny;
