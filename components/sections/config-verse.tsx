@@ -123,7 +123,7 @@ export default function ConfigVerse() {
           </div>
           <div className="text-sm leading-6">
             <label htmlFor="verseAuto" className="font-medium text-gray-900">
-              Auto Fill <span className="font-normal text-gray-500">- Let Beacon provide a daily verse.</span>
+              Auto Fill <span className="font-normal text-gray-500">- Let Us provide a daily verse.</span>
             </label>
           </div>
         </div>

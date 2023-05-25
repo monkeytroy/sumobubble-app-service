@@ -8,18 +8,18 @@ import { create } from 'zustand';
 export interface IAppState {
 
   sites: Array<ISitesSummary>,
-  configuration: IBeaconSite | null,
+  configuration: ISite | null,
   changed: boolean;
   lastSaveTime: number;
 
   setSites: (val: Array<ISitesSummary>) => void;
   addSite: (siteTitle: string) => void;
   removeSite: (siteId: string) => void;
-  setConfiguration: (val: IBeaconSite) => void;
+  setConfiguration: (val: ISite) => void;
   setChanged: (val: boolean) => void;
   updateLastSaveTime: () => void;
   enableSection: (val: boolean, section: string) => void;
-  activateChatbot: (val: IBeaconSite) => void;
+  activateChatbot: (val: ISite) => void;
 }
 
 export const useAppStore = create<IAppState>((set, get) => ({
@@ -65,7 +65,7 @@ export const useAppStore = create<IAppState>((set, get) => ({
     }
   },
 
-  setConfiguration: (val: IBeaconSite) => set (state => ({ configuration: {...val} }) ),
+  setConfiguration: (val: ISite) => set (state => ({ configuration: {...val} }) ),
 
   setChanged: (val: boolean) => set ( state => ({ changed: val})),
   
@@ -99,7 +99,7 @@ export const useAppStore = create<IAppState>((set, get) => ({
 
   },
 
-  activateChatbot: async (site: IBeaconSite) => {
+  activateChatbot: async (site: ISite) => {
   
     if (site?._id) {
 

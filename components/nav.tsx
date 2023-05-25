@@ -3,6 +3,7 @@ import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, InformationCircleIcon, UserCircleIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useSession, signOut, signIn } from "next-auth/react"
 import Image from "next/image";
+import Link from 'next/link';
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -34,19 +35,19 @@ export default function Nav() {
                 <div className="hidden sm:flex flex-1 items-center justify-center sm:space-x-12">
 
                   {navigation.map((item) => (
-                    <a key={item.name} href={item.href} 
+                    <Link key={item.name} href={item.href} 
                       className="text-normal font-semibold leading-6">
                       {item.name}
-                    </a>
+                    </Link>
                   ))}
                   
                 </div>
                 <div className="flex items-center">
                   {session &&
-                    <a href="/console"
+                    <Link href="/console"
                       className="text-normal font-semibold leading-6">
                       Console
-                    </a>
+                    </Link>
                   }
                   {!session &&
                     <a href="#"
@@ -135,13 +136,13 @@ export default function Nav() {
                   />
                 </div>
                 <div className="ml-3">
-                  <div className="text-base font-medium text-gray-800">Tom Cook</div>
-                  <div className="text-sm font-medium text-gray-500">tom@example.com</div>
+                  <div className="text-base font-medium text-gray-800">{session?.user.name}</div>
+                  <div className="text-sm font-medium text-gray-500">{session?.user.email}</div>
                 </div>
                 <button
                   type="button"
-                  className="ml-auto flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
+                  className="ml-auto flex-shrink-0 rounded-full bg-white p-1 text-gray-400 
+                    hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                   <span className="sr-only">View notifications</span>
                   <BellIcon className="h-6 w-6" aria-hidden="true" />
                 </button>

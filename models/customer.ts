@@ -13,7 +13,7 @@ export enum SubscriptionStatus {
   Incomplete = 'incomplete'
 }
 
-export interface IBeaconCustomer {
+export interface ICustomer {
   email: string;
   customerId: string;
   name: string;
@@ -25,7 +25,7 @@ export interface IBeaconCustomer {
   membership: Membership
 }
 
-const customerSchema = new Schema<IBeaconCustomer>({
+const customerSchema = new Schema<ICustomer>({
   email: { type: String, required: true, index: true, unique: true },
   customerId: { type: String, required: true, index: true, unique: true },
   name: { type: String, required: true },

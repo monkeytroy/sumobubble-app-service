@@ -64,7 +64,7 @@ const put = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
     }
 
     // create new empty site.
-    const newSite: IBeaconSite = {
+    const newSite: ISite = {
       customerId,
       customerEmail,
       title: siteTitle,

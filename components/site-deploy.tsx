@@ -21,7 +21,7 @@ export default function SiteDeploy() {
         <div className="bg-gray-300 rounded-lg shadow-md p-6">
           <pre><code className="">
 {`<script type="module" 
-  src="https://beacon-app-5jegr.ondigitalocean.app/app/infochat-app.js" 
+  src="https://app.infochatapp.com/wc/infochat-app.js" 
   id="infochat-app-scriptastic">
 </script>
 <infochat-app site="${configuration?._id}"/>`}

@@ -1,6 +1,8 @@
 import { useAppStore, IAppState } from '@/store/app-store';
 import router from 'next/router';
 import { ISection, sections } from '@/components/sections/sections';
+import Link from 'next/link';
+import { config } from 'process';
 
 export default function SectionSelection() {
 
@@ -31,9 +33,9 @@ export default function SectionSelection() {
               <div className="grow flex w-full items-center justify-between space-x-6 p-6">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3">
-                    <h3 className="text-sm truncate font-medium text-gray-900">{section.name}</h3>
+                    <h3 className="text-md truncate font-medium text-gray-900 uppercase">{section.name}</h3>
                   </div>
-                  <p className="mt-1 t ext-sm text-gray-500">{section.title}</p>
+                  <p className="mt-1 t ext-sm text-gray-500">{section.description}</p>
                 </div>
                 <div className="h-10 w-10 flex-shrink-0 rounded-full text-blue-400">
                   {section.icon}
@@ -46,10 +48,10 @@ export default function SectionSelection() {
                     {!!configuration?.sections[section.name.toLowerCase() as keyof ISiteSections]?.enabled && 'Enabled'}
                     {!(!!configuration?.sections[section.name.toLowerCase() as keyof ISiteSections]?.enabled) && 'Disabled'}
                   </div>
-                  <div className="flex w-0 flex-1 px-2 py-4 items-center justify-center cursor-pointer hover:bg-gray-100"
-                    onClick={() => section.href ? router.push(section.href) : null}>
+                  <Link className="flex w-0 flex-1 px-2 py-4 items-center justify-center cursor-pointer hover:bg-gray-100"
+                    href={`/console/site/${configuration._id}/${section.route}`}>
                     Configure
-                  </div>
+                  </Link>
                 </div>
               </div>
             </div>

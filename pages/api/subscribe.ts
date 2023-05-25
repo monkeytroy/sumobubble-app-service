@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import Cors from 'cors';
 import { apiMiddleware } from '@/services/api-middleware';
 import connectMongo from '@/services/mongoose';
-import Customer, { IBeaconCustomer } from '@/models/customer';
+import Customer, { ICustomer } from '@/models/customer';
 import { log } from '@/services/log';
 
 const cors = Cors({

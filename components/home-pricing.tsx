@@ -24,7 +24,7 @@ export default function HomePricing(props: IAppProps) {
           </p>
         </div>
         <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-300">
-          Choose an affordable plan that's perfect for your organization and customers.
+          Choose an affordable plan that is perfect for your organization and customers.
         </p>
 
         <div className="isolate mx-auto mt-10 relative">
@@ -38,7 +38,7 @@ export default function HomePricing(props: IAppProps) {
           {props.stripe?.key && props.stripe?.homeId && 
             <stripe-pricing-table 
               customer-email={session?.user?.email}
-              success-url="http://localhost:3000/"
+              success-url={process.env.NEXTAUTH_URL}
               pricing-table-id={props.stripe?.homeId}
               publishable-key={props.stripe?.key}>
             </stripe-pricing-table>

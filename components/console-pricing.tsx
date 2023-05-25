@@ -87,7 +87,7 @@ export default function ConsolePricing(props: IAppProps) {
                       {props.stripe?.key && props.stripe?.consoleId && 
                         <stripe-pricing-table 
                           customer-email={session?.user?.email}
-                          success-url="http://localhost:3000/"
+                          success-url={process.env.NEXTAUTH_URL}
                           pricing-table-id={props.stripe?.consoleId}
                           publishable-key={props.stripe?.key}>
                         </stripe-pricing-table>

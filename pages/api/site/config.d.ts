@@ -3,7 +3,7 @@
 //   contact = 'contact'
 // }
 
-interface IBeaconSite {
+interface ISite {
   _id?: string;
   customerId: string;
   customerEmail: string;
@@ -53,7 +53,7 @@ interface Copyrights {
 type ConfigRes = {
   success: boolean,
   message: string,
-  data: IBeaconConfig
+  data: ISite
 }
 
 interface IContactCategory {

@@ -3,7 +3,7 @@ import { CtxOrReq } from "next-auth/client/_utils";
 import { getSession } from "next-auth/react";
 import connectMongo from "./mongoose";
 import { log } from "./log";
-import { IBeaconCustomer } from "@/models/customer";
+import { ICustomer } from "@/models/customer";
 import { fetchOrCreateCustomer } from "./customer";
 import { fetchCustomerSites } from "./site";
 import { GetServerSideProps } from "next";
@@ -14,7 +14,7 @@ export interface ISitesSummary {
 }
 
 export interface IAppProps {
-  customer?: IBeaconCustomer;
+  customer?: ICustomer;
   sites?: ISitesSummary[];
   stripe?: {
     key: string,

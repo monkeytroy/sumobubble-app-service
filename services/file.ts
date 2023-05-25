@@ -1,5 +1,5 @@
 
-export const saveFile = async (config: IBeaconConfig, fileblob: Blob) => {
+export const saveFile = async (config: ISite, fileblob: Blob) => {
 
   const formData = new FormData();
 

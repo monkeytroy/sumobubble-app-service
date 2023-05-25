@@ -1,4 +1,4 @@
-import Customer, { IBeaconCustomer, Membership } from "@/models/customer";
+import Customer, { ICustomer, Membership } from "@/models/customer";
 import { getSession } from "next-auth/react";
 import { log } from "./log";
 import connectMongo from "./mongoose";
@@ -8,8 +8,8 @@ import { fetchOrCreateCustomer } from "./customer";
 import { fetchCustomerSite } from "./site";
 
 export interface ISiteProps {
-  customer?: IBeaconCustomer;
-  site?: IBeaconSite;
+  customer?: ICustomer;
+  site?: ISite;
 }
  
 /**

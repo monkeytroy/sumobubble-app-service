@@ -27,7 +27,7 @@ export default function Console(props: IAppProps) {
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-800 sm:text-3xl">Console</p>
           <p className="mt-6 text-base leading-7 text-gray-600">
             Welcome! To get started, first create a site. From there you can set the main summary content of your InfoChatApp.
-            Then checkout the different Sections that can be enabled to enhance the common user experience across all of your website's pages. 
+            Then checkout the different Sections that can be enabled to enhance the common user experience across your entire website. 
             Finally, subscribe to use the app on your website!
           </p>
         </div>

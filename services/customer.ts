@@ -1,4 +1,4 @@
-import Customer, { IBeaconCustomer, SubscriptionStatus, Membership } from "@/models/customer";
+import Customer, { ICustomer, SubscriptionStatus, Membership } from "@/models/customer";
 import { log } from "./log";
 import connectMongo from "./mongoose";
 
@@ -10,16 +10,16 @@ interface IFetchOrCreateCustomerProps {
 
 export const fetchOrCreateCustomer = async (
     {customerId, username, email}: IFetchOrCreateCustomerProps): 
-    Promise<IBeaconCustomer | null> => { 
+    Promise<ICustomer | null> => { 
 
   await connectMongo();
 
   log(`fetchOrCreateCustomer::Looking for ${customerId} ${email}`);
 
   // fetch or create customer rec
-  let customer: IBeaconCustomer | null = await Customer.findOne({ email: email });
+  let customer: ICustomer | null = await Customer.findOne({ email: email });
   if (!customer) {
-    const newCustomer: IBeaconCustomer = {
+    const newCustomer: ICustomer = {
       email,
       customerId,
       name: username || '',

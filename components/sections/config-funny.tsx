@@ -112,7 +112,7 @@ export default function ConfigFunny() {
             <label htmlFor="funnyAuto" className="font-medium text-gray-900">
               Auto Fill
             </label>
-            <p className="text-gray-500">Let Beacon provide a daily funny.</p>
+            <p className="text-gray-500">Let Us provide a daily funny.</p>
           </div>
         </div>
 

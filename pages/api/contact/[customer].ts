@@ -87,7 +87,7 @@ export default async function handler(
           const mailBody = {
             emailTo: '',
             name,
-            subject: `Beacon contact from ${name}`,
+            subject: `InfoChat App contact from ${name}`,
             body: bodyText
           }
 

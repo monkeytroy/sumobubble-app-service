@@ -83,7 +83,7 @@ export const removeSite = async (siteId: string) => {
 
 }
 
-export const saveSite = async (config: IBeaconSite) => {
+export const saveSite = async (config: ISite) => {
 
   const res = await fetch(`/api/site/${config._id}`, {
     method: 'POST',
