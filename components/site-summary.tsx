@@ -80,7 +80,7 @@ export default function ConfigSummary(props: IAppProps) {
 
   const onImagesUpload = (blobInfo:any) => new Promise<string>(async (resolve, reject) => {
     
-    const res = await saveFile(configuration, blobInfo.blob());
+    const res = await saveFile(configuration?.customerEmail || 'unknown', blobInfo.blob());
 
     if (res.success) {
       resolve(res.data.url);
