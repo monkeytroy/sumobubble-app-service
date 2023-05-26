@@ -3,11 +3,15 @@ import {
   HomeIcon,
   DocumentTextIcon,
   ArrowUpOnSquareIcon,
+  ServerIcon,
 } from '@heroicons/react/24/outline'
 
 import { ISection, sections } from '@/components/sections/sections';
 import { useRouter } from 'next/router';
 import { IAppState, useAppStore } from '@/store/app-store';
+import { useState } from 'react';
+import { publishSite } from '@/services/site';
+import { toast } from 'react-toastify';
 
 // configuration so 'current' works.
 const navigation: Array<ISection> = [
@@ -50,17 +54,37 @@ export default function NavSide() {
   const currentRoute = router.route;
   
   const configuration = useAppStore((state: IAppState) => state.configuration);
+  const [saving, setSaving] = useState(false);
 
   const current = (item: ISection) => {
     return currentRoute.endsWith(`/${item.route}`) || section == item.name.toLowerCase()
   }
 
-  return (
-    <div className="w-64 overflow-hidden flex min-h-screen shrink-0 flex-col gap-y-5 overflow-y-auto bg-indigo-600 px-6 pt-20">
-      <nav className="flex flex-1 flex-col">
-        <ul role="list" className="flex flex-1 flex-col gap-y-7">
-          <li>
+  const onPublish = async () => {
+    if (configuration?._id) {
+      setSaving(true);
 
+      try {
+        await publishSite(configuration._id);       
+      } finally {
+        setTimeout(() => setSaving(false), 2000);
+      }
+      
+    } else {
+      toast.warn('No site loaded... cannot publish.', {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+      });
+    }
+  }
+
+  return (
+    <div className="w-64 overflow-hidden flex min-h-screen shrink-0 
+      flex-col overflow-y-auto bg-indigo-600 px-4 pt-20">
+      <nav className="">
+        <ul role="list" className="flex flex-col gap-4">
+          <li>
             <ul role="list" className="-mx-2 space-y-1">
               <a href={`/console`}
                 className={classNames(currentRoute == '/console' ? 'bg-indigo-700 text-white'
@@ -74,15 +98,31 @@ export default function NavSide() {
                   aria-hidden="true">
                   <HomeIcon></HomeIcon>
                 </span>
-                Sites
+                Account
               </a>
             </ul>
-            
-            <ul>
-              <div className="text-white group rounded-md p-2 leading-6 font-semibold truncate">
-                {configuration?.title}
-              </div>
-            </ul>
+          </li>
+          <li>
+            <div className="border-t border-gray-400 py-2 text-xs font-semibold leading-6 text-indigo-200">
+              Site Name
+            </div>
+            <div className="text-white group rounded-md leading-6 font-semibold truncate">
+              {configuration?.title || 'Create or Select'}
+            </div>
+            <button type="button" disabled={!configuration || saving}
+              onClick={() => onPublish()}
+              title="Site changes only available to user after a publish!"
+              className="w-full my-4 rounded-md bg-blue-500 py-2 px-3 text-sm font-semibold 
+                text-white shadow-sm hover:bg-blue-600 disabled:opacity-25
+                focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+              Publish Site Now
+            </button>
+          </li>
+          <li>
+
+            <div className="border-t border-gray-400 py-2 text-xs font-semibold leading-6 text-indigo-200">
+              Site Settings
+            </div>
 
             <div className={configuration ? '' : 'pointer-events-none select-none opacity-50'}>
               <ul role="list" className="-mx-2 space-y-1">
@@ -111,7 +151,7 @@ export default function NavSide() {
             </div>
           </li>
 
-          <li className="-mx-6 mt-auto">
+          <li className="mt-auto">
           </li>
         </ul>
       </nav>

@@ -7,6 +7,7 @@ import formidable from "formidable";
 import fs from 'fs';
 import { log } from "@/services/log";
 import { UUID } from "bson";
+import { getS3Client } from "@/services/s3";
 
 const spacesUrl = process.env.SPACES_BUCKET_URL;
 
@@ -40,25 +41,6 @@ export default async function handler(
       res.status(405).send({ success: false, message: 'Method unsupported' })  
   }
 
-}
-
-/**
- * Get the s3 client to access objects
- * @returns 
- */
-const getS3Client = () => {
-  
-  const s3Client = new S3({
-    forcePathStyle: false, // Configures to use subdomain/virtual calling format.
-    endpoint: process.env.SPACES_ENDPOINT,
-    region: process.env.SPACES_REGION,
-    credentials: {
-      accessKeyId: process.env.SPACES_KEY || '',
-      secretAccessKey: process.env.SPACES_SECRET || ''
-    }
-  });
-
-  return s3Client;
 }
 
 /**

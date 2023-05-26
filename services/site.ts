@@ -93,7 +93,6 @@ export const saveSite = async (config: ISite) => {
   const json = await res.json();
 
   if (json.success) {
-
     toast.success('Saved!', {
       position: "top-center",
       autoClose: 3000,
@@ -107,6 +106,33 @@ export const saveSite = async (config: ISite) => {
       autoClose: 3000,
       hideProgressBar: true,
       });
+
+    return null;
+  }
+}
+
+export const publishSite = async (siteId: string) => {
+
+  const res = await fetch(`/api/site/${siteId}/publish`, {
+    method: 'POST'
+  });
+
+  const json = await res.json();
+
+  if (json.success) {
+    toast.success('Site was published! Time to deploy!', {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: true,
+      });
+      
+    return json.data;
+  } else {
+    toast.error('Oops... could not publish site!', {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: true,
+    });
 
     return null;
   }

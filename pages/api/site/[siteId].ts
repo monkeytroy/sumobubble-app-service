@@ -10,7 +10,7 @@ import { log } from '@/services/log';
 import Site from '@/models/site';
 
 const cors = Cors({
-  methods: ['GET', 'POST', 'PUT', 'DELET', 'HEAD'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'],
 });
 
 const DEFAULT_TRANSLATION = 'ASV';

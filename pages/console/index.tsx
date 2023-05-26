@@ -24,12 +24,39 @@ export default function Console(props: IAppProps) {
 
       <div className="relative">
         <div className="md:w-2/3">
-          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-800 sm:text-3xl">Console</p>
-          <p className="mt-6 text-base leading-7 text-gray-600">
-            Welcome! To get started, first create a site. From there you can set the main summary content of your InfoChatApp.
-            Then checkout the different Sections that can be enabled to enhance the common user experience across your entire website. 
-            Finally, subscribe to use the app on your website!
+          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-800 sm:text-3xl">
+            Account
           </p>
+          <p className="mt-6 text-base leading-7 text-gray-600">
+            Welcome! Ready to get started?
+          </p>
+          <dl className="mt-10 max-w-xl space-y-8 text-base leading-7 text-gray-600 lg:max-w-none">
+            <div className="relative pl-9">
+              <dt className="inline font-semibold text-gray-900">
+                1. Create a Site
+              </dt>{' '}
+              <dd className="inline">
+                Start out by creating a site below. Then select it!
+              </dd>
+            </div>
+            <div className="relative pl-9">
+              <dt className="inline font-semibold text-gray-900">
+                2. Configure the Site
+              </dt>{' '}
+              <dd className="inline">
+                Enter a summary for your site that will display when someone opens InfoChat. 
+                You can also enable and configure additional sections.
+              </dd>
+            </div>
+            <div className="relative pl-9">
+              <dt className="inline font-semibold text-gray-900">
+                3. Publish!
+              </dt>{' '}
+              <dd className="inline">
+                When you have Info Chat all setup... publish to make it public!
+              </dd>
+            </div>
+          </dl>
         </div>
       </div>
 

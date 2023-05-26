@@ -1,4 +1,9 @@
-
+/**
+ * Upload a file to the api for saving
+ * @param id 
+ * @param fileblob 
+ * @returns 
+ */
 export const saveFile = async (id: string, fileblob: Blob) => {
 
   const formData = new FormData();
