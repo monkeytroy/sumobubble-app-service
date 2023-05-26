@@ -63,6 +63,8 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
         ContentType: "application/json"
       };
 
+      log('Writing object to spaces: ', fileParams);
+
       const putObjectRes = await s3Client.send(new PutObjectCommand(fileParams));
 
       log(putObjectRes);
