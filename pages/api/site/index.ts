@@ -69,7 +69,11 @@ const put = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
       customerEmail,
       title: siteTitle,
       summary: {
+        enabled: false,
         content: ''
+      },
+      chatbot: {
+        enabled: false
       },
       sections: {}
     }
