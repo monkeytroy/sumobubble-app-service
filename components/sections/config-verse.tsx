@@ -1,8 +1,8 @@
 import { saveSite } from "@/services/site";
-import { IAppState, useAppStore } from "@/store/app-store";
+import { useAppStore } from "@/store/app-store";
 import { BookOpenIcon } from "@heroicons/react/24/outline";
 import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
-import ConfigSubmit from "../config-submit";
+import ConfigSubmit from "../submit-form";
 import VerseTranslationSelect from "../verse-translation-select";
 import { ISection } from "./sections";
 
@@ -10,15 +10,15 @@ export const section: ISection = {
   name: 'verse',
   title: 'Verse',
   description: 'A custom static or automatic daily verse in the translation of your choice.',
-  route: 'sections/verse',
   icon: <BookOpenIcon/>,
   class: 'ml-2 text-xs',
-  component: <ConfigVerse/>
+  component: <ConfigVerse/>,
+  isInfoSection: true
 };
 
 export default function ConfigVerse() {
 
-  const configuration = useAppStore((state: IAppState) => state.configuration);
+  const configuration = useAppStore((state) => state.site);
 
   // load this section.
   const thisSection: ISiteSection | undefined = configuration?.sections[section.name];

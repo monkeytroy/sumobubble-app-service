@@ -1,23 +1,23 @@
 import { saveSite } from "@/services/site";
-import { useAppStore, IAppState } from "@/store/app-store";
+import { useAppStore } from "@/store/app-store";
 import { ExclamationCircleIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
-import ConfigSubmit from "../config-submit";
+import ConfigSubmit from "../submit-form";
 import { ISection } from "./sections";
 
 export const section: ISection = {
   name: 'contact',
   title: 'Contact Us',
   description: 'Contact form with customizable intro.',
-  route: 'sections/contact',
   icon: <UsersIcon/>,
   class: 'ml-2 text-xs',
-  component: <ConfigContact/>
+  component: <ConfigContact/>,
+  isInfoSection: true
 };
 
 export default function ConfigContact() {
 
-  const configuration = useAppStore((state: IAppState) => state.configuration);
+  const configuration = useAppStore((state) => state.site);
 
   // load this section.
   const thisSection: ISiteSection | undefined = configuration?.sections[section.name];

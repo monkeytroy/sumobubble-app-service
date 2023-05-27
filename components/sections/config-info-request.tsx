@@ -1,23 +1,23 @@
 import { saveSite } from "@/services/site";
-import { useAppStore, IAppState } from "@/store/app-store";
+import { useAppStore } from "@/store/app-store";
 import { ExclamationCircleIcon, MinusCircleIcon, StarIcon } from "@heroicons/react/24/outline";
 import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
-import ConfigSubmit from "../config-submit";
+import ConfigSubmit from "../submit-form";
 import { ISection } from "./sections";
 
 export const section: ISection = {
-  name: 'info',
+  name: 'inforequest',
   title: 'Info Request',
   description: 'Configurable information requests.',
-  route: 'sections/info',
   icon: <StarIcon/>,
   class: 'ml-2 text-xs',
-  component: <ConfigInfoRequest/>
+  component: <ConfigInfoRequest/>,
+  isInfoSection: true
 };
 
 export default function ConfigInfoRequest() {
 
-  const configuration = useAppStore((state: IAppState) => state.configuration);
+  const configuration = useAppStore((state) => state.site);
 
   // load this section.
   const thisSection: ISiteSection | undefined = configuration?.sections[section.name];

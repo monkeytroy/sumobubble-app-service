@@ -1,4 +1,5 @@
 
+import { ICustomer } from '@/models/customer';
 import { createChatbot } from '@/services/chatbot';
 import { addNewSite, removeSite, saveSite } from '@/services/site';
 import { ISitesSummary } from '@/services/ssp-default';
@@ -8,31 +9,33 @@ import { create } from 'zustand';
 export interface IAppState {
 
   sites: Array<ISitesSummary>,
-  configuration: ISite | null,
-  changed: boolean;
-  lastSaveTime: number;
+  site: ISite | null,
+  siteChanged: boolean;
+  customer: ICustomer | null;
 
+  setCustomer: (val: ICustomer) => void; 
   setSites: (val: Array<ISitesSummary>) => void;
   addSite: (siteTitle: string) => void;
   removeSite: (siteId: string) => void;
-  setConfiguration: (val: ISite) => void;
-  setChanged: (val: boolean) => void;
-  updateLastSaveTime: () => void;
+  setSite: (val: ISite) => void;
+  setSiteChanged: (val: boolean) => void;
   enableSection: (val: boolean, section: string) => void;
   activateChatbot: (val: ISite) => void;
 }
 
-export const useAppStore = create<IAppState>((set, get) => ({
+export const useAppStore = create<IAppState>( (set, get) => ({
 
   sites: [],
-  configuration: null,
-  token: '',
-  changed: false,
-  lastSaveTime: 0,
+  site: null,
+  siteChanged: false,
+  customer: null,
 
-  setSites: (val: Array<ISitesSummary>) => set (state => ({ sites: [...val]})),
+  setCustomer: (val: ICustomer) => set (() => ({ customer: {...val}})),
+
+  setSites: (val: Array<ISitesSummary>) => set (() => ({ sites: [...val]})),
 
   addSite: async (siteTitle: string) => {
+
     // call the service. 
     const newSiteRes = await addNewSite(siteTitle); 
 
@@ -59,24 +62,25 @@ export const useAppStore = create<IAppState>((set, get) => ({
   removeSite: async (siteId: string) => {
     // call the service
     const removeSiteRes = await removeSite(siteId);
+
     // update the store
     if (removeSiteRes) {
       set(state => ({ sites: [...state.sites.filter((val) => val._id !== siteId)]}));
     }
   },
 
-  setConfiguration: (val: ISite) => set (state => ({ configuration: {...val} }) ),
+  setSite: (val: ISite) => set (() => ({ site: {...val} }) ),
 
-  setChanged: (val: boolean) => set ( state => ({ changed: val})),
-  
-  updateLastSaveTime: () => set( state => ({ lastSaveTime: state.lastSaveTime + 1}) ),
+  setSiteChanged: (val: boolean) => set ( () => ({ siteChanged: val})),
 
-  enableSection: async (val: boolean, section: string) => {
+  enableSection: async (val: boolean, sectionName: string) => {
 
-    const config = get().configuration;
-    if (config) {
-      let selectedSection = config?.sections[section as keyof ISiteSections];
+    const site = get().site;
 
+    if (site) {
+      let selectedSection = site?.sections[sectionName as keyof ISiteSections];
+
+      // enable or create section
       if (selectedSection) {
         selectedSection.enabled = val;
       } else {
@@ -87,13 +91,13 @@ export const useAppStore = create<IAppState>((set, get) => ({
         }
       }
 
-      config.sections[section as keyof ISiteSections] = {...selectedSection};
+      site.sections[sectionName as keyof ISiteSections] = {...selectedSection};
       
-      const res = await saveSite(config);
+      // service
+      const res = await saveSite(site);
 
-      set({
-        configuration: {...res}
-      });
+      // back to state
+      get().setSite(res);
   
     }
 
@@ -103,10 +107,13 @@ export const useAppStore = create<IAppState>((set, get) => ({
   
     if (site?._id) {
 
+      // service
       const res = await createChatbot(site?._id);
 
       if (res?.success) {
-        set (state => ({ configuration: {...res.data}}));
+
+        // state
+        get().setSite(res.data);
 
         toast.success('Created!', {
           position: "top-center",

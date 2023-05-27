@@ -6,14 +6,14 @@ import { log } from '@/services/log';
 import Site from '@/models/site';
 import connectMongo from '@/services/mongoose';
 import { stripHtml } from "string-strip-html";
+import { checkChatbaseChatbotExists, createChatbaseChatbot } from '@/services/chatbase';
 
 const cors = Cors({
   methods: ['GET', 'PUT', 'POST', 'HEAD'],
 });
 
-export default async function handler(
-  req: NextApiRequest, res: NextApiResponse<ConfigRes | any>
-) {
+export default async function handler(req: NextApiRequest, 
+    res: NextApiResponse<ConfigRes | any>) {
 
   await apiMiddleware(req, res, cors);
 
@@ -36,72 +36,42 @@ const invalid = (res: NextApiResponse, reason: string) => {
 
 const put = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) => {
 
-  const chatbaseUrl = 'https://www.chatbase.co/api/v1/create-chatbot';
-
   const { siteId } = req.query;
+  let failMsg = 'Unable to create chatbot';
+
+  log(`/api/chatbot/${siteId} put`);
 
   await connectMongo();
 
   // get the site.
   const site = await Site.findById(siteId);
-
-  log(`chatbot put for site ${siteId}`);
-
   if (site) {
 
-    const sourceText = stripHtml(site.summary?.content || 'A new chatbot from InfoChat App!').result;
+    // determine if a chatbot already exists.
+    let chatbotExists = false;
+    const chatbaseId = site?.chatbot?.chatbaseId;
+    if (chatbaseId) {
+      chatbotExists = await checkChatbaseChatbotExists(chatbaseId);
+    }
 
-    const payload = {
-      chatbotName: site.title,
-      sourceText
-    };
+    if (chatbotExists) {
+      failMsg = `Chatbot for ${site?.title || 'your site'} already exists.`;
+    } else {
 
-    log(`Building payload for ${JSON.stringify(payload)}`);
+      const sourceText = stripHtml(site.summary?.content || 'A new chatbot from InfoChat App!').result;
 
-    const chatbaseRes = await fetch(chatbaseUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + process.env.CHATBASE_API_KEY
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (chatbaseRes) {
-      const chatbaseResJson = await chatbaseRes.json();
-
-      if (chatbaseResJson.chatbotId) {
-
-        // save the chatbot id, creating section if it does not exist. 
-        // order here matters.  set def values.  spread the existing overtop.  spread props over that
-        // like a cake!  (or onion)
-
-        // sections is a map. get a js copy, update and set back.
-        let chatbot = JSON.parse(JSON.stringify(site.sections.get('chatbot') || {}));
-
-        chatbot = {
-          enabled: true,
-          content: '',
-          ...chatbot,
-          props: { 
-            ...chatbot?.props,
-            chatbaseId: chatbaseResJson.chatbotId
-          }
-        }
-
-        site.sections.set('chatbot', chatbot);
+      const chatbotId = await createChatbaseChatbot(site?._id, sourceText);
+      if (chatbotId) {
+        // save the chatbot id
+        site.chatbot.chatbaseId = chatbotId;
 
         await site.save();
 
         res.status(200).json({ success: true, message: 'Created', data: site });  
         return;
-      } else {
-        log(`No json from chatbase ${JSON.stringify(chatbaseResJson)}`);  
-      }
-    } else {
-      log(`No response from chatbase ${chatbaseRes}`);
+      }      
     }
   }
   
-  invalid(res, 'Unable to create chatbot.');
+  invalid(res, failMsg);
 }

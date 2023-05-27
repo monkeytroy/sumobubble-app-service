@@ -1,36 +1,35 @@
 //import { PhotoIcon } from "@heroicons/react/24/solid";
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
-import ConfigSubmit from '@/components/config-submit';
+import ConfigSubmit from '@/components/submit-form';
 import { saveSite } from '@/services/site';
 import { TwitterPicker } from 'react-color';
-import { IAppState, useAppStore } from '@/store/app-store';
+import { useAppStore } from '@/store/app-store';
 import { Editor } from '@tinymce/tinymce-react';
 import ReactHtmlParser from 'react-html-parser';
 import { saveFile } from '@/services/file';
 import { IAppProps } from '@/services/ssp-default';
+import { DocumentTextIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { ISection } from './sections';
+
+export const section: ISection = { 
+  name: 'info', 
+  title: 'Info',
+  description: 'Summary info displayed when app is opened', 
+  icon: <InformationCircleIcon/>,
+  class: 'text-sm',
+  component: <ConfigSummary/>,
+  isInfoSection: false
+}
 
 export default function ConfigSummary(props: IAppProps) {
   
-  const DEFAULT_THEME_COLOR = '#8ED1FC';
-  
-  const COLORS = [
-    '#000000', '#EFEFEF', '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#0039e6', 
-    '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', 
-    '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#607D8B', 
-    '#F8BBD0', '#E6EE9C', '#B2DFDB', '#80CBC4', '#BBDEFB', '#90CAF9', '#CE93D8', 
-    '#FFAB91', '#BCAAA4'
-  ];
+  const configuration = useAppStore((state) => state.site);
 
-  const configuration = useAppStore((state: IAppState) => state.configuration);
-
-  const [title, setTitle] = useState('');
   const [logo, setLogo] = useState('');
   const [summary, setSummary] = useState('');
   const [special, setSpecial] = useState('');
-  const [themePrimary, setThemePrimary] = useState(DEFAULT_THEME_COLOR);
 
   const [saving, setSaving] = useState(false);
-  const [pickColor, setPickColor] = useState(false);
   
   const [summaryLoading, setSummaryLoading] = useState(true);
   const editorRef = useRef({} as any);
@@ -38,12 +37,10 @@ export default function ConfigSummary(props: IAppProps) {
   const [newSummary, setNewSummary] = useState(summary);
 
   const reset = useCallback(() => {
-    setTitle(configuration?.title || '');
     setLogo(configuration?.logo?.url || '');
     setSummary(configuration?.summary?.content || '');
     setNewSummary(configuration?.summary?.content || '');
     setSpecial(configuration?.summary?.special || '');
-    setThemePrimary(configuration?.theme?.primary || DEFAULT_THEME_COLOR)
   }, [configuration]);
 
   useEffect(() => {
@@ -58,13 +55,7 @@ export default function ConfigSummary(props: IAppProps) {
 
       // copy configuration
       const newConfiguration = JSON.parse(JSON.stringify(configuration));
-
-      // create new section
-      newConfiguration.title = title;
-      newConfiguration.logo = { url: logo };
-      newConfiguration.theme = {
-        primary: themePrimary
-      }
+     
       newConfiguration.summary.content = newSummary;
       newConfiguration.summary.special = special;
 
@@ -72,10 +63,6 @@ export default function ConfigSummary(props: IAppProps) {
 
       setTimeout(() => setSaving(false), 2000);
     }
-  }
-
-  const themeSelect = (color: any) => {
-    setThemePrimary(color.hex);
   }
 
   const onImagesUpload = (blobInfo:any) => new Promise<string>(async (resolve, reject) => {
@@ -99,39 +86,7 @@ export default function ConfigSummary(props: IAppProps) {
           <span className="text-sm text-gray-600">
             All about your organization!
           </span>
-        </div>
-          
-        <div className="flex gap-4 max-w-full sm:max-w-md w-full">
-          <div className="flex-1">
-            <label htmlFor="title" className="block text-sm font-medium leading-6 text-gray-900">
-              Title - Pop up heading
-            </label>
-            <div className="mt-2">
-              <input
-                type="text" name="title" id="title"
-                value={title} onChange={e => setTitle(e.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm 
-                  ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 
-                  focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-          </div>
-
-          <div className="md:grow-1 sm:shrink">
-            <label htmlFor="title" className="block text-sm font-medium leading-6 text-gray-900">
-              Theme Color
-            </label>
-            <div className="mt-2 relative">
-              <div className="w-24 h-9 rounded-md" style={{backgroundColor: themePrimary}} 
-                onClick={() => setPickColor(!pickColor)}></div>
-              {pickColor && 
-                <div className="z-50 absolute mt-2 p-4 bg-gradient-to-t from-gray-100 bg-gray-50 border-gray-200 shadow-md shadow-gray-500 rounded-lg ">
-                  <TwitterPicker onChangeComplete={themeSelect} colors={COLORS}></TwitterPicker>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
+        </div>        
 
         <div className="w-full sm:w-full md:w-3/4 hidden">
           <label htmlFor="logo" className="block text-sm font-medium leading-6 text-gray-900">

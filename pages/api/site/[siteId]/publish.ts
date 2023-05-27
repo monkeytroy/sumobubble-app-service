@@ -47,8 +47,19 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
     const site = await Site.findOne({ _id: siteId }); 
 
     if (site) {
+
       // remove unnecessary fields
       const { __v, ...siteRes} = site.toJSON();
+
+      // massage any data
+      const spotlight = siteRes.sections['spotlight'];
+      if (spotlight) {
+        let spotlightUrl = spotlight?.urls[0];
+        if (spotlightUrl.indexOf('watch?v=') > 0) {
+          spotlightUrl = spotlightUrl.replace('watch?v=', 'embed/');
+          spotlight.urls = [spotlightUrl];
+        }
+      }
 
       // write file to space.
       const s3Client = getS3Client();

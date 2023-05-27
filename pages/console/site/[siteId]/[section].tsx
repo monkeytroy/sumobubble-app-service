@@ -11,11 +11,13 @@ export default function SectionPage(props: ISiteProps) {
   const { section } = router.query || 'contact';
 
   // app props on app state
-  const setConfiguration = useAppStore((state: any) => state.setConfiguration);
+  const setSite = useAppStore((state) => state.setSite);
     
   useEffect(() => {
-    setConfiguration(props.site);
-  }, [setConfiguration, props.site]);
+    if (props.site) {
+      setSite(props.site);
+    }
+  }, [setSite, props.site]);
   
   return (
     <>

@@ -1,4 +1,8 @@
-
+/**
+ * Client call to create chatbot.
+ * @param id 
+ * @returns 
+ */
 export const createChatbot = async (id: string) => {
 
   const chatbotUrl = `/api/chatbot/${id}`;

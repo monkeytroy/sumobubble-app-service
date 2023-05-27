@@ -8,6 +8,7 @@ import Funny, { IFunny } from '@/models/funny';
 import Verse from '@/models/verse';
 import { log } from '@/services/log';
 import Site from '@/models/site';
+import { setChatbaseSiteAndRefresh } from '@/services/chatbase';
 
 const cors = Cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'],
@@ -105,7 +106,20 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
     //   return;
     // }
 
+    const currentSite = await Site.findById(siteId);
+
+    const currentChatsite = currentSite?.chatbot?.chatsite;
+
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const chatbaseId = body?.chatbot?.chatbaseId;
+    const chatsite = body?.chatbot?.chatsite;
+
+    if (chatbaseId && chatsite !== currentChatsite) {
+      // call to refresh the chatbot site. 
+      // todo maybe this should happen on publish
+      // and maybe a workflow msg based process?  retry.. time? 
+      setChatbaseSiteAndRefresh(chatbaseId, chatsite);
+    }
 
     const site = await Site.findOneAndUpdate({ _id: siteId }, body, {
       new: true

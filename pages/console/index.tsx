@@ -1,6 +1,6 @@
 import { getServerSideProps, IAppProps } from '@/services/ssp-default';
 import SiteAdd from '@/components/site-add';
-import { IAppState, useAppStore } from '@/store/app-store';
+import { useAppStore } from '@/store/app-store';
 import { useEffect } from 'react';
 import SiteList from '@/components/site-list';
 import ConsolePricing from '@/components/console-pricing';
@@ -8,8 +8,8 @@ import ConsolePricing from '@/components/console-pricing';
 export default function Console(props: IAppProps) { 
  
   // app props on app state
-  const setSites = useAppStore((state: IAppState) => state.setSites);
-  const sites = useAppStore((state: IAppState) => state.sites);
+  const setSites = useAppStore((state) => state.setSites);
+  const sites = useAppStore((state) => state.sites);
 
   useEffect(() => {
     setSites(props.sites || []);

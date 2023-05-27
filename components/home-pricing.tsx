@@ -1,5 +1,6 @@
 import { IAppProps } from "@/services/ssp-default";
 import { signIn, useSession } from "next-auth/react";
+import { useAppStore } from '@/store/app-store';
 
 declare global {
   namespace JSX {
@@ -13,6 +14,7 @@ declare global {
 }
 
 export default function HomePricing(props: IAppProps) {
+  const customer = useAppStore((state) => state.customer);
   const {data: session} = useSession();
 
   return (

@@ -1,15 +1,16 @@
 import { IAppProps, getServerSideProps } from '@/services/ssp-default';
 import HomePricing from '@/components/home-pricing';
 import HomeFeatures from '@/components/home-features';
+import { useAppStore } from '@/store/app-store';
+import { useEffect } from 'react';
 
 export default function Home(props: IAppProps) { 
 
-  // this is how to put server side props onto the store if needed. 
-  //const setConfiguration = useAppStore((state: any) => state.setConfiguration);
+  const setCustomer = useAppStore((state: any) => state.setCustomer);
     
-  // useEffect(() => {
-  //   setConfiguration(props.configuration);
-  // }, [setConfiguration, props.configuration]);
+  useEffect(() => {
+    setCustomer(props.customer);
+  }, [props]);
   
   return (
     <div className="flex flex-col gap-24">

@@ -10,8 +10,6 @@ const sectionSchema = new Schema<ISiteSection>({
     required: false
   },
   props: {
-    chatsite: String,
-    chatbaseId: String,
     verseRef: String,
     autoFill: Boolean,
     copyright: String,
@@ -45,19 +43,23 @@ const siteSchema = new Schema<ISite>({
   theme: {
     primary: String
   },
-  logo: {                            // depricated
-    url: String,
-    align: String
-  },
-  social: {                          // unused?
+  social: {                          // unused for now. placeholder.
     youtube: String
   },
   summary: {
     type: {
+      enabled: Boolean,
       content: String,
       special: String
     },
     required: true
+  },
+  chatbot: {
+    type: {
+      enabled: Boolean,
+      chatsite: String,
+      chatbaseId: String, 
+    }
   },
   sections: {
     type: Map,

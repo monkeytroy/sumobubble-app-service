@@ -1,24 +1,24 @@
 import { saveSite } from "@/services/site";
-import { IAppState, useAppStore } from "@/store/app-store";
+import { useAppStore } from "@/store/app-store";
 import { ExclamationCircleIcon, ExclamationTriangleIcon, TvIcon } from "@heroicons/react/24/outline";
 import { useState, FormEvent, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
-import ConfigSubmit from "../config-submit";
+import ConfigSubmit from "../submit-form";
 import { ISection } from "./sections";
 
 export const section: ISection = {
   name: 'spotlight',
   title: 'Spotlight',
   description: 'A video or channel to spotlight for your guests.',
-  route: 'sections/spotlight',
   icon: <TvIcon/>,
   class: 'ml-2 text-xs',
-  component: <ConfigSpotlight/>
+  component: <ConfigSpotlight/>,
+  isInfoSection: true
 };
 
 export default function ConfigSpotlight() {
 
-  const configuration = useAppStore((state: IAppState) => state.configuration);
+  const configuration = useAppStore((state) => state.site);
 
   // load this section.
   const thisSection: ISiteSection | undefined = configuration?.sections[section.name];

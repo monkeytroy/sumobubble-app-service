@@ -1,10 +1,10 @@
 import { removeSite } from "@/services/site";
-import { useAppStore, IAppState } from "@/store/app-store";
+import { useAppStore } from "@/store/app-store";
 import { TrashIcon } from "@heroicons/react/24/outline";
 
 export default function SiteList() {
   
-  const sites = useAppStore((state: IAppState) => state.sites);
+  const sites = useAppStore((state) => state.sites);
 
   return (
     <div className="flex flex-col gap-2">
@@ -22,7 +22,7 @@ export default function SiteList() {
                 hover:border-gray-400 hover:bg-blue-100
                 flex items-center justify-between">
               <div className="min-w-0 flex-1">
-                <a href={`/console/site/${val._id}/summary`} 
+                <a href={`/console/site/${val._id}/setup`} 
                   className="focus:outline-none">
                   <p className="text-sm font-medium text-gray-900">{val.title}</p>
                   <p className="truncate text-sm text-gray-500"></p>

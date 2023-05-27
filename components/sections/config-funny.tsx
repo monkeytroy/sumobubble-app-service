@@ -1,24 +1,24 @@
 
 import { saveSite } from "@/services/site";
-import { IAppState, useAppStore } from "@/store/app-store";
+import { useAppStore } from "@/store/app-store";
 import { FaceSmileIcon } from "@heroicons/react/24/outline";
 import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
-import ConfigSubmit from "../config-submit";
+import ConfigSubmit from "../submit-form";
 import { ISection } from "./sections";
 
 export const section: ISection = {
   name: 'funny',
   title: 'Daily Funny',
   description: 'A custom or automatic daily funny item!',
-  route: 'sections/funny',
   icon: <FaceSmileIcon/>,
   class: 'ml-2 text-xs',
-  component: <ConfigFunny/>
+  component: <ConfigFunny/>,
+  isInfoSection: true
 };
 
 export default function ConfigFunny() {
 
-  const configuration = useAppStore((state: IAppState) => state.configuration);
+  const configuration = useAppStore((state) => state.site);
   
   // load this section.
   const thisSection: ISiteSection | undefined = configuration?.sections[section.name];

@@ -95,8 +95,6 @@ const updateSubscription = async (eventObject: any) => {
     const subscriptionId = eventObject.id;
     const items = eventObject.items;
 
-    console.log('Items: ', JSON.stringify(items));
-
     // todo store more info like dates.
 
     if (customerId) {

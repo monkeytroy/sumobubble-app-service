@@ -1,45 +1,13 @@
-import {
-  BookmarkIcon,
-  HomeIcon,
-  DocumentTextIcon,
-  ArrowUpOnSquareIcon,
-  ServerIcon,
-} from '@heroicons/react/24/outline'
-
+import { HomeIcon } from '@heroicons/react/24/outline'
 import { ISection, sections } from '@/components/sections/sections';
 import { useRouter } from 'next/router';
-import { IAppState, useAppStore } from '@/store/app-store';
+import { useAppStore } from '@/store/app-store';
 import { useState } from 'react';
 import { publishSite } from '@/services/site';
 import { toast } from 'react-toastify';
 
 // configuration so 'current' works.
 const navigation: Array<ISection> = [
-  { 
-    name: 'summary', 
-    title: 'Summary',
-    description: 'Summary info displayed when app is opened', 
-    route: 'summary', 
-    icon: <DocumentTextIcon></DocumentTextIcon>,
-    class: 'text-sm' 
-  },
-  {
-     
-    name: 'deploy', 
-    title: 'Deploy',
-    description: 'Deploy your InfoChat App', 
-    route: 'deploy', 
-    icon: <ArrowUpOnSquareIcon></ArrowUpOnSquareIcon>,
-    class: 'text-sm' 
-  },
-  { 
-    name: 'sections', 
-    title: 'Sections',
-    description: 'All available sections', 
-    route: 'sections', 
-    icon: <BookmarkIcon/>, 
-    class: 'text-sm' 
-  },
   ...sections
 ]
 
@@ -53,11 +21,11 @@ export default function NavSide() {
   const { section, siteId } = router.query;
   const currentRoute = router.route;
   
-  const configuration = useAppStore((state: IAppState) => state.configuration);
+  const configuration = useAppStore((state) => state.site);
   const [saving, setSaving] = useState(false);
 
   const current = (item: ISection) => {
-    return currentRoute.endsWith(`/${item.route}`) || section == item.name.toLowerCase()
+    return currentRoute.endsWith(`/${item.name}`) || section == item.name.toLowerCase()
   }
 
   const onPublish = async () => {
@@ -102,6 +70,7 @@ export default function NavSide() {
               </a>
             </ul>
           </li>
+          
           <li>
             <div className="border-t border-gray-400 py-2 text-xs font-semibold leading-6 text-indigo-200">
               Site Name
@@ -128,7 +97,7 @@ export default function NavSide() {
               <ul role="list" className="-mx-2 space-y-1">
                 {navigation.map((item) => (
                   <li key={item.name}>
-                    <a href={`/console/site/${siteId}/${item.route}`}
+                    <a href={`/console/site/${siteId}/${item.name}`}
                       className={classNames(
                         item.class,
                         current(item)

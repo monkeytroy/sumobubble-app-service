@@ -11,16 +11,18 @@ interface ISite {
   theme?: {
     primary?: string;
   }
-  logo?: {
-    url?: string;
-    align?: string;
-  },
   social?: {
     youtube?: string;
   }
   summary: {
+    enabled: boolean;
     content: string;
     special?: string;
+  },
+  chatbot: {
+    enabled: boolean;
+    chatsite?: string;                // the url for the site the chat will be baesd off
+    chatbaseId?: string;              // the chatbase bot id
   }
   sections: ISiteSections
 }
@@ -35,8 +37,6 @@ interface ISiteSection {
   content: string;
   urls?: string[];
   props?: {
-    chatsite?: string;                // the url for the site the chat will be baesd off
-    chatbaseId?: string;              // the chatbase bot id
     verseRef?: string;
     autoFill?: boolean;
     translation?: string;
