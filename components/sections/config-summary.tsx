@@ -25,6 +25,7 @@ export default function ConfigSummary(props: IAppProps) {
   
   const configuration = useAppStore((state) => state.site);
 
+  const [enabled, setEnabled] = useState(false);
   const [summary, setSummary] = useState('');
   const [special, setSpecial] = useState('');
 
@@ -36,6 +37,7 @@ export default function ConfigSummary(props: IAppProps) {
   const [newSummary, setNewSummary] = useState(summary);
 
   const reset = useCallback(() => {
+    setEnabled(typeof configuration?.summary?.enabled !== 'undefined' ? configuration?.summary?.enabled : false);
     setSummary(configuration?.summary?.content || '');
     setNewSummary(configuration?.summary?.content || '');
     setSpecial(configuration?.summary?.special || '');
@@ -54,6 +56,7 @@ export default function ConfigSummary(props: IAppProps) {
       // copy configuration
       const newConfiguration = JSON.parse(JSON.stringify(configuration));
      
+      newConfiguration.summary.enabled = enabled;
       newConfiguration.summary.content = newSummary;
       newConfiguration.summary.special = special;
 
@@ -84,7 +87,21 @@ export default function ConfigSummary(props: IAppProps) {
           <span className="text-sm text-gray-600">
             All about your organization!
           </span>
-        </div>      
+        </div>
+        
+        <div className="col-span-full flex gap-x-3">
+          <div className="flex h-6 items-center">
+            <input id="spotlightEnabled" name="spotlightEnabled" type="checkbox"
+              checked={enabled} onChange={(e) => setEnabled(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+            />
+          </div>
+          <div className="text-sm leading-6">
+            <label htmlFor="spotlightEnabled" className="font-medium text-gray-900">
+              Enable the section
+            </label>
+          </div>
+        </div>  
 
         <div className="flex gap-8">
           <div className="h-160 flex flex-col grow">
@@ -150,11 +167,11 @@ export default function ConfigSummary(props: IAppProps) {
           </div>
 
           <div className="h-160 hidden xl:flex flex-col max-w-full sm:max-w-md w-full">
-            <label htmlFor="summaryContent" className="block text-sm font-medium leading-6 text-gray-900">
+            <label htmlFor="summaryPreview" className="block text-sm font-medium leading-6 text-gray-900">
               Summary Preview
             </label>
             
-            <div id="summaryContent" className="grow mt-2 overflow-y-auto
+            <div id="summaryPreview" className="grow mt-2 overflow-y-auto
               border-2 border-gray-200 p-4 rounded-lg">
               {newSummary && ReactHtmlParser(newSummary)}
             </div>

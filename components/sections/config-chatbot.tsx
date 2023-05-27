@@ -108,13 +108,16 @@ export default function ConfigChatbot() {
             }
 
             {!chatbot?.chatbaseId && 
-              <button type="button" onClick={onCreateChatbot}
-                disabled={chatbotCreating}
-                className="px-4 py-2 rounded-md bg-indigo-600 p-1 text-white shadow-sm 
-                  hover:bg-indigo-500 focus-visible:outline disabled:opacity-30
-                  focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                Create
-              </button>
+              <div className="flex flex-col gap-4 items-start">
+                <div>First time eh?  Provision your chatbot to make it available to your site.</div>
+                <button type="button" onClick={onCreateChatbot}
+                  disabled={chatbotCreating}
+                  className="px-4 py-2 rounded-md bg-indigo-600 p-1 text-white shadow-sm 
+                    hover:bg-indigo-500 focus-visible:outline disabled:opacity-30
+                    focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                  Provision Chatbot
+                </button>
+              </div>
             }
 
             {chatbot?.chatbaseId && 
