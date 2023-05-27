@@ -25,7 +25,6 @@ export default function ConfigSummary(props: IAppProps) {
   
   const configuration = useAppStore((state) => state.site);
 
-  const [logo, setLogo] = useState('');
   const [summary, setSummary] = useState('');
   const [special, setSpecial] = useState('');
 
@@ -37,7 +36,6 @@ export default function ConfigSummary(props: IAppProps) {
   const [newSummary, setNewSummary] = useState(summary);
 
   const reset = useCallback(() => {
-    setLogo(configuration?.logo?.url || '');
     setSummary(configuration?.summary?.content || '');
     setNewSummary(configuration?.summary?.content || '');
     setSpecial(configuration?.summary?.special || '');
@@ -86,22 +84,7 @@ export default function ConfigSummary(props: IAppProps) {
           <span className="text-sm text-gray-600">
             All about your organization!
           </span>
-        </div>        
-
-        <div className="w-full sm:w-full md:w-3/4 hidden">
-          <label htmlFor="logo" className="block text-sm font-medium leading-6 text-gray-900">
-            Logo - URL to a logo appearing at the top of the summary.
-          </label>
-          <div className="mt-2">
-            <input
-              type="text" name="logo" id="logo"
-              value={logo} onChange={e => setLogo(e.target.value)}
-              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm 
-                ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 
-                focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-        </div>        
+        </div>      
 
         <div className="flex gap-8">
           <div className="h-160 flex flex-col grow">
