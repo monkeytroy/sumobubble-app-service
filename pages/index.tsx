@@ -10,7 +10,7 @@ export default function Home(props: IAppProps) {
     
   useEffect(() => {
     setCustomer(props.customer);
-  }, [props]);
+  }, [setCustomer, props]);
   
   return (
     <div className="flex flex-col gap-24">

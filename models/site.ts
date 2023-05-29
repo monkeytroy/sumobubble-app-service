@@ -39,7 +39,7 @@ const sectionSchema = new Schema<ISiteSection>({
 const siteSchema = new Schema<ISite>({
   customerId: { type: String, required: true },
   customerEmail: { type: String, required: true },
-  title: { type: String, required: true },
+  title: { type: String, required: true, min: 5, max: 160},
   theme: {
     primary: String
   },

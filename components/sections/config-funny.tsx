@@ -18,6 +18,8 @@ export const section: ISection = {
 
 export default function ConfigFunny() {
 
+  // TODO GET THIS CODE ALIGNED WITH OTHER SECTIONS
+
   const configuration = useAppStore((state) => state.site);
   
   // load this section.

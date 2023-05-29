@@ -4,6 +4,7 @@ import { ExclamationCircleIcon, MinusCircleIcon, StarIcon } from "@heroicons/rea
 import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
 import ConfigSubmit from "../submit-form";
 import { ISection } from "./sections";
+import { ConsoleBody } from "../console-body";
 
 export const section: ISection = {
   name: 'inforequest',
@@ -17,10 +18,9 @@ export const section: ISection = {
 
 export default function ConfigInfoRequest() {
 
-  const configuration = useAppStore((state) => state.site);
-
-  // load this section.
-  const thisSection: ISiteSection | undefined = configuration?.sections[section.name];
+  // site and editable values
+  const site = useAppStore((state) => state.site);
+  const thisSection: ISiteSection | undefined = site?.sections[section.name];
 
   // setup local state for editing.
   const [enabled, setEnabled] = useState(false);
@@ -28,38 +28,35 @@ export default function ConfigInfoRequest() {
   const [email, setEmail] = useState([] as Array<string>);
   const [categories, setCategories] = useState([] as Array<IContactCategory>);
 
+  // local component state
   const [newCategory, setNewCategory] = useState('');
   const [newCategoryEmail, setNewCategoryEmail] = useState('');
   const [saving, setSaving] = useState(false);
   const [invalid, setInvalid] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
 
-  // reset / init the content when thisSection is set
+  // reset to site state
   const reset = useCallback(() => {
-    setEnabled(typeof thisSection?.enabled !== 'undefined' ? thisSection.enabled : false);
+    setEnabled(!!thisSection?.enabled);
     setContent(thisSection?.content || '');
     setEmail(thisSection?.props?.email || []);
     setCategories(thisSection?.props?.categories || []);
   }, [thisSection]);
   
+  // reset to modifed site upon changes from state
   useEffect(() => {
     reset();
-  }, [reset, configuration]);
+  }, [reset, site]);
   
-  const submit = async (e: FormEvent) => {
-    e.preventDefault(); 
-
+  // save the new site info
+  const onSave = async () => {
     setInvalid(false);
     if (enabled && !email) {
       setInvalid(true);
       return;
     }
     
-    if (configuration) {
+    if (site) {
       setSaving(true);
-
-      // copy configuration
-      const newConfiguration = JSON.parse(JSON.stringify(configuration));
 
       // create the new section
       const newSection: ISiteSection = {
@@ -71,21 +68,22 @@ export default function ConfigInfoRequest() {
         }
       }
 
-      // spread it out...  old first
-      newConfiguration.sections = {
-        ...configuration.sections,
-        [section.name]: {...newSection}
-      };
+      // save the new site
+      await saveSite({
+        ...site,
+        sections: {
+          ...site.sections,
+          [section.name]: {...newSection}
+        }
+      });
 
-      // save!
-      await saveSite(newConfiguration);
- 
       setTimeout(() => setSaving(false), 2000);
     }
   }
 
+  // validation.  effect on values. Set invalid. 
   useEffect(() => {
-    setInvalid(enabled && (email.length == 0 || !formRef.current?.checkValidity()));
+    setInvalid(enabled && (email.length == 0));
   }, [email, enabled])
 
   /**
@@ -94,8 +92,9 @@ export default function ConfigInfoRequest() {
    */
   const addNewCategory = () => {
 
-    if (categories.filter((cat) => cat.title === newCategory).length == 1) {
-      // show some error 
+    if (!newCategory || !newCategoryEmail || 
+        categories.filter((cat) => cat.title === newCategory).length == 1) {
+      // todo show some error 
       return;
     }
 
@@ -116,17 +115,14 @@ export default function ConfigInfoRequest() {
   }
   
   return (
-    <form onSubmit={submit} onReset={reset} ref={formRef}>
-      <div className="flex flex-col gap-6 pb-6 select-none">
+    <ConsoleBody 
+      title={section.title} subTitle={section.description}
+      invalid={invalid} saving={saving} 
+      onSave={() => onSave()} onCancel={() => reset()}>
 
-        <div className="flex gap-4 items-baseline">
-          <span className="text-xl font-semibold text-gray-900">{section.title}</span>
-          <span className="text-sm text-gray-600">
-            {section.description}
-          </span>
-        </div>
+      <div className="flex flex-col gap-8">
 
-        <div className="col-span-full flex gap-x-3">
+        <div className="flex gap-3">
           <div className="flex h-6 items-center">
             <input id="sectionEnabled" name="sectionEnabled" type="checkbox"
               checked={enabled} onChange={(e) => setEnabled(e.target.checked)}
@@ -140,11 +136,11 @@ export default function ConfigInfoRequest() {
           </div>
         </div>
         
-        <div className="">
+        <div className="flex flex-col gap-3">
           <label htmlFor="contact" className="block text-sm font-medium leading-6 text-gray-900">
             Invitation - A message to your users.
           </label>
-          <div className="mt-2">
+          <div className="">
             <textarea 
               id="content" name="content" rows={3}
               value={content} 
@@ -157,11 +153,11 @@ export default function ConfigInfoRequest() {
           </div>
         </div>
 
-        <div className="sm:col-span-4">
+        <div className="flex flex-col gap-3">
           <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
             Default email address - Used if a category is not selected by the user. 
           </label>
-          <div className="relative mt-2">
+          <div className="relative">
             <input required
               id="email" name="email" type="email"
               value={email} 
@@ -183,20 +179,21 @@ export default function ConfigInfoRequest() {
           </div>
         </div>
 
-        <div>
+        <div className="flex flex-col gap-3">
           <label htmlFor="contact" 
             className="block text-sm font-medium leading-6 text-gray-900">
               Categories
           </label>
         
-          <div className="mt-2 rounded-md border border-gray-300 shadow-sm flex flex-wrap divide-x divide-gray-300">
+          <div className="rounded-md border border-gray-300 shadow-sm 
+            flex flex-wrap divide-x divide-gray-300">
             
-            <div className="p-4 flex flex-col gap-4 w-1/2 min-w-fit">
-              <div className="">
+            <div className="p-4 flex flex-col gap-3 w-1/2 min-w-fit">
+              <div className="flex flex-col gap-3">
                 <label htmlFor="catName" className="block text-sm font-medium leading-6 text-gray-900">
                   Category
                 </label>
-                <div className="mt-2">
+                <div className="">
                   <input
                     id="category" name="category" type="text"
                     value={newCategory} 
@@ -208,11 +205,11 @@ export default function ConfigInfoRequest() {
                   />
                 </div>
               </div>
-              <div className="">
+              <div className="flex flex-col gap-3">
                 <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-                  Target email address(s) - Comma separated
+                  Target email address
                 </label>
-                <div className="mt-2">
+                <div className="">
                   <input
                     id="email" name="email" type="email"
                     value={newCategoryEmail} 
@@ -234,7 +231,7 @@ export default function ConfigInfoRequest() {
               </button>
             </div>
 
-            <div className="p-4">
+            <div className="p-4 flex flex-col">
 
               <label htmlFor="contact" 
                 className="block text-sm font-medium leading-6 text-gray-900">
@@ -276,10 +273,7 @@ export default function ConfigInfoRequest() {
             </div>
           </div>
         </div>        
-      </div>
-
-      <ConfigSubmit saving={saving} invalid={invalid}></ConfigSubmit>
-        
-    </form>
+      </div>        
+    </ConsoleBody>
   )
 }

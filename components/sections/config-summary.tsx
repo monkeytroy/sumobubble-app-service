@@ -1,15 +1,11 @@
-//import { PhotoIcon } from "@heroicons/react/24/solid";
-import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
-import ConfigSubmit from '@/components/submit-form';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { saveSite } from '@/services/site';
-import { TwitterPicker } from 'react-color';
 import { useAppStore } from '@/store/app-store';
 import { Editor } from '@tinymce/tinymce-react';
-import ReactHtmlParser from 'react-html-parser';
 import { saveFile } from '@/services/file';
-import { IAppProps } from '@/services/ssp-default';
-import { DocumentTextIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { ISection } from './sections';
+import { ConsoleBody } from '../console-body';
 
 export const section: ISection = { 
   name: 'info', 
@@ -21,54 +17,52 @@ export const section: ISection = {
   isInfoSection: false
 }
 
-export default function ConfigSummary(props: IAppProps) {
+export default function ConfigSummary() {
   
-  const configuration = useAppStore((state) => state.site);
+  // site and editable values
+  const site = useAppStore((state) => state.site);
 
   const [enabled, setEnabled] = useState(false);
-  const [summary, setSummary] = useState('');
+  const [content, setContent] = useState('');
   const [special, setSpecial] = useState('');
 
+  // local component state
   const [saving, setSaving] = useState(false);
-  
+  const [invalid, setInvalid] = useState(false);
   const [summaryLoading, setSummaryLoading] = useState(true);
   const editorRef = useRef({} as any);
-  //const [dirty, setDirty] = useState(false);
-  const [newSummary, setNewSummary] = useState(summary);
 
+  // reset to site state
   const reset = useCallback(() => {
-    setEnabled(typeof configuration?.summary?.enabled !== 'undefined' ? configuration?.summary?.enabled : false);
-    setSummary(configuration?.summary?.content || '');
-    setNewSummary(configuration?.summary?.content || '');
-    setSpecial(configuration?.summary?.special || '');
-  }, [configuration]);
+    setEnabled(!!site?.summary?.enabled);
+    setContent(site?.summary?.content || '');
+    //setNewSummary(site?.summary?.content || '');
+    setSpecial(site?.summary?.special || '');
+  }, [site]);
 
+  // reset to modified site upon changes from state
   useEffect(() => {
     reset();
-  }, [reset, configuration]);
+  }, [reset, site]);
 
-  const submit = async (e: FormEvent) => {
-    e.preventDefault(); 
-
-    if (configuration) {
+  // save the new site info
+  const onSave = async () => {
+    if (site) {
       setSaving(true);
-
-      // copy configuration
-      const newConfiguration = JSON.parse(JSON.stringify(configuration));
-     
-      newConfiguration.summary.enabled = enabled;
-      newConfiguration.summary.content = newSummary;
-      newConfiguration.summary.special = special;
-
-      await saveSite(newConfiguration);
-
+      await saveSite({...site, summary: { enabled, content, special}});
       setTimeout(() => setSaving(false), 2000);
     }
   }
 
+  // validation.  effect on values. Set invalid. 
+  useEffect(() => {
+    setInvalid(content.length === 0);
+  }, [content])
+
+  // more component support
   const onImagesUpload = (blobInfo:any) => new Promise<string>(async (resolve, reject) => {
     
-    const res = await saveFile(configuration?.customerEmail || 'unknown', blobInfo.blob());
+    const res = await saveFile(site?.customerEmail || 'unknown', blobInfo.blob());
 
     if (res.success) {
       resolve(res.data.url);
@@ -79,17 +73,14 @@ export default function ConfigSummary(props: IAppProps) {
   });
 
   return (
-    <form onSubmit={submit} onReset={() => reset()}>
-      <div className="flex flex-col gap-6 pb-6 select-none">
-
-        <div className="flex gap-4 items-baseline">
-          <span className="text-xl font-semibold text-gray-900">Customer Info</span>
-          <span className="text-sm text-gray-600">
-            All about your organization!
-          </span>
-        </div>
+    <ConsoleBody 
+      title="Info Summary" subTitle="Summarize your organization." 
+      invalid={invalid} saving={saving} 
+      onSave={() => onSave()} onCancel={() => reset()}>
         
-        <div className="col-span-full flex gap-x-3">
+      <div className="flex flex-col gap-8">
+        
+        <div className="flex gap-3">
           <div className="flex h-6 items-center">
             <input id="spotlightEnabled" name="spotlightEnabled" type="checkbox"
               checked={enabled} onChange={(e) => setEnabled(e.target.checked)}
@@ -103,40 +94,45 @@ export default function ConfigSummary(props: IAppProps) {
           </div>
         </div>  
 
-        <div className="flex gap-8">
-          <div className="h-160 flex flex-col grow">
+        <div className="h-160 flex flex-col">
 
-            <label htmlFor="summary" className="block text-sm font-medium leading-6 text-gray-900">
-              Summary - Summary text
-            </label>           
+          <label htmlFor="summary" className="block text-sm font-medium leading-6 text-gray-900">
+            Summary - Summary text
+          </label>           
 
-            <div className="mt-2 grow xl:max-w-full w-full max-w-md " >
-              {summaryLoading && 
-                <div role="status" 
-                  className="relative h-full flex flex-col gap-4 animate-pulse border-2 border-gray-200 p-4 rounded-lg">
-                  <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px]"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px]"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px]"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px]"></div>
-                  <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                  
-                  <span className="absolute inset-1/2 -mx-6 text-gray-500">Loading...</span>
-                </div>
-              }
+          <div className={
+              "mt-2 grow w-full rounded-xl h-full " + 
+              (enabled && invalid ? 'border-2 border-red-300': '') +
+              (!enabled ? 'select-none': '')
+            }>
 
+            {(summaryLoading || !enabled) && 
+              <div role="status" 
+                className="relative h-full flex flex-col gap-4 animate-pulse border-2 border-gray-200 p-4 rounded-lg">
+                <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48"></div>
+                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px]"></div>
+                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px]"></div>
+                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px]"></div>
+                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px]"></div>
+                <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
+                
+                {enabled && summaryLoading && <span className="absolute inset-1/2 -mx-6 text-gray-500">Loading</span>}
+              </div>
+            }
+
+            {(enabled) && 
               <Editor
                 id="summaryEditor"
                 tinymceScriptSrc={'/tinymce/tinymce.min.js'}
                 onInit={(evt, editor) => { setSummaryLoading(false); editorRef.current = editor; }}
-                initialValue={summary}
-                onEditorChange={(newValue) => setNewSummary(newValue)}
-                //onDirty={() => setDirty(true)}
+                initialValue={content}
+                onEditorChange={(newValue) => setContent(newValue)}
+                //onDirty={() => setDirty(true)}  // content changed.. needed?
                 init={{
                   images_upload_handler: onImagesUpload,
                   resize: false,
@@ -161,41 +157,27 @@ export default function ConfigSummary(props: IAppProps) {
                     'bold italic forecolor emoticons | alignleft aligncenter ' +
                     'alignright alignjustify | bullist numlist outdent indent '
                     //'image media | removeformat code | help'
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="h-160 hidden xl:flex flex-col max-w-full sm:max-w-md w-full">
-            <label htmlFor="summaryPreview" className="block text-sm font-medium leading-6 text-gray-900">
-              Summary Preview
-            </label>
-            
-            <div id="summaryPreview" className="grow mt-2 overflow-y-auto
-              border-2 border-gray-200 p-4 rounded-lg">
-              {newSummary && ReactHtmlParser(newSummary)}
-            </div>
+                }}/>
+              }
           </div>
         </div>
 
-        <div className="max-w-full sm:max-w-md w-full">
+        <div className="flex flex-col gap-3">
           <label htmlFor="special" className="block text-sm font-medium leading-6 text-gray-900">
             Special - A highlighted special announcement
           </label>
-          <div className="mt-2">
+          <div className="">
             <textarea
+              disabled={!enabled}
               id="special" name="special" rows={3}
               value={special} onChange={e => setSpecial(e.target.value)}
               className="block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 
-                ring-inset ring-gray-300 placeholder:text-gray-400 
+                ring-inset ring-gray-300 placeholder:text-gray-400 disabled:opacity-50
                 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:py-1.5 sm:text-sm sm:leading-6"
             />
           </div>
         </div>
       </div>
-    
-      <ConfigSubmit saving={saving}></ConfigSubmit>
-
-    </form>
+    </ConsoleBody>
   )
 }

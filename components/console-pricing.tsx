@@ -2,6 +2,7 @@ import { signIn, useSession } from "next-auth/react";
 import { Dialog, Transition } from '@headlessui/react'
 import { useState, Fragment } from "react";
 import { IAppProps } from "@/services/ssp-default";
+import { useAppStore } from "@/store/app-store";
 
 declare global {
   namespace JSX {
@@ -15,6 +16,9 @@ declare global {
 }
 
 export default function ConsolePricing(props: IAppProps) {
+
+  const customer = useAppStore((state: any) => state.customer);
+
   const {data: session} = useSession();
   let [isOpen, setIsOpen] = useState(true);
 
@@ -28,12 +32,12 @@ export default function ConsolePricing(props: IAppProps) {
 
   return (
 
-    <div className="absolute top-0 right-0 z-50">
+    <div className="z-50">
 
       {!isOpen && 
         <button
           type="button" onClick={openModal}
-          className="z-50 inline-flex justify-center rounded-md border 
+          className="z-50 absolute top-0 right-0 justify-center rounded-md border 
             border-transparent bg-gray-300 px-4 py-2 text-sm 
             font-medium text-gray-700 hover:bg-blue-200 
             focus:outline-none focus-visible:ring-2 
@@ -83,12 +87,12 @@ export default function ConsolePricing(props: IAppProps) {
 
                       <div className="isolate mx-auto mt-10 relative">
 
-                      {props.stripe?.key && props.stripe?.consoleId && 
+                      {props?.stripe?.key && props?.stripe?.consoleId && 
                         <stripe-pricing-table 
                           customer-email={session?.user?.email}
                           success-url={process.env.NEXTAUTH_URL}
-                          pricing-table-id={props.stripe?.consoleId}
-                          publishable-key={props.stripe?.key}>
+                          pricing-table-id={props?.stripe?.consoleId}
+                          publishable-key={props?.stripe?.key}>
                         </stripe-pricing-table>
                       }
 

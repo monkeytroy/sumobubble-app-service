@@ -5,6 +5,7 @@ import { useState, FormEvent, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import ConfigSubmit from "../submit-form";
 import { ISection } from "./sections";
+import { ConsoleBody } from "../console-body";
 
 export const section: ISection = {
   name: 'spotlight',
@@ -18,48 +19,45 @@ export const section: ISection = {
 
 export default function ConfigSpotlight() {
 
-  const configuration = useAppStore((state) => state.site);
-
-  // load this section.
-  const thisSection: ISiteSection | undefined = configuration?.sections[section.name];
+  // load this site and editable values
+  const site = useAppStore((state) => state.site);
+  const thisSection: ISiteSection | undefined = site?.sections[section.name];
 
   // setup local state for editing.
   const [enabled, setEnabled] = useState(false);
   const [content, setContent] = useState('');
-  const [urls, setUrls] = useState(['']);
+  const [urls, setUrls] = useState([] as Array<string>);
   
+  // local component state
   const [saving, setSaving] = useState(false);
   const [invalid, setInvalid] = useState(false);
 
-  // reset / init the content when thisSection is set
+  // reset to site state
   const reset = useCallback(() => {
-    setEnabled(typeof thisSection?.enabled !== 'undefined' ? thisSection.enabled : false);
+    setEnabled(!!thisSection?.enabled);
     setContent(thisSection?.content || '');
     setUrls(thisSection?.urls || ['']);
   }, [thisSection]);
 
+  // reset to modified site upon changes from state
   useEffect(() => {
     reset();
-  }, [reset, configuration]);
+  }, [reset, site]);
 
   useEffect(() => {
     if (!enabled) {
       setUrls(['']);
     }
-  }, [enabled])
+  }, [enabled]);
 
-  const submit = async (e: FormEvent) => {
-    e.preventDefault(); 
-
+  // save the new site info
+  const onSave = async () => {
     if (enabled && invalid) {      
       return;
     }
 
-    if (configuration) {
+    if (site) {
       setSaving(true);
-
-      // copy configuration
-      const newConfiguration = JSON.parse(JSON.stringify(configuration));
 
       // create the new section
       const newSection: ISiteSection = {
@@ -70,36 +68,36 @@ export default function ConfigSpotlight() {
         }
       }
 
-      // spread it out... old first
-      newConfiguration.sections = {
-        ...newConfiguration.sections,
-        [section.name]: {...newSection}
-      }
-
-      await saveSite(newConfiguration);
+      // save the new site
+      await saveSite({
+        ...site,
+        sections: {
+          ...site.sections,
+          [section.name]: {...newSection}
+        }
+      });
     
       setTimeout(() => setSaving(false), 2000);
     }
   }
 
-  const validateSpotlightUrl = (url: string) => {
+  // validation.  effect on values. Set invalid. 
+  useEffect(() => {
+    console.log('here');
     var regExp = /^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+$/;
-    setInvalid(!regExp.test(url));
-    setUrls([url]);
-  }
-
+    // only one for now
+    setInvalid(enabled && !regExp.test(urls[0]));
+  }, [urls, enabled]);
+  
   return (
-    <form onSubmit={submit} onReset={() => reset()}>
-      <div className="flex flex-col gap-4 pb-6 select-none">
+    <ConsoleBody 
+      title={section.title} subTitle={section.description}
+      invalid={invalid} saving={saving} 
+      onSave={() => onSave()} onCancel={() => reset()}>
+        
+      <div className="flex flex-col gap-8">
 
-        <div className="flex gap-4 items-baseline">
-          <span className="text-xl font-semibold text-gray-900">{section.title}</span>
-          <span className="text-sm text-gray-600">
-            {section.description}
-          </span>
-        </div>
-
-        <div className="col-span-full flex gap-x-3">
+        <div className="flex gap-3">
           <div className="flex h-6 items-center">
             <input id="spotlightEnabled" name="spotlightEnabled" type="checkbox"
               checked={enabled} onChange={(e) => setEnabled(e.target.checked)}
@@ -113,11 +111,11 @@ export default function ConfigSpotlight() {
           </div>
         </div>
 
-        <div className="col-span-full">
+        <div className="flex flex-col gap-3">
           <label htmlFor="spotlightContent" className="block text-sm font-medium leading-6 text-gray-900">
             Spotlight Introduction
           </label>
-          <div className="mt-2">
+          <div className="">
             <textarea
               id="spotlightContent" name="spotlightContent" rows={4}
               value={content} onChange={e => setContent(e.target.value)} disabled={!enabled}
@@ -131,11 +129,11 @@ export default function ConfigSpotlight() {
           </p>
         </div>
 
-        <div className="sm:col-span-4">
+        <div className="flex flex-col gap-3">
           <label htmlFor="spotlightUrl" className="block text-sm font-medium leading-6 text-gray-900">
             YouTube Video URL
           </label>
-          <div className="mt-2">
+          <div className="">
             <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 
               focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md relative">
                 
@@ -145,7 +143,7 @@ export default function ConfigSpotlight() {
                 type="text" name="spotlightUrl" id="spotlightUrl"
                 placeholder="https://www.youtube.com/watch?v=qVEOJzAYIW4"
                 value={urls} 
-                onChange={e => validateSpotlightUrl(e.target.value)} 
+                onChange={e => setUrls([e.target.value])} 
                 className="peer disabled:opacity-30
                   block w-full rounded-md border-0 text-gray-900 invalid:text-red-900 shadow-sm py-1.5 pr-10 
                   ring-1 ring-inset ring-gray-300 invalid:ring-red-300 placeholder:text-gray-300 
@@ -161,8 +159,6 @@ export default function ConfigSpotlight() {
           </div>
         </div>
       </div>
-
-      <ConfigSubmit saving={saving} invalid={invalid}></ConfigSubmit>
-    </form>
+    </ConsoleBody>
   )
 }

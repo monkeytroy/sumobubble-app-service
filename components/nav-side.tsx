@@ -48,7 +48,7 @@ export default function NavSide() {
   }
 
   return (
-    <div className="w-64 overflow-hidden flex min-h-screen shrink-0 
+    <div className="flex min-h-screen shrink-0 
       flex-col overflow-y-auto bg-indigo-600 px-4 pt-20">
       <nav className="">
         <ul role="list" className="flex flex-col gap-4">

@@ -4,6 +4,7 @@ import { ExclamationCircleIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
 import ConfigSubmit from "../submit-form";
 import { ISection } from "./sections";
+import { ConsoleBody } from "../console-body";
 
 export const section: ISection = {
   name: 'contact',
@@ -16,46 +17,41 @@ export const section: ISection = {
 };
 
 export default function ConfigContact() {
-
-  const configuration = useAppStore((state) => state.site);
-
-  // load this section.
-  const thisSection: ISiteSection | undefined = configuration?.sections[section.name];
+  
+  // site and editable values
+  const site = useAppStore((state) => state.site);
+  const thisSection: ISiteSection | undefined = site?.sections[section.name];
 
   // setup local state for editing.
   const [enabled, setEnabled] = useState(false);
   const [content, setContent] = useState('');
   const [email, setEmail] = useState([] as Array<string>);
-  
+
+  // local component state
   const [saving, setSaving] = useState(false);
   const [invalid, setInvalid] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
 
-  // reset / init the content when thisSection is set
+  // reset to site state
   const reset = useCallback(() => {
-    setEnabled(typeof thisSection?.enabled !== 'undefined' ? thisSection.enabled : false);
+    setEnabled(!!thisSection?.enabled);
     setContent(thisSection?.content || '');
     setEmail(thisSection?.props?.email || []);
   }, [thisSection]);
   
+  // reset to modified site upon changes from state
   useEffect(() => {
     reset();
-  }, [reset, configuration]);
+  }, [reset, site]);
 
-  const submit = async (e: FormEvent) => {
-    e.preventDefault(); 
-
+  // save the new site info
+  const onSave = async () => {
     setInvalid(false);
     if (enabled && !email) {
       setInvalid(true);
       return;
     }
-
-    if (configuration) {
+    if (site) {
       setSaving(true);
-
-      // copy configuration
-      const newConfiguration = JSON.parse(JSON.stringify(configuration));
 
       // create the new section
       const newSection: ISiteSection = {
@@ -66,35 +62,33 @@ export default function ConfigContact() {
         }
       }
 
-      // spread it out...  old first
-      newConfiguration.sections = {
-        ...newConfiguration.sections,
-        [section.name]: {...newSection}
-      }
-
-      // save!
-      await saveSite(newConfiguration);
+      // save the new site
+      await saveSite({
+        ...site,
+        sections: {
+          ...site.sections,
+          [section.name]: {...newSection}
+        }
+      });
 
       setTimeout(() => setSaving(false), 2000);
     }
   }
 
+  // validation.  effect on values. Set invalid. 
   useEffect(() => {
-    setInvalid(enabled && (email.length == 0 || !formRef.current?.checkValidity()));
+    setInvalid(enabled && (email.length == 0));
   }, [email, enabled])
 
   return (
-    <form onSubmit={submit} onReset={reset} ref={formRef}>
-      <div className="flex flex-col gap-6 pb-6 select-none">
+    <ConsoleBody 
+      title={section.title} subTitle={section.description}
+      invalid={invalid} saving={saving} 
+      onSave={() => onSave()} onCancel={() => reset()}>
 
-        <div className="flex gap-4 items-baseline">
-          <span className="text-xl font-semibold text-gray-900">{section.title}</span>
-          <span className="text-sm text-gray-600">
-            {section.description}
-          </span>
-        </div>
+      <div className="flex flex-col gap-8">
 
-        <div className="col-span-full flex gap-x-3">
+        <div className="flex gap-3">
           <div className="flex h-6 items-center">
             <input id="contactEnabled" name="contactEnabled" type="checkbox"
               checked={enabled} onChange={(e) => setEnabled(e.target.checked)}
@@ -108,11 +102,11 @@ export default function ConfigContact() {
           </div>
         </div>
         
-        <div className="col-span-full">
+        <div className="flex flex-col gap-3">
           <label htmlFor="contact" className="block text-sm font-medium leading-6 text-gray-900">
             Contact Invitation - A message to your users.
           </label>
-          <div className="mt-2">
+          <div className="">
             <textarea 
               id="contact" name="contact" rows={4}
               value={content} onChange={e => setContent(e.target.value)} disabled={!enabled}
@@ -123,11 +117,11 @@ export default function ConfigContact() {
           </div>
         </div>
 
-        <div className="sm:col-span-4">
+        <div className="flex flex- col gap-3">
           <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-            Target email address(s) - Comma separated
+            Target email address
           </label>
-          <div className="relative mt-2">
+          <div className="relative">
             <input required
               id="email" name="email" type="email"
               value={email} 
@@ -147,10 +141,7 @@ export default function ConfigContact() {
             </div>
           </div>
         </div>
-      </div>
-
-      <ConfigSubmit saving={saving} invalid={invalid}></ConfigSubmit>
-        
-    </form>
+      </div>       
+    </ConsoleBody>
   )
 }
