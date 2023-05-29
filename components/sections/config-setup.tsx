@@ -22,7 +22,7 @@ export const section: ISection = {
 const DEFAULT_THEME_COLOR = '#8ED1FC';
 
 const TITLE_LEN_MAX = 160;
-const TITLE_LEN_MIN = 5;
+const TITLE_LEN_MIN = 4;
   
 const COLORS = [
   '#000000', '#EFEFEF', '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#0039e6', 

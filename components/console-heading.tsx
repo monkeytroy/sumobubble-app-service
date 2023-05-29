@@ -4,6 +4,7 @@ export interface IConsoleHeadingProps {
   subTitle?: string;
   saving: boolean;
   invalid: boolean;
+  saveOff?: boolean;
   onCancel: () => void;
   onSave: () => void;
 }
@@ -18,23 +19,25 @@ export default function ConsoleHeading(props: IConsoleHeadingProps) {
             {props.subTitle}
           </span>
       </div>
-      <div className="mt-3 sm:ml-4 sm:mt-0 flex gap-4 items-baseline">
-        {props.invalid && 
-          <div className="text-red-600 text-sm">Fix invalid entries</div>
-        }
-        <button type="reset" disabled={props.saving || props.invalid}
-          onClick={props.onCancel}
-          className="text-sm font-semibold leading-6 text-gray-900 disabled:opacity-25">
-          Cancel
-        </button>
-        <button type="submit" disabled={props.saving || props.invalid}
-          onClick={props.onSave}
-          className="rounded-md bg-blue-500 py-2 px-3 text-sm font-semibold 
-            text-white shadow-sm hover:bg-blue-600 disabled:opacity-25
-            focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-          Save
-        </button>
-      </div>
+      {!props?.saveOff && 
+        <div className="mt-3 sm:ml-4 sm:mt-0 flex gap-4 items-baseline">
+          {props.invalid && 
+            <div className="text-red-600 text-sm">Fix invalid entries</div>
+          }
+          <button type="reset" disabled={props.saving || props.invalid}
+            onClick={props.onCancel}
+            className="text-sm font-semibold leading-6 text-gray-900 disabled:opacity-25">
+            Cancel
+          </button>
+          <button type="submit" disabled={props.saving || props.invalid}
+            onClick={props.onSave}
+            className="rounded-md bg-blue-500 py-2 px-3 text-sm font-semibold 
+              text-white shadow-sm hover:bg-blue-600 disabled:opacity-25
+              focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            Save
+          </button>
+        </div>
+      }
     </div>
   )
 }
