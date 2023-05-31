@@ -9,8 +9,9 @@ export default function Footer () {
         </div>
         (c)2023 InfoChatApp
       </div>
-      <div>
+      <div className="flex flex-col">
         <Link href="/privacy">Privacy Policy</Link>
+        <Link href="/privacy">Terms of Service</Link>
       </div>
     </div>
   )
