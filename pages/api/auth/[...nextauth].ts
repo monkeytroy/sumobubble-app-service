@@ -1,13 +1,9 @@
 import NextAuth, { IUser, Session, User } from 'next-auth';
-import SimpleCrypto from 'simple-crypto-js'
 import clientPromise from './lib/mongo-client';
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
 import { log } from '@/services/log';
 import { JWT } from 'next-auth/jwt/types';
 import Auth0Provider from "next-auth/providers/auth0";
-
-
-const crypto = new SimpleCrypto(process.env.CRYPTO_KEY);
 
 export const authOptions = {
   // Configure one or more authentication providers

@@ -81,7 +81,6 @@ export default function ConfigSpotlight() {
 
   // validation.  effect on values. Set invalid. 
   useEffect(() => {
-    console.log('here');
     var regExp = /^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+$/;
     // only one for now
     setInvalid(enabled && !regExp.test(urls[0]));

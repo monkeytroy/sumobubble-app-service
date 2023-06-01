@@ -4,7 +4,7 @@ import Cors from 'cors';
 import { mailIt } from '@/services/mail';
 import { apiMiddleware } from '@/services/api-middleware';
 import connectMongo from '@/services/mongoose';
-import Configuration from '@/models/site';
+import Site from '@/models/site';
 import { log } from '@/services/log';
 
 const cors = Cors({
@@ -65,23 +65,18 @@ export default async function handler(
 
       // get the config.
       await connectMongo();
-      const { customer } = req.query;
-      const configuration = await Configuration.findOne({ customerId: customer });
-      log(`Configuration: ${JSON.stringify(configuration)}`);
+      const { siteId } = req.query;
+      const site = await Site.findById(siteId);
+      log(`Site: ${JSON.stringify(site)}`);
 
-      if (configuration) {
-        const sectionRec = configuration.sections.get(section);
+      if (site) {
+        const sectionRec = site.sections.get(section);
         log(`Section: ${sectionRec}`);
 
         if (sectionRec) {
 
           // setup email message
-          let bodyText = `A message from <b>${name} ${email} ${phone}</b> <br/> `;
-          if (moreInfo) {
-            bodyText += '<p>Who would like to be added to newsletter or mailing list to receive updates and information.';
-          } else {
-            bodyText += '<p>Do NOT add to newsletter or mailing list to receive updates and information';
-          }
+          let bodyText = `<p><b>The following content was entered by an InfoChat user on your website</b></p><b>Name: ${name}  |  Email: ${email}  |  Phone: ${phone || 'Not Provided'}</b> <br/> <hr/><br/>`
           bodyText += `<p>${message}</p>`;
 
           const mailBody = {
