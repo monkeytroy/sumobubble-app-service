@@ -4,8 +4,6 @@ import { ISection } from "./sections";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { saveSite } from "@/services/site";
 import { TwitterPicker } from "react-color";
-import debounce from 'lodash/debounce';
-import SectionHeading from "../console-heading";
 import { ConsoleBody } from "../console-body";
 import { formClass } from "@/constants/form-class";
 

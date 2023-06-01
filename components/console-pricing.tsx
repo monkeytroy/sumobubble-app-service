@@ -17,8 +17,6 @@ declare global {
 
 export default function ConsolePricing(props: IAppProps) {
 
-  const customer = useAppStore((state: any) => state.customer);
-
   const {data: session} = useSession();
   let [isOpen, setIsOpen] = useState(true);
 

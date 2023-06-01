@@ -1,8 +1,7 @@
 import { saveSite } from "@/services/site";
 import { useAppStore } from "@/store/app-store";
 import { ChatBubbleOvalLeftIcon, ExclamationCircleIcon,  } from "@heroicons/react/24/outline";
-import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
-import ConfigSubmit from "../submit-form";
+import { useState, useEffect, useCallback } from "react";
 import { ISection } from "./sections";
 import { ConsoleBody } from "../console-body";
 
@@ -35,7 +34,7 @@ export default function ConfigChatbot() {
 
   // reset / init the content
   const reset = useCallback(() => {
-    setEnabled(typeof chatbot?.enabled !== 'undefined' ? chatbot.enabled : false);
+    setEnabled(!!chatbot?.enabled);
     setChatsite(chatbot?.chatsite || '');
   }, [chatbot]);
   

@@ -1,8 +1,7 @@
 import { saveSite } from "@/services/site";
 import { useAppStore } from "@/store/app-store";
 import { ExclamationCircleIcon, UsersIcon } from "@heroicons/react/24/outline";
-import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
-import ConfigSubmit from "../submit-form";
+import { useState, useEffect, useCallback } from "react";
 import { ISection } from "./sections";
 import { ConsoleBody } from "../console-body";
 
@@ -96,7 +95,7 @@ export default function ConfigContact() {
             />
           </div>
           <div className="text-sm leading-6">
-            <label htmlFor="comments" className="font-medium text-gray-900">
+            <label htmlFor="contactEnabled" className="font-medium text-gray-900">
               Enable this section 
             </label>
           </div>
@@ -117,7 +116,7 @@ export default function ConfigContact() {
           </div>
         </div>
 
-        <div className="flex flex- col gap-3">
+        <div className="flex flex-col gap-3">
           <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
             Target email address
           </label>

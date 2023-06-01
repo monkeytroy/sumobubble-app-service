@@ -1,10 +1,10 @@
 import { saveSite } from "@/services/site";
 import { useAppStore } from "@/store/app-store";
 import { BookOpenIcon } from "@heroicons/react/24/outline";
-import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
-import ConfigSubmit from "../submit-form";
+import { useState, useEffect, useCallback } from "react";
 import VerseTranslationSelect from "../verse-translation-select";
 import { ISection } from "./sections";
+import { ConsoleBody } from "../console-body";
 
 export const section: ISection = {
   name: 'verse',
@@ -18,12 +18,9 @@ export const section: ISection = {
 
 export default function ConfigVerse() {
 
-  // TODO GET THIS CODE ALIGNED WITH OTHER SECTIONS
-  
-  const configuration = useAppStore((state) => state.site);
-
-  // load this section.
-  const thisSection: ISiteSection | undefined = configuration?.sections[section.name];
+  // site and editable values  
+  const site = useAppStore((state) => state.site);
+  const thisSection: ISiteSection | undefined = site?.sections[section.name];
 
   // setup local state for editing.
   const [enabled, setEnabled] = useState(false);
@@ -32,31 +29,28 @@ export default function ConfigVerse() {
   const [verseRef, setVerseRef] = useState('');
   const [translation, setTranslation] = useState('ESV');
   
+  // local component state
   const [saving, setSaving] = useState(false);
   const [invalid, setInvalid] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
 
-  // reset / init the content when thisSection is set
+  // reset to site state
   const reset = useCallback(() => {
-    setEnabled(typeof thisSection?.enabled !== 'undefined' ? thisSection?.enabled : false);
+    setEnabled(!!thisSection?.enabled);
     setContent(thisSection?.content || '');
-    setAutoFill(typeof thisSection?.props?.autoFill !== 'undefined' ? thisSection?.props?.autoFill : true);
+    setAutoFill(!!thisSection?.props?.autoFill);
     setVerseRef(thisSection?.props?.verseRef || '');
     setTranslation(thisSection?.props?.translation || 'ESV');
   }, [thisSection]);
 
+  // reset to modified site upon changes from state
   useEffect(() => {
     reset();
-  }, [reset, configuration]);
+  }, [reset, site]);
 
-  const submit = async (e: FormEvent) => {
-    e.preventDefault(); 
-    
-    if (configuration) {
+  // save the new site info
+  const onSave = async () => {
+    if (site) {
       setSaving(true);
-
-      // copy configuration
-      const newConfiguration = JSON.parse(JSON.stringify(configuration));
 
       // create the new section
       const newSection: ISiteSection = {
@@ -69,14 +63,14 @@ export default function ConfigVerse() {
         }
       }
 
-      // spread it out... old first
-      newConfiguration.sections = {
-        ...newConfiguration.sections,
-        [section.name]: {...newSection}    
-      }
-
-      // save!
-      await saveSite(newConfiguration);
+      // save the new site
+      await saveSite({
+        ...site,
+        sections: {
+          ...site.sections,
+          [section.name]: {...newSection}
+        }
+      });
     
       setTimeout(() => setSaving(false), 2000);
     }
@@ -87,17 +81,14 @@ export default function ConfigVerse() {
   }
 
   return (
-    <form onSubmit={submit} onReset={reset} ref={formRef}>
-      <div className="flex flex-col gap-4 pb-6 select-none">
+    <ConsoleBody 
+      title={section.title} subTitle={section.description}
+      invalid={invalid} saving={saving} 
+      onSave={() => onSave()} onCancel={() => reset()}>
 
-        <div className="flex gap-4 items-baseline">
-          <span className="text-xl font-semibold text-gray-900">{section.title}</span>
-          <span className="text-sm text-gray-600">
-            {section.description}
-          </span>
-        </div>
+      <div className="flex flex-col gap-8">
 
-        <div className="col-span-full flex gap-x-3">
+        <div className="flex gap-3">
           <div className="flex h-6 items-center">
             <input id="verseEnabled" name="verseEnabled" type="checkbox"
               checked={enabled} onChange={(e) => setEnabled(e.target.checked)}
@@ -111,12 +102,10 @@ export default function ConfigVerse() {
           </div>
         </div>
 
-        <div className="sm:col-span-4">
-            <VerseTranslationSelect translation={translation} disabled={!enabled}
-              onChangeTranslation={onChangeTranslation}></VerseTranslationSelect>
-        </div>
+        <VerseTranslationSelect translation={translation} disabled={!enabled}
+          onChangeTranslation={onChangeTranslation}></VerseTranslationSelect>
 
-        <div className="col-span-full flex gap-x-3">
+        <div className="flex gap-3">
           <div className="flex h-6 items-center">
             <input id="verseAuto" name="verseAuto" type="checkbox"
               checked={autoFill} onChange={(e) => setAutoFill(e.target.checked)} disabled={!enabled}
@@ -130,11 +119,11 @@ export default function ConfigVerse() {
           </div>
         </div>
 
-        <div className="sm:col-span-3">
+        <div className="flex flex-col gap-3">
           <label htmlFor="verseRef" className="block text-sm font-medium leading-6 text-gray-900">
             Verse Reference (Psalms 1:1-4)
           </label>
-          <div className="mt-2">
+          <div className="">
             <input
               type="text" name="verseRef" id="verseRef"
               value={verseRef} onChange={e => setVerseRef(e.target.value)} disabled={!enabled || autoFill}
@@ -145,11 +134,11 @@ export default function ConfigVerse() {
           </div>
         </div>
 
-        <div className="col-span-full">
+        <div className="flex flex-col gap-3">
           <label htmlFor="verseBody" className="block text-sm font-medium leading-6 text-gray-900">
             Verse Body
           </label>
-          <div className="mt-2">
+          <div className="">
             <textarea
               id="verseBody" name="verseBody" rows={4}
               value={content} onChange={e => setContent(e.target.value)} disabled={!enabled || autoFill}
@@ -161,7 +150,6 @@ export default function ConfigVerse() {
         </div>
       </div>
 
-      <ConfigSubmit saving={saving} invalid={invalid}></ConfigSubmit>
-    </form>
+    </ConsoleBody>
   )
 }

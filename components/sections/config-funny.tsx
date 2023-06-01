@@ -2,9 +2,9 @@
 import { saveSite } from "@/services/site";
 import { useAppStore } from "@/store/app-store";
 import { FaceSmileIcon } from "@heroicons/react/24/outline";
-import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
-import ConfigSubmit from "../submit-form";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ISection } from "./sections";
+import { ConsoleBody } from "../console-body";
 
 export const section: ISection = {
   name: 'funny',
@@ -18,47 +18,44 @@ export const section: ISection = {
 
 export default function ConfigFunny() {
 
-  // TODO GET THIS CODE ALIGNED WITH OTHER SECTIONS
+  // site and editable values
+  const site = useAppStore((state) => state.site);
+  const thisSection: ISiteSection | undefined = site?.sections[section.name];
 
-  const configuration = useAppStore((state) => state.site);
-  
-  // load this section.
-  const thisSection: ISiteSection | undefined = configuration?.sections[section.name];
-
-  //const [title, setTitle] = useState('');
+  // setup local state for editing.
+  const [title, setTitle] = useState('');
   const [enabled, setEnabled] = useState(false);
   const [autoFill, setAutoFill] = useState(false);
   const [content, setContent] = useState('');
   const [urls, setUrls] = useState(['']);
   
+  // local component state
   const [saving, setSaving] = useState(false);
   const [invalid, setInvalid] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
   
+  // reset to site state
   const reset = useCallback(() => {
-    setEnabled(thisSection?.enabled || false);
-    setAutoFill(typeof thisSection?.props?.autoFill !== 'undefined' ? thisSection?.props.autoFill : false);
+    setTitle(thisSection?.title || '');
+    setEnabled(!!thisSection?.enabled);
+    setAutoFill(!!thisSection?.props?.autoFill);
     setContent(thisSection?.content || '');
     setUrls(thisSection?.urls || ['']);
   }, [thisSection]);
 
+  // reset to modified site upon changes from state
   useEffect(() => {
     reset();
-  }, [reset, configuration]);
+  }, [reset, site]);
 
-  const submit = async (e: FormEvent) => {
-    e.preventDefault();
-
-    if (configuration) {
-
+  // save the new site info
+  const onSave = async () => {
+    if (site) {
       setSaving(true);
-
-      // copy configuration
-      const newConfiguration = JSON.parse(JSON.stringify(configuration));
 
       // create the new section
       const newSection: ISiteSection = {
         enabled,
+        title,
         content,
         urls,
         props: {
@@ -66,30 +63,28 @@ export default function ConfigFunny() {
         }
       }
 
-      // spread it out... old first
-      newConfiguration.sections = {
-        ...newConfiguration.sections,
-        [section.name]: {...newSection}
-      }
-
-      await saveSite(newConfiguration);
+      // save the new site
+      await saveSite({
+        ...site,
+        sections: {
+          ...site.sections,
+          [section.name]: {...newSection}
+        }
+      });
 
       setTimeout(() => setSaving(false), 2000);
     }    
   }
 
   return (
-    <form onSubmit={submit} onReset={() => reset()} ref={formRef}>
-      <div className="flex flex-col gap-4 pb-6 select-none">
+    <ConsoleBody 
+      title={section.title} subTitle={section.description}
+      invalid={invalid} saving={saving} 
+      onSave={() => onSave()} onCancel={() => reset()}>
 
-        <div className="flex gap-4 items-baseline">
-          <span className="text-xl font-semibold text-gray-900">{section.title}</span>
-          <span className="text-sm text-gray-600">
-            {section.description}
-          </span>
-        </div>
+      <div className="flex flex-col gap-8">
         
-        <div className="col-span-full flex gap-x-3">
+        <div className="flex gap-3">
           <div className="flex h-6 items-center">
             <input id="funnyEnabled" name="funnyEnabled" type="checkbox"
               checked={enabled} onChange={(e) => setEnabled(e.target.checked)}
@@ -103,26 +98,26 @@ export default function ConfigFunny() {
           </div>
         </div>
 
-        <div className="col-span-full flex gap-x-3">
+        <div className="flex gap-3">
           <div className="flex h-6 items-center">
-            <input id="autoFill" name="funnyAuto" type="checkbox"
+            <input id="autoFill" name="autoFill" type="checkbox"
               checked={autoFill} onChange={(e) => setAutoFill(e.target.checked)} disabled={!enabled}
               className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 disabled:opacity-30"
             />
           </div>
           <div className="text-sm leading-6">
-            <label htmlFor="funnyAuto" className="font-medium text-gray-900">
+            <label htmlFor="autoFill" className="font-medium text-gray-900">
               Auto Fill
             </label>
             <p className="text-gray-500">Let Us provide a daily funny.</p>
           </div>
         </div>
 
-        <div className="col-span-full">
+        <div className="flex flex-col gap-3">
           <label htmlFor="funnyContent" className="block text-sm font-medium leading-6 text-gray-900">
             YOU Tell a Joke
           </label>
-          <div className="mt-2">
+          <div className="">
             <textarea
               id="funnyContent" name="funnyContent" rows={4}
               value={content} onChange={e => setContent(e.target.value)} disabled={!enabled || autoFill}
@@ -136,25 +131,26 @@ export default function ConfigFunny() {
           </p>
         </div>
 
-        <div className="sm:col-span-4">
+        <div className="flex flex-col gap-3">
           <label htmlFor="memeUrl" className="block text-sm font-medium leading-6 text-gray-900">
             YOU Share a meme
           </label>
-          <div className="mt-2">
+          <div className="">
             <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 
               focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
               <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm">https://</span>
               <input type="text" name="memeUrl" id="memeUrl"
-                value={urls} onChange={e => setUrls([e.target.value])} disabled={!enabled || autoFill}
-                className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 disabled:opacity-30
-                  placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                value={urls} onChange={e => setUrls([e.target.value])} 
+                disabled={!enabled || autoFill}
                 placeholder="https://some-image-url.com"
+                className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 disabled:opacity-30
+                  placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"                
               />
             </div>
           </div>
         </div>
       </div>
-      <ConfigSubmit saving={saving} invalid={invalid}></ConfigSubmit>
-    </form>
+
+    </ConsoleBody>
   )
 }

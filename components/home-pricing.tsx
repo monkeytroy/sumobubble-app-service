@@ -14,7 +14,6 @@ declare global {
 }
 
 export default function HomePricing(props: IAppProps) {
-  const customer = useAppStore((state) => state.customer);
   const {data: session} = useSession();
 
   return (

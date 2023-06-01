@@ -1,9 +1,7 @@
 import { saveSite } from "@/services/site";
 import { useAppStore } from "@/store/app-store";
-import { ExclamationCircleIcon, ExclamationTriangleIcon, TvIcon } from "@heroicons/react/24/outline";
+import { ExclamationCircleIcon, TvIcon } from "@heroicons/react/24/outline";
 import { useState, FormEvent, useEffect, useCallback } from "react";
-import { toast } from "react-toastify";
-import ConfigSubmit from "../submit-form";
 import { ISection } from "./sections";
 import { ConsoleBody } from "../console-body";
 

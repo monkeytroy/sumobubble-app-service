@@ -1,8 +1,7 @@
 import { saveSite } from "@/services/site";
 import { useAppStore } from "@/store/app-store";
 import { ExclamationCircleIcon, MinusCircleIcon, StarIcon } from "@heroicons/react/24/outline";
-import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
-import ConfigSubmit from "../submit-form";
+import { useState, useEffect, useCallback } from "react";
 import { ISection } from "./sections";
 import { ConsoleBody } from "../console-body";
 
