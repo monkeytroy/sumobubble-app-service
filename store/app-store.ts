@@ -1,6 +1,6 @@
 
 import { ICustomer } from '@/models/customer';
-import { createChatbot } from '@/services/chatbot';
+import { ISiteState } from '@/models/siteState';
 import { addNewSite, removeSite, saveSite } from '@/services/site';
 import { ISitesSummary } from '@/services/ssp-default';
 import { toast } from 'react-toastify';
@@ -10,6 +10,7 @@ export interface IAppState {
 
   sites: Array<ISitesSummary>,
   site: ISite | null,
+  siteState: ISiteState | null,
   siteChanged: boolean;
   customer: ICustomer | null;
 
@@ -18,15 +19,16 @@ export interface IAppState {
   addSite: (siteTitle: string) => void;
   removeSite: (siteId: string) => void;
   setSite: (val: ISite) => void;
+  setSiteState: (val: ISiteState) => void;
   setSiteChanged: (val: boolean) => void;
   enableSection: (val: boolean, section: string) => void;
-  activateChatbot: (val: ISite) => void;
 }
 
 export const useAppStore = create<IAppState>( (set, get) => ({
 
   sites: [],
   site: null,
+  siteState: null,
   siteChanged: false,
   customer: null,
 
@@ -71,6 +73,8 @@ export const useAppStore = create<IAppState>( (set, get) => ({
 
   setSite: (val: ISite) => set (() => ({ site: {...val} }) ),
 
+  setSiteState: (val: ISiteState) => set (() => ({ siteState: {...val} }) ),
+
   setSiteChanged: (val: boolean) => set ( () => ({ siteChanged: val})),
 
   enableSection: async (val: boolean, sectionName: string) => {
@@ -101,35 +105,6 @@ export const useAppStore = create<IAppState>( (set, get) => ({
   
     }
 
-  },
-
-  activateChatbot: async (site: ISite) => {
-  
-    if (site?._id) {
-
-      // service
-      const res = await createChatbot(site?._id);
-
-      if (res?.success) {
-
-        // state
-        get().setSite(res.data);
-
-        toast.success('Created!', {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: true,
-          });
-
-      } else {
-
-        toast.error('Ooops! New chatbot could not be created. ' + res?.message, {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: true,
-          });
-      }
-    }
   }
 
 }));

@@ -8,10 +8,10 @@ import Funny, { IFunny } from '@/models/funny';
 import Verse from '@/models/verse';
 import { log } from '@/services/log';
 import Site from '@/models/site';
-import { setChatbaseSiteAndRefresh } from '@/services/chatbase';
+import { setupChatbot } from '@/services/chatbase';
 
 const cors = Cors({
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'],
+  methods: ['GET', 'POST', 'DELETE', 'HEAD'],
 });
 
 const DEFAULT_TRANSLATION = 'ASV';
@@ -108,17 +108,18 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
 
     const currentSite = await Site.findById(siteId);
 
-    const currentChatsite = currentSite?.chatbot?.chatsite;
-
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    const chatbaseId = body?.chatbot?.chatbaseId;
-    const chatsite = body?.chatbot?.chatsite;
+    const newChatsite = body?.chatbot?.chatsite;
 
-    if (chatbaseId && chatsite !== currentChatsite) {
-      // call to refresh the chatbot site. 
-      // todo maybe this should happen on publish
-      // and maybe a workflow msg based process?  retry.. time? 
-      setChatbaseSiteAndRefresh(chatbaseId, chatsite);
+    // kick off process to make chatbot if...
+    // no existing chatbaseId AND 
+    // there is a newChatsite that is not the same as the old chatsite.
+
+    if ((!currentSite.chatbot.chatbaseId && newChatsite) ||
+        (newChatsite && newChatsite !== currentSite.chatbot.chatsite)) {
+
+      const chatbaseId = await setupChatbot(newChatsite, currentSite);
+      body.chatbot.chatbaseId = chatbaseId;
     }
 
     const site = await Site.findOneAndUpdate({ _id: siteId }, body, {

@@ -2,6 +2,7 @@ import Site from "@/models/site";
 import { toast } from "react-toastify";
 import { ISitesSummary } from "./ssp-default";
 import connectMongo from "./mongoose";
+import SiteState from "@/models/siteState";
 
 /**
  * Fetch the customer sites by customer id.
@@ -21,6 +22,11 @@ export const fetchCustomerSites = async (email: string) => {
     }
   });
   return sitesRes;
+}
+
+export const fetchSiteState = async(siteId: string) => {
+  await connectMongo();
+  return await SiteState.findOne({siteId: siteId}).select('-__v');
 }
 
 /**

@@ -10,7 +10,8 @@ export enum Membership {
 export enum SubscriptionStatus {
   Active = 'active',
   Inactive = 'inactive',
-  Incomplete = 'incomplete'
+  Incomplete = 'incomplete',
+  Cancelled = 'cancelled'
 }
 
 export interface ICustomer {
@@ -21,6 +22,10 @@ export interface ICustomer {
     id?: string;
     customerId?: string;
     status: SubscriptionStatus;
+    productId?: string
+    metadata?: {
+      chatbot?: boolean
+    }
   },  
   membership: Membership
 }
@@ -32,7 +37,9 @@ const customerSchema = new Schema<ICustomer>({
   subscription: {
     id: { type: String, required: false },
     customerId: { type: String, required: false },
-    status: { type: String, required: false }
+    status: { type: String, required: false },
+    productId: { type: String, required: false },
+    metadata: { type: {}, required: false }
   },
   membership: String
 });

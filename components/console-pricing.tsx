@@ -15,10 +15,15 @@ declare global {
   }
 }
 
-export default function ConsolePricing(props: IAppProps) {
+interface IConsolePricingProps extends IAppProps {
+  startClosed?: boolean;
+}
+
+export default function ConsolePricing(props: IConsolePricingProps) {
 
   const {data: session} = useSession();
-  let [isOpen, setIsOpen] = useState(true);
+
+  let [isOpen, setIsOpen] = useState(!!!props.startClosed);
 
   const closeModal = () => {
     setIsOpen(false);
@@ -30,22 +35,22 @@ export default function ConsolePricing(props: IAppProps) {
 
   return (
 
-    <div className="z-50">
+    <div className="z-40">
 
       {!isOpen && 
         <button
           type="button" onClick={openModal}
-          className="z-50 absolute top-0 right-0 justify-center rounded-md border 
-            border-transparent bg-gray-300 px-4 py-2 text-sm 
-            font-medium text-gray-700 hover:bg-blue-200 
-            focus:outline-none focus-visible:ring-2 
+          className="justify-center rounded-md border \
+            border-transparent bg-gray-300 px-4 py-2 text-sm \
+            font-medium text-gray-700 hover:bg-blue-200 \
+            focus:outline-none focus-visible:ring-2 \
             focus-visible:ring-blue-500 focus-visible:ring-offset-2">
           Subscribe!
         </button>
       }
 
       <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+        <Dialog as="div" className="relative z-60" onClose={closeModal}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -54,11 +59,12 @@ export default function ConsolePricing(props: IAppProps) {
             leave="ease-in duration-200"
             leaveFrom="opacity-100"
             leaveTo="opacity-0">
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
+            <div className="fixed inset-0 bg-black bg-opacity-60" />
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center bg-gray-200 bg-opacity-30">
+            <div className="flex min-h-full items-center justify-center 
+              p-4 text-center bg-gray-200 bg-opacity-30">
               <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -72,7 +78,7 @@ export default function ConsolePricing(props: IAppProps) {
                   className="w-11/12 xl:w-3/5 transform overflow-hidden rounded-2xl 
                   bg-white p-6 text-left align-middle shadow-xl transition-all">
 
-                  <div className="py-2 select-none bg-white">
+                  <div className="select-none bg-white">
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                       <div className="mx-auto max-w-4xl text-center">
                         <p className="mt-2 text-4xl font-bold tracking-tight text-gray-700 sm:text-5xl">
@@ -83,7 +89,7 @@ export default function ConsolePricing(props: IAppProps) {
                         Choose an affordable plan that meets your needs to deploy your app!
                       </p>
 
-                      <div className="isolate mx-auto mt-10 relative">
+                      <div className="isolate mx-auto relative">
 
                       {props?.stripe?.key && props?.stripe?.consoleId && 
                         <stripe-pricing-table 

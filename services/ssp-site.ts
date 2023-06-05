@@ -1,14 +1,14 @@
-import Customer, { ICustomer, Membership } from "@/models/customer";
+import { ICustomer } from "@/models/customer";
 import { getSession } from "next-auth/react";
 import { log } from "./log";
-import connectMongo from "./mongoose";
 import { GetServerSideProps } from "next/types";
-import Site from "@/models/site";
 import { fetchOrCreateCustomer } from "./customer";
-import { fetchCustomerSite } from "./site";
+import { fetchCustomerSite, fetchSiteState } from "./site";
+import { ISiteState } from "@/models/siteState";
 
 export interface ISiteProps {
   customer?: ICustomer;
+  siteState?: ISiteState;
   site?: ISite;
 }
  
@@ -48,15 +48,22 @@ export const getServerSideProps: GetServerSideProps  = async (context) => {
             
   const customer = await fetchOrCreateCustomer({customerId, username, email }); 
 
+  const siteState = await fetchSiteState(Array.isArray(siteId) ? siteId[0] : siteId);
+
   // fetch customer site
-  let siteRes = null;
   const site = await fetchCustomerSite(Array.isArray(siteId) ? siteId[0] : siteId);
   if (site) {
     // Pass data to the page via props
     return {
       props: {
         customer: customer,
-        site: JSON.parse(JSON.stringify(site))
+        site: JSON.parse(JSON.stringify(site)),
+        siteState: JSON.parse(JSON.stringify(siteState)),
+        stripe: {
+          key: process.env.STRIPE_KEY || null,
+          homeId: process.env.STRIPE_HOME_ID || null,
+          consoleId: process.env.STRIPE_CONSOLE_ID || null
+        }
       }
     }
   } else {

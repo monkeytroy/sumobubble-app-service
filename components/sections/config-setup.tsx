@@ -6,6 +6,9 @@ import { saveSite } from "@/services/site";
 import { TwitterPicker } from "react-color";
 import { ConsoleBody } from "../console-body";
 import { formClass } from "@/constants/form-class";
+import { SubscriptionStatus } from "@/models/customer";
+import ConsolePricing from "../console-pricing";
+import { IAppProps } from "@/services/ssp-default";
 
 export const section: ISection = {
   name: 'setup', 
@@ -30,10 +33,10 @@ const COLORS = [
   '#FFAB91', '#BCAAA4'
 ];
 
-export default function ConfigSetup() {
-
+export default function ConfigSetup(props: IAppProps) {
   // site and editable values
   const site = useAppStore((state: any) => state.site);
+  const customer = useAppStore((state: any) => state.customer);
   
   const [title, setTitle] = useState('');
   const [themePrimary, setThemePrimary] = useState(DEFAULT_THEME_COLOR);
@@ -135,20 +138,31 @@ export default function ConfigSetup() {
             </span>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <div className="block text-sm font-medium leading-6 text-gray-900">
-              Copy the following code and paste it into your webpage!
+          {customer?.subscription?.status != SubscriptionStatus.Active && 
+            <div className="text-lg text-gray-600 mt-4 flex flex-col gap-4">
+              Subscribe to deploy InfoChat App to your webiste.    
+
+              <div className="">
+                <ConsolePricing {...props} startClosed={true}></ConsolePricing>
+              </div>          
             </div>
-            <div className="bg-gray-300 rounded-lg shadow-md p-6 select-text break-all whitespace-pre-wrap">
-              <code>
+          }
+          {customer?.subscription?.status == SubscriptionStatus.Active && 
+            <div className="flex flex-col gap-2">
+              <div className="block text-sm font-medium leading-6 text-gray-900">
+                Copy the following code and paste it into your webpage!
+              </div>
+              <div className="bg-gray-300 rounded-lg shadow-md p-6 select-text break-all whitespace-pre-wrap">
+                <code>
   {`<script type="module" 
   src="https://app.infochatapp.com/wc/infochat-app.js" 
   id="infochat-app-scriptastic">
   </script>
   <infochat-app site="${site?._id}"/>`}
-              </code>
+                </code>
+              </div>
             </div>
-          </div>
+          }
         </div>
       </div>
     </ConsoleBody>

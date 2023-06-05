@@ -1,6 +1,5 @@
 import { IAppProps } from "@/services/ssp-default";
 import { signIn, useSession } from "next-auth/react";
-import { useAppStore } from '@/store/app-store';
 
 declare global {
   namespace JSX {
@@ -39,7 +38,6 @@ export default function HomePricing(props: IAppProps) {
           {props.stripe?.key && props.stripe?.homeId && 
             <stripe-pricing-table 
               customer-email={session?.user?.email}
-              success-url={process.env.NEXTAUTH_URL}
               pricing-table-id={props.stripe?.homeId}
               publishable-key={props.stripe?.key}>
             </stripe-pricing-table>

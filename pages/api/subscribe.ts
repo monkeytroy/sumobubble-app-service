@@ -3,8 +3,51 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import Cors from 'cors';
 import { apiMiddleware } from '@/services/api-middleware';
 import connectMongo from '@/services/mongoose';
-import Customer, { ICustomer } from '@/models/customer';
+import Customer, { ICustomer, SubscriptionStatus } from '@/models/customer';
 import { log } from '@/services/log';
+
+
+/**
+ * The following stripe hook 'event' objects are most important currently.
+ *  customer.updated
+ *  customer.created
+ *  customer.subscription.created
+ *  customer.deleted
+ *  customer.subscription.deleted
+ * 
+ * TODO potentially capture invoices to show to the user
+ *  invoice.created
+ *  invoice.finalized
+ *  invoice.paid
+ *  invoice.payment_succeeded
+ *  
+ *  product.updated - when metadata changed.. 
+ *    should capture and update local md based on data.object.id 'prod_O1AZsc9SaxmdVK' for object 'product'
+ *   
+ * The following stripe hook 'subscription' object is the main thing.
+ * Things to possibly collect include...
+ * 
+ *   customer: string id of customer on stripe
+ *   id: subscription id
+ * 
+ *   cancel_at_period_end: boolean
+ *   cancel_at: ? null
+ *   cancleed_at: timestamp?
+ *   cancellation_details.reason | feedback | comment
+ *   current_period_end: timestamp?
+ *   current_period_start: timestamp?
+ *   discount: object w dtails
+ *   ended_at: timestamp?
+ *   metadata: object
+ *   plan: {
+ *     metadata: object?
+ *     nickname?
+ *   }
+ *   quantity: number
+ *   start_date: timestamp?
+ *   trial_end, _start, _settings
+ */
+
 
 const cors = Cors({
   methods: ['GET', 'POST', 'HEAD'],
@@ -32,7 +75,7 @@ export default async function handler(
 
 const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) => {
 
-  log('Webhook called', req.body);
+  log('Webhook called ------------------------------------------------------');
 
   // handle invoice status.
   const event = req.body;
@@ -58,6 +101,8 @@ const linkCustomer = async (eventObject: any) => {
 
     const id = eventObject.id;
     const email = eventObject.email;
+
+    //console.log(eventObject)
 
     if (id && email) {
 
@@ -88,14 +133,29 @@ const linkCustomer = async (eventObject: any) => {
  * @param eventObject 
  */
 const updateSubscription = async (eventObject: any) => {
+  
   if (eventObject.object == 'subscription') {
 
     const customerId = eventObject.customer;
     const status = eventObject.status;
-    const subscriptionId = eventObject.id;
-    const items = eventObject.items;
+    
+    let subscriptionId = eventObject.id;
+    let productId = eventObject.plan.product;
+    let chatbot = false;
 
     // todo store more info like dates.
+
+    // todo more.. query the product for metadata instead of 
+    // storing the product id's here
+    if ((process.env.STRIPE_CHAT_PRODUCTS || ['']).includes(productId)) {
+      chatbot = true;
+    }
+
+    if (status != SubscriptionStatus.Active) {
+      chatbot = false;
+      productId = '';
+      subscriptionId = '';
+    }
 
     if (customerId) {
 
@@ -106,6 +166,10 @@ const updateSubscription = async (eventObject: any) => {
         if (customer) {
           customer.subscription.id = subscriptionId;
           customer.subscription.status = status;
+          customer.subscription.productId = productId;
+          customer.subscription.metadata = {
+            chatbot
+          }
           customer.save();
         } else {
           log(`updateSubscription:: error - could not find customer ${customerId} for event object.`, eventObject);

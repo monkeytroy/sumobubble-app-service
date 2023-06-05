@@ -55,11 +55,9 @@ const siteSchema = new Schema<ISite>({
     required: true
   },
   chatbot: {
-    type: {
-      enabled: Boolean,
-      chatsite: String,
-      chatbaseId: String, 
-    }
+    enabled: Boolean,
+    chatsite: String,
+    chatbaseId: String
   },
   sections: {
     type: Map,
