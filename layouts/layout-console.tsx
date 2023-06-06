@@ -21,6 +21,11 @@ export default function Layout({ children } : { children: ReactElement }) {
         </div>
         <Footer></Footer>
       </div>
+
+      <script type="module" src="http://localhost:5173/dist/infochat-app.js" 
+        id="infochat-app-scriptastic"></script>
+      <infochat-app preview="true" site="647c1c4f427a3a36d0e939a0"></infochat-app>
+      
     </div>
   )
 }

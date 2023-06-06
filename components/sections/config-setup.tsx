@@ -40,6 +40,7 @@ export default function ConfigSetup(props: IAppProps) {
   
   const [title, setTitle] = useState('');
   const [themePrimary, setThemePrimary] = useState(DEFAULT_THEME_COLOR);
+  const [button, setButton] = useState('');
 
   // local component state
   const [showPickColor, setShowPickColor] = useState(false);
@@ -48,6 +49,7 @@ export default function ConfigSetup(props: IAppProps) {
 
   // reset to site state
   const reset = useCallback(() => {
+    setButton(site?.button || '');
     setTitle(site?.title || '');
     setThemePrimary(site?.theme?.primary || DEFAULT_THEME_COLOR);
   }, [site]);
@@ -61,7 +63,7 @@ export default function ConfigSetup(props: IAppProps) {
   const onSave = async () => {
     if (site) {
       setSaving(true);
-      await saveSite({...site, title: title, theme: {primary: themePrimary}});
+      await saveSite({...site, title: title, theme: {primary: themePrimary}, button});
       setTimeout(() => setSaving(false), 1000);
     }
   };
@@ -128,6 +130,37 @@ export default function ConfigSetup(props: IAppProps) {
             </div>
           </div>
 
+          <div>
+            <label className="block text-sm font-medium leading-6 text-gray-900">Button Style</label>
+            <p className="text-sm text-gray-500">How would you like InfoChat button to appear?</p>
+            <fieldset className="mt-4">
+              <legend className="sr-only">Select</legend>
+              <div className="space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
+                <div className="flex items-center">
+                  <input id="buttonCircle" name="notification-method"
+                    type="radio" defaultChecked={button == 'circleRight'}
+                    onClick={() => setButton('circleRight')}
+                    className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                  />
+                  <label htmlFor="buttonCircle"
+                    className="ml-3 block text-sm font-medium leading-6 text-gray-900">
+                    Circle Button
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input id="buttonRight" name="notification-method"
+                    type="radio" defaultChecked={button == '' || button == 'right'}
+                    onClick={() => setButton('right')}
+                    className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                  />
+                  <label htmlFor="buttonRight"
+                    className="ml-3 block text-sm font-medium leading-6 text-gray-900">
+                    Right Edge
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+          </div>
         </div>
         
         <div className="flex flex-col gap-4 py-8">

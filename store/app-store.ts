@@ -1,6 +1,7 @@
 
 import { ICustomer } from '@/models/customer';
 import { ISiteState } from '@/models/siteState';
+import { preview } from '@/services/preview';
 import { addNewSite, removeSite, saveSite } from '@/services/site';
 import { ISitesSummary } from '@/services/ssp-default';
 import { toast } from 'react-toastify';
@@ -71,7 +72,10 @@ export const useAppStore = create<IAppState>( (set, get) => ({
     }
   },
 
-  setSite: (val: ISite) => set (() => ({ site: {...val} }) ),
+  setSite: (val: ISite) => {
+    preview(val);
+    set (() => ({ site: {...val} }) );
+  },
 
   setSiteState: (val: ISiteState) => set (() => ({ siteState: {...val} }) ),
 

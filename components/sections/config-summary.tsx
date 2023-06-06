@@ -27,6 +27,7 @@ export default function ConfigSummary() {
   const [special, setSpecial] = useState('');
 
   // local component state
+  const [newSummary, setNewSummary] = useState('');
   const [saving, setSaving] = useState(false);
   const [invalid, setInvalid] = useState(false);
   const [summaryLoading, setSummaryLoading] = useState(true);
@@ -36,7 +37,7 @@ export default function ConfigSummary() {
   const reset = useCallback(() => {
     setEnabled(!!site?.summary?.enabled);
     setContent(site?.summary?.content || '');
-    //setNewSummary(site?.summary?.content || '');
+    setNewSummary(site?.summary?.content || '');
     setSpecial(site?.summary?.special || '');
   }, [site]);
 
@@ -49,15 +50,15 @@ export default function ConfigSummary() {
   const onSave = async () => {
     if (site) {
       setSaving(true);
-      await saveSite({...site, summary: { enabled, content, special}});
+      await saveSite({...site, summary: { enabled, content: newSummary, special}});
       setTimeout(() => setSaving(false), 2000);
     }
   }
 
   // validation.  effect on values. Set invalid. 
   useEffect(() => {
-    setInvalid(content.length === 0);
-  }, [content])
+    setInvalid(enabled && newSummary.length === 0);
+  }, [content, newSummary])
 
   // more component support
   const onImagesUpload = (blobInfo:any) => new Promise<string>(async (resolve, reject) => {
@@ -131,7 +132,7 @@ export default function ConfigSummary() {
                 tinymceScriptSrc={'/tinymce/tinymce.min.js'}
                 onInit={(evt, editor) => { setSummaryLoading(false); editorRef.current = editor; }}
                 initialValue={content}
-                onEditorChange={(newValue) => setContent(newValue)}
+                onEditorChange={(newValue) => setNewSummary(newValue)}
                 //onDirty={() => setDirty(true)}  // content changed.. needed?
                 init={{
                   images_upload_handler: onImagesUpload,

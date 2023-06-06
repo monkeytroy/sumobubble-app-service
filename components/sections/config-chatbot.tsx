@@ -85,7 +85,7 @@ export default function ConfigChatbot(props: IAppProps) {
 
         {customer?.subscription?.status != SubscriptionStatus.Active &&
           <div className="text-lg text-gray-600 mt-4 flex flex-col gap-4">
-            Subscribe to deploy InfoChat App to your webiste.    
+            Subscribe to configure and enable chatbot.
 
             <div className="">
               <ConsolePricing {...props} startClosed={true}></ConsolePricing>
@@ -108,19 +108,15 @@ export default function ConfigChatbot(props: IAppProps) {
           </div>
         } 
 
-        {customer?.subscription?.metadata?.chatbot && 
+        {customer?.subscription?.status == SubscriptionStatus.Active && 
+          customer?.subscription?.metadata?.chatbot && 
+          
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-3">
               <label htmlFor="spotlightUrl" className="block text-sm font-medium leading-6 text-gray-900">
                 Chatbot Status
               </label>
               <div className="mx-6">
-
-                {site?.summary?.content && site.summary.content.length < 40 &&
-                  <div>
-                    To create the chatbot, your site summary must be more than 40 characters.
-                  </div>
-                }
 
                 {siteState?.seeded == ChatbaseSeedState.seedfail &&
                   <div className="rounded-md bg-blue-50 p-4">
@@ -130,7 +126,7 @@ export default function ConfigChatbot(props: IAppProps) {
                       </div>
                       <div className="ml-3 flex-1 md:flex md:justify-between">
                         <div className="text-sm text-blue-700">
-                          The chatbot source was not set correctly.  Verify the 
+                          The chatbot source was not set correctly. Verify the 
                           Chatbot Root Source value and save value again. 
                         </div>
                       </div>
@@ -146,7 +142,7 @@ export default function ConfigChatbot(props: IAppProps) {
                       </div>
                       <div className="ml-3 flex-1 md:flex md:justify-between">
                         <div className="text-sm text-blue-700">
-                          The chatbot will not be created until the root source url has been entered and saved.
+                          The chatbot will not be created until the source url has been entered (below) and saved.
                           <ul className="list-disc pl-6 hidden">
                             <li>Info summary text has been entered. (more than 100 characters)</li>
                             <li>Chatbot Root Source has been entered below.</li>

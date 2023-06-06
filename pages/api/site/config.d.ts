@@ -8,6 +8,7 @@ interface ISite {
   customerId: string;
   customerEmail: string;
   title: string;
+  button?: string;
   theme?: {
     primary?: string;
   }

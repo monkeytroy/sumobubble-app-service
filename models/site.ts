@@ -40,6 +40,7 @@ const siteSchema = new Schema<ISite>({
   customerId: { type: String, required: true },
   customerEmail: { type: String, required: true },
   title: { type: String, required: true, min: 4, max: 160},
+  button: { type: String, required: false },
   theme: {
     primary: String
   },

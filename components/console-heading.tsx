@@ -27,7 +27,7 @@ export default function ConsoleHeading(props: IConsoleHeadingProps) {
           <button type="reset" disabled={props.saving || props.invalid}
             onClick={props.onCancel}
             className="text-sm font-semibold leading-6 text-gray-900 disabled:opacity-25">
-            Cancel
+            Reset
           </button>
           <button type="submit" disabled={props.saving || props.invalid}
             onClick={props.onSave}

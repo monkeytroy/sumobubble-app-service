@@ -23,3 +23,17 @@ declare module 'next/app' {
 
 declare module "formidable";
 declare module "mime";
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'infochat-app': CustomElement<>;
+    }
+  }
+}
+
+declare global {
+  interface Window {
+    onInfoChatPreviewUpdate: any;
+  }
+}

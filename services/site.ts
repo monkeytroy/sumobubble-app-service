@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { ISitesSummary } from "./ssp-default";
 import connectMongo from "./mongoose";
 import SiteState from "@/models/siteState";
+import { preview } from "./preview";
 
 /**
  * Fetch the customer sites by customer id.
@@ -89,6 +90,8 @@ export const removeSite = async (siteId: string) => {
 }
 
 export const saveSite = async (config: ISite) => {
+
+  preview(config);
 
   const res = await fetch(`/api/site/${config._id}`, {
     method: 'POST',

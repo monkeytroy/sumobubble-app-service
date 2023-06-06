@@ -2,9 +2,10 @@ import { HomeIcon } from '@heroicons/react/24/outline'
 import { ISection, sections } from '@/components/sections/sections';
 import { useRouter } from 'next/router';
 import { useAppStore } from '@/store/app-store';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { publishSite } from '@/services/site';
 import { toast } from 'react-toastify';
+import { SubscriptionStatus } from '@/models/customer';
 
 // configuration so 'current' works.
 const navigation: Array<ISection> = [
@@ -21,12 +22,18 @@ export default function NavSide() {
   const { section, siteId } = router.query;
   const currentRoute = router.route;
   
+  const customer = useAppStore((state) => state.customer);
   const configuration = useAppStore((state) => state.site);
   const [saving, setSaving] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
 
   const current = (item: ISection) => {
     return currentRoute.endsWith(`/${item.name}`) || section == item.name.toLowerCase()
   }
+
+  useEffect(() => {
+    setSubscribed(customer?.subscription?.status === SubscriptionStatus.Active);
+  }, [customer]);
 
   const onPublish = async () => {
     if (configuration?._id) {
@@ -78,10 +85,10 @@ export default function NavSide() {
             <div className="text-white group rounded-md leading-6 font-semibold truncate">
               {configuration?.title || 'Create or Select'}
             </div>
-            <button type="button" disabled={!configuration || saving}
+            <button type="button" disabled={!configuration || saving || !subscribed}
               onClick={() => onPublish()}
               title="Site changes only available to user after a publish!"
-              className="w-full my-4 rounded-md bg-blue-500 py-2 px-3 text-sm font-semibold 
+              className="w-full mt-6 rounded-md bg-blue-500 py-2 px-3 text-sm font-semibold 
                 text-white shadow-sm hover:bg-blue-600 disabled:opacity-25
                 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
               Publish Site Now
