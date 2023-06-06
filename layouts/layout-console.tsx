@@ -24,7 +24,7 @@ export default function Layout({ children } : { children: ReactElement }) {
 
       <script type="module" src="https://app.infochatapp.com/wc/infochat-app.js" 
         id="infochat-app-scriptastic"></script>
-      <infochat-app preview="true" site=""></infochat-app>
+      <infochat-app preview="true" site="preview"></infochat-app>
       
     </div>
   )
