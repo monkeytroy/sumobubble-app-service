@@ -20,8 +20,10 @@ const getLayoutPlain = (page: ReactElement) => {
 }
 
 const getLayoutConsole = (page: ReactElement) => {
+  const router = useRouter();
+  const siteId = Array.isArray(router.query.siteId) ? router.query.siteId[0] : router.query.siteId;
   return (
-    <LayoutConsole>
+    <LayoutConsole siteId={siteId || ''}>
       {page}
     </LayoutConsole>
   )

@@ -4,7 +4,7 @@ import Footer from "../components/footer";
 import Nav from "../components/nav";
 import NavSide from "../components/nav-side";
 
-export default function Layout({ children } : { children: ReactElement }) {
+export default function Layout({ siteId, children } : { siteId: string, children: ReactElement }) {
   return (
     <div className="flex min-h-screen">
       <div className="fixed w-full left-0 z-50">
@@ -24,7 +24,7 @@ export default function Layout({ children } : { children: ReactElement }) {
 
       <script type="module" src="https://app.infochatapp.com/wc/infochat-app.js" 
         id="infochat-app-scriptastic"></script>
-      <infochat-app preview="true" site="preview"></infochat-app>
+      <infochat-app preview="true" site={siteId}></infochat-app>
       
     </div>
   )
