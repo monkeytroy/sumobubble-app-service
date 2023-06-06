@@ -22,7 +22,7 @@ export default function Layout({ children } : { children: ReactElement }) {
         <Footer></Footer>
       </div>
 
-      <script type="module" src="https://app.infochatapp.com/app/infochat-app.js" 
+      <script type="module" src="https://app.infochatapp.com/wc/infochat-app.js" 
         id="infochat-app-scriptastic"></script>
       <infochat-app preview="true" site=""></infochat-app>
       
