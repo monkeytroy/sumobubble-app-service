@@ -191,7 +191,7 @@ export default function ConfigSetup(props: IAppProps) {
   src="https://app.infochatapp.com/wc/infochat-app.js" 
   id="infochat-app-scriptastic">
   </script>
-  <infochat-app site="${site?._id}"/>`}
+  <infochat-app site="${site?._id}"></infochat-app>`}
                 </code>
               </div>
             </div>
