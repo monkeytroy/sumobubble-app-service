@@ -11,7 +11,7 @@ import Head from 'next/head';
 import '@/styles/globals.css';
 import '@/styles/summary.scss';
 
-const getLayoutPlain = (page: ReactElement) => {
+const ThisLayoutPlain = (page: ReactElement) => {
   return (
     <LayoutPlain>
       {page}
@@ -19,7 +19,7 @@ const getLayoutPlain = (page: ReactElement) => {
   )
 }
 
-const getLayoutConsole = (page: ReactElement) => {
+const ThisLayoutConsole = (page: ReactElement) => {
   const router = useRouter();
   const siteId = Array.isArray(router.query.siteId) ? router.query.siteId[0] : router.query.siteId;
   return (
@@ -35,7 +35,7 @@ const App:NextComponentType<AppContext, AppInitialProps, AppLayoutProps> =
   const router = useRouter();
 
   const getLayout = Component.getLayout || 
-    (router.route.startsWith('/console') ? getLayoutConsole : getLayoutPlain)
+    (router.route.startsWith('/console') ? ThisLayoutConsole : ThisLayoutPlain)
 
   return (
     <>
