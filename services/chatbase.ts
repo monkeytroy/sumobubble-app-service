@@ -1,8 +1,10 @@
 import SiteState, { ChatbaseSeedState, ISiteState } from "@/models/siteState";
 import { log } from "./log";
 import connectMongo from "./mongoose";
+import axios from "axios";
 
 const chatbaseUrl = 'https://www.chatbase.co/api/v1/';
+const chatbaseChatbotUrl = 'https://www.chatbase.co/chatbot/';
 
 interface IChatbasePayload {
   chatbotName: string;
@@ -36,28 +38,39 @@ export const setupChatbot = async (chatsite: string, site: ISite) => {
   
   let chatbaseId = site.chatbot.chatbaseId || null;
 
-  log('Checking if chatbaseId exists', Date.now());
-
   let chatbotExists = false;
   if (chatbaseId) {
-    // verify a chatbot already exists.
+    log(`Checking if chatbaseId exists ${chatbaseId}`);
     chatbotExists = await checkChatbaseChatbotExists(chatbaseId);
+    log(`chatbaseId ${chatbaseId} exists ${chatbotExists}`);
+  } else {
+    log(`No chatbaseId value for site ${site._id}`);
   }
 
   // If not, try to create the chatbot in chatbase
   if (!chatbotExists) {
-    log('Creating if chatbaseId didnt exist', Date.now());
+    log(`Creating as it didn't exist`);
     chatbaseId = await createChatbaseChatbot({
       chatbotName: site._id
     });
   }
 
   if (chatbaseId) {
-    log('Kick off crawlAndScrape', Date.now());
+    log('Kick off crawlAndScrape');
     crawlAndScrape(chatbaseId, chatsite, site);
+
+    // also kick off fix visibility.. dont wait. 
+    fetch(`https://infochat-cb-fix-rfpgk.ondigitalocean.app/cb-fix/${chatbaseId}`, {
+      method: 'get',
+      headers: {
+        Authorization: 'Bearer ' + 'fjaobham12ng9idf721b23lsldkghaopqwpweiuy'
+      }
+    });
+
+    log(`Returning chatbase id ${chatbaseId}`);
+  } else {
+    log(`No chatbase id to return`);
   }
-  
-  log('Returning chatbase id', Date.now());
 
   return chatbaseId;  
 }
@@ -96,7 +109,6 @@ const crawlAndScrape = async (chatbotId: string, chatsite: string, site: ISite) 
 
 }
 
-
 const updateChatbotUrls = async (chatbotId: string, urlsToScrape: Array<string>) => {
 
   const query = {
@@ -104,18 +116,28 @@ const updateChatbotUrls = async (chatbotId: string, urlsToScrape: Array<string>)
     urlsToScrape
   };
 
-  log(JSON.stringify(query), process.env.CHATBASE_API_KEY);
+  log(`updatechatbotUrls ${JSON.stringify(query)} ${process.env.CHATBASE_API_KEY}`);
 
-  const chatbaseRes = await fetch(chatbaseUrl + '/update-chatbot-data', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + process.env.CHATBASE_API_KEY
-    },
-    body: JSON.stringify(query)
-  });
+  try {
+    const chatbaseRes = await axios.post(
+      chatbaseUrl + '/update-chatbot-data', 
+      query,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + process.env.CHATBASE_API_KEY
+        }  
+      }
+    );
 
-  return chatbaseRes.status === 200;
+    return chatbaseRes.status === 200;
+
+  } catch (err) {
+    log(err);
+  }
+
+  return false;
+  
 }
 
 
@@ -149,27 +171,39 @@ const createChatbaseChatbot = async (
   //   }
   // }
 
-  log(`Building payload for createChatbaseChatbot:  ${JSON.stringify(payload)}`);
-  
-  const chatbaseRes = await fetch(chatbaseUrl + '/create-chatbot', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + process.env.CHATBASE_API_KEY
-    },
-    body: JSON.stringify(payload)
-  });
+  const payloadString = JSON.stringify(payload);
 
-  if (chatbaseRes?.status === 200) {
-    const chatbaseResJson = await chatbaseRes.json();
+  log(`Building payload for createChatbaseChatbot:  ${payloadString}`);
+  //log(`Url: ${chatbaseUrl} key ${process.env.CHATBASE_API_KEY}`);
 
-    if (chatbaseResJson.chatbotId) {
-      return chatbaseResJson.chatbotId;
+  try {
+
+    const chatbaseRes = await axios.post(
+      chatbaseUrl + '/create-chatbot',
+      payloadString, 
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + process.env.CHATBASE_API_KEY
+        }
+      }
+    );
+
+    log(`Sent create-chatbot.. `, chatbaseRes.status);
+
+    if (chatbaseRes?.status === 200) {
+      const chatbaseResJson = chatbaseRes.data;
+
+      if (chatbaseResJson.chatbotId) {
+        return chatbaseResJson.chatbotId;
+      } else {
+        log(`No chatbot was created ${JSON.stringify(chatbaseResJson)}`);  
+      }
     } else {
-      log(`No chatbot was created ${JSON.stringify(chatbaseResJson)}`);  
+      log(`Invalid response from chatbase ${chatbaseRes}`);
     }
-  } else {
-    log(`Invalid response from chatbase ${chatbaseRes}`);
+  } catch (err) {
+    log(err);    
   }
 
   return null;
@@ -182,34 +216,47 @@ const createChatbaseChatbot = async (
  */
 const checkChatbaseChatbotExists = async (chatbaseId: string) => {
 
-  const query = {
-    messages: [
-      { content: 'Are you there?', role: 'user' }
-    ],
-    chatId: chatbaseId,
-    stream: false,
-    temperature: 0
-  };
+  const getRes = await axios.get(chatbaseChatbotUrl + chatbaseId);
 
-  const chatbaseRes = await fetch(chatbaseUrl + '/chat', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + process.env.CHATBASE_API_KEY
-    },
-    body: JSON.stringify(query)
-  });
-
-  if (chatbaseRes.status === 200) {
-    const resJson = await chatbaseRes.json();
-    
-    if (resJson?.text) {
-      // safe bet bot exists.
-      return true;
-    }
+  if (getRes.status === 307) {
+    return false;
+  } else {
+    return true;
   }
 
-  return false;
+  // log('Initial get check did not fail.');
+
+  // const query = {
+  //   messages: [
+  //     { content: 'Are you there?', role: 'user' }
+  //   ],
+  //   chatId: chatbaseId,
+  //   stream: false,
+  //   temperature: 0
+  // };
+
+  // log('checkChatbaseChatbotExists axios post');
+  
+  // const chatbaseRes = await axios.post(
+  //   chatbaseUrl + '/chat', 
+  //   query,
+  //   {
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       Authorization: 'Bearer ' + process.env.CHATBASE_API_KEY
+  //     }
+  //   }
+  // );
+
+  // if (chatbaseRes.status === 200) {
+  //   const resJson = await chatbaseRes.data;
+  //   if (resJson?.text) {
+  //     // safe bet bot exists.
+  //     return true;
+  //   }
+  // }
+
+  // return false;
 }
 
 
