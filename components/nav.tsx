@@ -21,7 +21,7 @@ export default function Nav() {
 
   return (
     <Disclosure as="nav" className="bg-white border-b-2 border-gray-200">
-      {({ open }) => (
+      {({ open } : { open: boolean}) => (
         <>
           <div className="mx-6 px-4 sm:px-6 lg:px-6 text-gray-600">
             <div className="flex h-16 justify-between">
@@ -92,7 +92,7 @@ export default function Nav() {
                           </div>
                         </Menu.Item>
                         <Menu.Item>
-                          {({ active }) => (
+                          {({ active } : { active: boolean }) => (
                             <a href="#" className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                               onClick={()=>signOut({ callbackUrl: '/' })}>
                               Sign out
