@@ -1,25 +1,24 @@
-import { ICustomer } from "@/models/customer";
-import { getSession } from "next-auth/react";
-import { log } from "./log";
-import { GetServerSideProps } from "next/types";
-import { fetchOrCreateCustomer } from "./customer";
-import { fetchCustomerSite, fetchSiteState } from "./site";
-import { ISiteState } from "@/models/siteState";
+import { ICustomer } from '@/models/customer';
+import { getSession } from 'next-auth/react';
+import { log } from './log';
+import { GetServerSideProps } from 'next/types';
+import { fetchOrCreateCustomer } from './customer';
+import { fetchCustomerSite, fetchSiteState } from './site';
+import { ISiteState } from '@/models/siteState';
 
 export interface ISiteProps {
   customer?: ICustomer;
   siteState?: ISiteState;
   site?: ISite;
 }
- 
+
 /**
  * Server side props will read the session, params and get db data to return as props.
- * 
- * @param context 
- * @returns 
+ *
+ * @param context
+ * @returns
  */
-export const getServerSideProps: GetServerSideProps  = async (context) => {
-  
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
   const customerId = session?.user.id;
   const email = session?.user.email;
@@ -29,9 +28,9 @@ export const getServerSideProps: GetServerSideProps  = async (context) => {
   const backToConsoleRes = {
     redirect: {
       permanent: false,
-      destination: "/console",
+      destination: '/console'
     },
-    props:{},
+    props: {}
   };
 
   // if session but no email.. something is wrong. error out.
@@ -45,8 +44,8 @@ export const getServerSideProps: GetServerSideProps  = async (context) => {
     log(`Missing siteId`);
     return backToConsoleRes;
   }
-            
-  const customer = await fetchOrCreateCustomer({customerId, username, email }); 
+
+  const customer = await fetchOrCreateCustomer({ customerId, username, email });
 
   const siteState = await fetchSiteState(Array.isArray(siteId) ? siteId[0] : siteId);
 
@@ -65,9 +64,8 @@ export const getServerSideProps: GetServerSideProps  = async (context) => {
           consoleId: process.env.STRIPE_CONSOLE_ID || null
         }
       }
-    }
+    };
   } else {
     return backToConsoleRes;
   }
-
-}
+};

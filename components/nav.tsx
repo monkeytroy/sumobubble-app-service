@@ -1,66 +1,59 @@
-import { Fragment } from 'react'
-import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, UserCircleIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { useSession, signOut, signIn } from "next-auth/react"
-import Image from "next/image";
+import { Fragment } from 'react';
+import { Disclosure, Menu, Transition } from '@headlessui/react';
+import { Bars3Icon, BellIcon, UserCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useSession, signOut, signIn } from 'next-auth/react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(' ');
 }
 
 export default function Nav() {
-
   const { data: session } = useSession();
 
   const navigation = [
     { name: 'Product', href: '/#product' },
     { name: 'Features', href: '/#features' },
     { name: 'Price', href: '/#pricing' }
-  ]
+  ];
 
   return (
     <Disclosure as="nav" className="bg-white border-b-2 border-gray-200">
-      {({ open } : { open: boolean}) => (
+      {({ open }: { open: boolean }) => (
         <>
           <div className="mx-6 px-4 sm:px-6 lg:px-6 text-gray-600">
             <div className="flex h-16 justify-between">
-              
               <div className="flex flex-1">
                 <div className="flex flex-shrink-0 items-center">
-                  <div className="text-2xl font-bold tracking-tight flex gap-4 items-center">
-                    InfoChat App
-                  </div>
-                </div>                
+                  <div className="text-2xl font-bold tracking-tight flex gap-4 items-center">InfoChat App</div>
+                </div>
                 <div className="hidden sm:flex flex-1 items-center justify-center sm:space-x-12">
-
                   {navigation.map((item) => (
-                    <Link key={item.name} href={item.href} 
-                      className="text-normal font-semibold leading-6">
+                    <Link key={item.name} href={item.href} className="text-normal font-semibold leading-6">
                       {item.name}
                     </Link>
                   ))}
-                  
                 </div>
                 <div className="flex items-center">
-                  {session &&
-                    <Link href="/console"
-                      className="text-normal font-semibold leading-6">
+                  {session && (
+                    <Link href="/console" className="text-normal font-semibold leading-6">
                       Console
                     </Link>
-                  }
-                  {!session &&
-                    <a href="#"
-                      onClick={() => signIn('auth0',{ callbackUrl: '/console' })}
+                  )}
+                  {!session && (
+                    <a
+                      href="#"
+                      onClick={() => signIn('auth0', { callbackUrl: `${window.location.origin}/console` })}
                       className="text-normal font-semibold leading-6">
                       Sign In
                     </a>
-                  }
+                  )}
                 </div>
               </div>
 
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
-                {session && session?.user?.name && 
+                {session && session?.user?.name && (
                   <Menu as="div" className="relative ml-3">
                     <div>
                       <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
@@ -77,24 +70,36 @@ export default function Nav() {
                       enterTo="transform opacity-100 scale-100"
                       leave="transition ease-in duration-75"
                       leaveFrom="transform opacity-100 scale-100"
-                      leaveTo="transform opacity-0 scale-95"
-                    >
+                      leaveTo="transform opacity-0 scale-95">
                       <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                         <Menu.Item>
                           <div className="flex items-center px-2 py-2">
                             <div>
-                              <img className="inline-block h-9 w-9 rounded-full" src={session?.user.image || ''} alt="user" />
+                              <img
+                                className="inline-block h-9 w-9 rounded-full"
+                                src={session?.user.image || ''}
+                                alt="user"
+                              />
                             </div>
                             <div className="ml-3">
-                              <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">{session?.user.name}</p>
-                              <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">{session?.user.email}</p>
+                              <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                                {session?.user.name}
+                              </p>
+                              <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
+                                {session?.user.email}
+                              </p>
                             </div>
                           </div>
                         </Menu.Item>
                         <Menu.Item>
-                          {({ active } : { active: boolean }) => (
-                            <a href="#" className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
-                              onClick={()=>signOut({ callbackUrl: '/' })}>
+                          {({ active }: { active: boolean }) => (
+                            <a
+                              href="#"
+                              className={classNames(
+                                active ? 'bg-gray-100' : '',
+                                'block px-4 py-2 text-sm text-gray-700'
+                              )}
+                              onClick={() => signOut({ callbackUrl: '/' })}>
                               Sign out
                             </a>
                           )}
@@ -102,7 +107,7 @@ export default function Nav() {
                       </Menu.Items>
                     </Transition>
                   </Menu>
-                }
+                )}
               </div>
               <div className="-mr-2 flex items-center sm:hidden">
                 {/* Mobile menu button */}
@@ -121,7 +126,9 @@ export default function Nav() {
           <Disclosure.Panel className="sm:hidden">
             <div className="space-y-1 pb-3 pt-2">
               {/* Current: "bg-indigo-50 border-indigo-500 text-indigo-700", Default: "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700" */}
-              <Disclosure.Button as="a" href="#"
+              <Disclosure.Button
+                as="a"
+                href="#"
                 className="block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-indigo-700">
                 Setup
               </Disclosure.Button>
@@ -148,7 +155,9 @@ export default function Nav() {
                 </button>
               </div>
               <div className="mt-3 space-y-1">
-                <Disclosure.Button as="a" href="#"
+                <Disclosure.Button
+                  as="a"
+                  href="#"
                   className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800">
                   Sign out
                 </Disclosure.Button>
@@ -158,5 +167,5 @@ export default function Nav() {
         </>
       )}
     </Disclosure>
-  )
+  );
 }
