@@ -24,7 +24,7 @@ export default function Layout({ siteId, children }: { siteId: string; children:
 
       <script
         type="module"
-        src="https://sumobubble-app-bukyz.ondigitalocean.app/wc/sumobubble-app.js"
+        src="https://sumobubble-app-bukyz.ondigitalocean.app/wc/app/sumobubble-app.js"
         id="sumobubble-scriptastic"></script>
       <sumobubble preview="true" site={siteId}></sumobubble>
     </div>
