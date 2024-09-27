@@ -24,9 +24,9 @@ export default function Layout({ siteId, children }: { siteId: string; children:
 
       <script
         type="module"
-        src="https://sumobubble-app-bukyz.ondigitalocean.app/wc/infochat-app.js"
-        id="infochat-app-scriptastic"></script>
-      <infochat-app preview="true" site={siteId}></infochat-app>
+        src="https://sumobubble-app-bukyz.ondigitalocean.app/wc/sumobubble-app.js"
+        id="sumobubble-scriptastic"></script>
+      <sumobubble preview="true" site={siteId}></sumobubble>
     </div>
   );
 }

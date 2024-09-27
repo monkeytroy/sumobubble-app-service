@@ -219,10 +219,10 @@ export default function ConfigSetup(props: IAppProps) {
               <div className="bg-gray-300 rounded-lg shadow-md p-6 select-text break-all whitespace-pre-wrap">
                 <code>
                   {`<script type="module" 
-  src="https://sumobubble-app-bukyz.ondigitalocean.app//wc/infochat-app.js" 
-  id="infochat-app-scriptastic">
+  src="https://sumobubble-app-bukyz.ondigitalocean.app//wc/sumobubble.js" 
+  id="sumobubble-scriptastic">
   </script>
-  <infochat-app site="${site?._id}"></infochat-app>`}
+  <sumobubble site="${site?._id}"></sumobubble>`}
                 </code>
               </div>
             </div>
