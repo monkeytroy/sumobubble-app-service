@@ -19,13 +19,13 @@ declare module 'mime';
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      sumobubble: CustomElement<>;
+      'sumobubble-wc': CustomElement<>;
     }
   }
 }
 
 declare global {
   interface Window {
-    onInfoChatPreviewUpdate: any;
+    onPreviewUpdate: any;
   }
 }

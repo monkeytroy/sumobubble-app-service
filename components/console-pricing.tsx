@@ -83,10 +83,12 @@ export default function ConsolePricing(props: IConsolePricingProps) {
                       <div className="isolate mx-auto relative">
                         {props?.stripe?.key && props?.stripe?.consoleId && (
                           <stripe-pricing-table
-                            customer-email={session?.user?.email}
-                            success-url={process.env.STRIPE_SUCCESS_URL}
                             pricing-table-id={props?.stripe?.consoleId}
-                            publishable-key={props?.stripe?.key}></stripe-pricing-table>
+                            publishable-key={props?.stripe?.key}
+                            customer-email={session?.user?.email}
+                            success-url={
+                              process.env.STRIPE_SUCCESS_URL + '?session_id={CHECKOUT_SESSION_ID}'
+                            }></stripe-pricing-table>
                         )}
                       </div>
                     </div>

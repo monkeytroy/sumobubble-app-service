@@ -1,6 +1,5 @@
-
-export const preview = ( newConfig: any) => {
-  if (window.onInfoChatPreviewUpdate) {
-    window.onInfoChatPreviewUpdate(newConfig);
+export const preview = (newConfig: any) => {
+  if (window.onPreviewUpdate) {
+    window.onPreviewUpdate(newConfig);
   }
-}
+};

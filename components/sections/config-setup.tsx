@@ -1,14 +1,16 @@
 import { useAppStore } from '@/store/app-store';
 import { CogIcon } from '@heroicons/react/24/outline';
 import { ISection } from './sections';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { saveSite } from '@/services/site';
 import { TwitterPicker } from 'react-color';
 import { ConsoleBody } from '../console-body';
 import { formClass } from '@/constants/form-class';
 import { SubscriptionStatus } from '@/models/customer';
-import ConsolePricing from '../console-pricing';
 import { IAppProps } from '@/services/ssp-default';
+
+import ConsolePricing from '../console-pricing';
+import AppScript from '@/components/app-script';
 
 export const section: ISection = {
   name: 'setup',
@@ -198,11 +200,6 @@ export default function ConfigSetup(props: IAppProps) {
         </div>
 
         <div className="flex flex-col gap-4 py-8">
-          <div className="flex gap-4 items-baseline">
-            <span className="text-xl font-semibold text-gray-900">Deploy</span>
-            <span className="text-sm text-gray-600">Deploy your InfoChat App</span>
-          </div>
-
           {customer?.subscription?.status != SubscriptionStatus.Active && (
             <div className="text-lg text-gray-600 mt-4 flex flex-col gap-4">
               Subscribe to deploy InfoChat App to your webiste.
@@ -213,17 +210,48 @@ export default function ConfigSetup(props: IAppProps) {
           )}
           {customer?.subscription?.status == SubscriptionStatus.Active && (
             <div className="flex flex-col gap-2">
+              <div className="flex gap-4 items-baseline">
+                <span className="text-xl font-semibold text-gray-900">Deploy Code</span>
+                <span className="text-sm text-gray-600">Deploy to a site using code.</span>
+              </div>
               <div className="block text-sm font-medium leading-6 text-gray-900">
-                Copy the following code and paste it into your webpage!
+                Copy and paste this into your webpage!
               </div>
               <div className="bg-gray-300 rounded-lg shadow-md p-6 select-text break-all whitespace-pre-wrap">
                 <code>
-                  {`<script type="module" 
-  src="https://sumobubble-app-bukyz.ondigitalocean.app//wc/app/sumobubble-app.js" 
-  id="sumobubble-scriptastic">
-  </script>
-  <sumobubble site="${site?._id}"></sumobubble>`}
+                  {`
+<script 
+  type="module"
+  src="${process.env.NEXT_PUBLIC_SCRIPT_URL}"
+  id="sumobubble-scriptastic"
+  async>
+</script>
+<sumobubble-wc site="${site._id}">
+</sumobubble-wc>
+                  `}
                 </code>
+              </div>
+
+              <div className="flex gap-4 items-baseline mt-6">
+                <span className="text-xl font-semibold text-gray-900">Deploy to Wix</span>
+                <span className="text-sm text-gray-600">Do the following</span>
+              </div>
+
+              <div className="block text-sm font-medium leading-6 text-gray-900">
+                <ol>
+                  <li>1. Create a Custom Element on your page. Choose Source will be selected.</li>
+                  <li>
+                    2. In the Element Attributes choose Server Url and enter:
+                    <div className="ml-4">
+                      <b>{process.env.NEXT_PUBLIC_SCRIPT_URL}</b>
+                    </div>
+                  </li>
+                  <li>3. Scroll down and enter the Tag name as: sumobubble-app</li>
+                  <li>4. Select the element option Set Attributes, then add a new attribute.</li>
+                  <li>
+                    5. Make the Attribute Name: <b>site</b> and the Value: <b>{site._id}</b>
+                  </li>
+                </ol>
               </div>
             </div>
           )}

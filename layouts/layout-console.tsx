@@ -3,6 +3,7 @@ import { ToastContainer } from 'react-toastify';
 import Footer from '../components/footer';
 import Nav from '../components/nav';
 import NavSide from '../components/nav-side';
+import AppScript from '@/components/app-script';
 
 export default function Layout({ siteId, children }: { siteId: string; children: ReactElement }) {
   return (
@@ -16,17 +17,12 @@ export default function Layout({ siteId, children }: { siteId: string; children:
 
       <div className="flex flex-col grow ml-48 md:ml-60 mt-16 px-6 overflow-hidden">
         <ToastContainer />
+        <AppScript site={siteId} preview={true} />
         <div className="min-h-screen max-w-full overflow-hidden px-4">
           <main>{children}</main>
         </div>
         <Footer></Footer>
       </div>
-
-      <script
-        type="module"
-        src="https://sumobubble-app-bukyz.ondigitalocean.app/wc/app/sumobubble-app.js"
-        id="sumobubble-scriptastic"></script>
-      <sumobubble preview="true" site={siteId}></sumobubble>
     </div>
   );
 }
