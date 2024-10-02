@@ -1,13 +1,13 @@
 import { IAppProps } from '@/services/ssp-default';
 import { signIn, useSession } from 'next-auth/react';
 
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'stripe-pricing-table': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-    }
-  }
-}
+// declare global {
+//   namespace JSX {
+//     interface IntrinsicElements {
+//       'stripe-pricing-table': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+//     }
+//   }
+// }
 
 export default function HomePricing(props: IAppProps) {
   const { data: session } = useSession();
@@ -32,7 +32,7 @@ export default function HomePricing(props: IAppProps) {
           {props.stripe?.key && props.stripe?.homeId && (
             <stripe-pricing-table
               customer-email={session?.user?.email}
-              success-url={process.env.STRIPE_SUCCESS_URL}
+              success-url="/console/thanks"
               pricing-table-id={props.stripe?.homeId}
               publishable-key={props.stripe?.key}></stripe-pricing-table>
           )}

@@ -32,10 +32,10 @@ const App: NextComponentType<AppContext, AppInitialProps, AppLayoutProps> = ({
   return (
     <>
       <Head>
-        <title>InfoChat</title>
+        <title>SumoBubble</title>
         <meta
           name="description"
-          content="Welcome. InfoChat is a powerful and easy to use helper for your website providing AI Q&A and simple summary details to your visitors."
+          content="Welcome. SumoBubble is a powerful and easy to use helper for your website providing AI Q&A and simple summary details to your visitors."
         />
       </Head>
       <SessionProvider session={session}>{getLayout(<Component {...pageProps} />)}</SessionProvider>

@@ -164,7 +164,7 @@ export default function ConfigSetup(props: IAppProps) {
 
           <div>
             <label className="block text-sm font-medium leading-6 text-gray-900">Button Style</label>
-            <p className="text-sm text-gray-500">How would you like InfoChat button to appear?</p>
+            <p className="text-sm text-gray-500">How would you like SumoBubble button to appear?</p>
             <fieldset className="mt-4">
               <legend className="sr-only">Select</legend>
               <div className="space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
@@ -202,7 +202,7 @@ export default function ConfigSetup(props: IAppProps) {
         <div className="flex flex-col gap-4 py-8">
           {customer?.subscription?.status != SubscriptionStatus.Active && (
             <div className="text-lg text-gray-600 mt-4 flex flex-col gap-4">
-              Subscribe to deploy InfoChat App to your webiste.
+              Subscribe to deploy SumoBubble to your webiste.
               <div className="">
                 <ConsolePricing {...props} startClosed={true}></ConsolePricing>
               </div>
@@ -246,7 +246,7 @@ export default function ConfigSetup(props: IAppProps) {
                       <b>{process.env.NEXT_PUBLIC_SCRIPT_URL}</b>
                     </div>
                   </li>
-                  <li>3. Scroll down and enter the Tag name as: sumobubble-app</li>
+                  <li>3. Scroll down and enter the Tag name as: sumobubble-wc</li>
                   <li>4. Select the element option Set Attributes, then add a new attribute.</li>
                   <li>
                     5. Make the Attribute Name: <b>site</b> and the Value: <b>{site._id}</b>

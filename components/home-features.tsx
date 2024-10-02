@@ -1,42 +1,36 @@
-import { CloudArrowUpIcon, LockClosedIcon, ArrowPathIcon } from "@heroicons/react/24/outline"
-
+import { CloudArrowUpIcon, LockClosedIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 
 export default function HomeFeatures() {
-
   const features = [
     {
       name: 'Create an Account',
       description:
-        'Create a new account on InfoChat to start. Sign in with Google or (coming soon) other social accounts.',
+        'Create a new account on SumoBubble to start. Sign in with Google or (coming soon) other social accounts.',
       href: '#',
-      icon: CloudArrowUpIcon,
+      icon: CloudArrowUpIcon
     },
     {
       name: 'Try Before Buy',
-      description:
-        'Setup InfoChat and fully customize it before trying out the fully operational preview',
+      description: 'Setup SumoBubble and fully customize it before trying out the fully operational preview',
       href: '#',
-      icon: LockClosedIcon,
+      icon: LockClosedIcon
     },
     {
       name: 'Subscribe and Deploy',
-      description:
-        'Once you subscribe a few lines of code will be provided to put on your website. Thats it!',
+      description: 'Once you subscribe a few lines of code will be provided to put on your website. Thats it!',
       href: '#',
-      icon: ArrowPathIcon,
-    },
-  ]
-  
+      icon: ArrowPathIcon
+    }
+  ];
+
   return (
     <div id="features" className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl lg:text-center">
           <h2 className="text-base font-semibold leading-7 text-indigo-600">Easy To Deploy</h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Using InfoChatApp is easy a 1 - 2 - 3
-          </p>
+          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Using SumoBubble is easy!</p>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            There are 3 easy steps to get your InfoChatApp running on your organizations website.
+            There are 3 easy steps to get your SumoBubble running on your organizations website.
           </p>
         </div>
         <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
@@ -61,5 +55,5 @@ export default function HomeFeatures() {
         </div>
       </div>
     </div>
-  )
+  );
 }

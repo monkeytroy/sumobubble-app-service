@@ -26,7 +26,7 @@ export default function Nav() {
             <div className="flex h-16 justify-between">
               <div className="flex flex-1">
                 <div className="flex flex-shrink-0 items-center">
-                  <div className="text-2xl font-bold tracking-tight flex gap-4 items-center">InfoChat App</div>
+                  <div className="text-2xl font-bold tracking-tight flex gap-4 items-center">SumoBubble</div>
                 </div>
                 <div className="hidden sm:flex flex-1 items-center justify-center sm:space-x-12">
                   {navigation.map((item) => (

@@ -1,7 +1,7 @@
-import SiteState, { ChatbaseSeedState, ISiteState } from "@/models/siteState";
-import { log } from "./log";
-import connectMongo from "./mongoose";
-import axios from "axios";
+import SiteState, { ChatbaseSeedState, ISiteState } from '@/models/siteState';
+import { log } from './log';
+import connectMongo from './mongoose';
+import axios from 'axios';
 
 const chatbaseUrl = 'https://www.chatbase.co/api/v1/';
 const chatbaseChatbotUrl = 'https://www.chatbase.co/chatbot/';
@@ -14,13 +14,12 @@ interface IChatbasePayload {
 
 /**
  * Updates existing chatbot with site to scrape for info.
- * 
- * @param chatbaseId 
- * @param chatsite 
- * @returns 
+ *
+ * @param chatbaseId
+ * @param chatsite
+ * @returns
  */
 export const setupChatbot = async (chatsite: string, site: ISite) => {
-
   log(`setupChatbot for site ${site._id} with new chatsite ${chatsite}`);
 
   // process is...
@@ -35,7 +34,7 @@ export const setupChatbot = async (chatsite: string, site: ISite) => {
   }
 
   await connectMongo();
-  
+
   let chatbaseId = site.chatbot.chatbaseId || null;
 
   let chatbotExists = false;
@@ -59,7 +58,7 @@ export const setupChatbot = async (chatsite: string, site: ISite) => {
     log('Kick off crawlAndScrape');
     crawlAndScrape(chatbaseId, chatsite, site);
 
-    // also kick off fix visibility.. dont wait. 
+    // also kick off fix visibility.. dont wait.
     fetch(`https://infochat-cb-fix-rfpgk.ondigitalocean.app/cb-fix/${chatbaseId}`, {
       method: 'get',
       headers: {
@@ -72,26 +71,26 @@ export const setupChatbot = async (chatsite: string, site: ISite) => {
     log(`No chatbase id to return`);
   }
 
-  return chatbaseId;  
-}
+  return chatbaseId;
+};
 
 const crawlAndScrape = async (chatbotId: string, chatsite: string, site: ISite) => {
-
   if (site?._id) {
-
     // created.. so we can find / update / create
     const resetSiteState: ISiteState = {
       siteId: site._id,
       provisioned: true,
       seeded: ChatbaseSeedState.unseeded
-    }
+    };
 
-    const siteState = await SiteState.findOneAndUpdate({ siteId: site._id },
-      resetSiteState, { upsert: true, new: true });
+    const siteState = await SiteState.findOneAndUpdate({ siteId: site._id }, resetSiteState, {
+      upsert: true,
+      new: true
+    });
 
     // crawl site
     const crawlRes = await crawlChatsite(chatsite);
-    const urlsToScrape = crawlRes?.map((val: { url: string } ) => val.url);
+    const urlsToScrape = crawlRes?.map((val: { url: string }) => val.url);
 
     if (urlsToScrape && urlsToScrape.length > 0) {
       const updateRes = await updateChatbotUrls(chatbotId, urlsToScrape);
@@ -106,11 +105,9 @@ const crawlAndScrape = async (chatbotId: string, chatsite: string, site: ISite) 
 
     siteState.save();
   }
-
-}
+};
 
 const updateChatbotUrls = async (chatbotId: string, urlsToScrape: Array<string>) => {
-
   const query = {
     chatbotId,
     urlsToScrape
@@ -119,42 +116,34 @@ const updateChatbotUrls = async (chatbotId: string, urlsToScrape: Array<string>)
   log(`updatechatbotUrls ${JSON.stringify(query)} ${process.env.CHATBASE_API_KEY}`);
 
   try {
-    const chatbaseRes = await axios.post(
-      chatbaseUrl + '/update-chatbot-data', 
-      query,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + process.env.CHATBASE_API_KEY
-        }  
+    const chatbaseRes = await axios.post(chatbaseUrl + '/update-chatbot-data', query, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + process.env.CHATBASE_API_KEY
       }
-    );
+    });
 
     return chatbaseRes.status === 200;
-
   } catch (err) {
     log(err);
   }
 
   return false;
-  
-}
-
+};
 
 /**
  * Server create chatbot at chatbase
  */
-const createChatbaseChatbot = async (
-  {chatbotName, sourceText, urlsToScrape}: IChatbasePayload) => {
-
+const createChatbaseChatbot = async ({ chatbotName, sourceText, urlsToScrape }: IChatbasePayload) => {
   // if (urlsToScrape?.length === 0 && (!sourceText || sourceText.length < 100)) {
   //   return null;
   // }
 
-  // create the bot with stubbed info. 
+  // create the bot with stubbed info.
   const payload: IChatbasePayload = {
     chatbotName,
-    sourceText: 'Welcome to InfoChat App with AI powered chatbot.  We are trying to find the answer to your question so please be patiend.  Thanks!'
+    sourceText:
+      'Welcome to SumoBubble with AI powered chatbot.  We are trying to find the answer to your question so please be patiend.  Thanks!'
   };
 
   // if (sourceText && sourceText.length > 100) {
@@ -177,17 +166,12 @@ const createChatbaseChatbot = async (
   //log(`Url: ${chatbaseUrl} key ${process.env.CHATBASE_API_KEY}`);
 
   try {
-
-    const chatbaseRes = await axios.post(
-      chatbaseUrl + '/create-chatbot',
-      payloadString, 
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + process.env.CHATBASE_API_KEY
-        }
+    const chatbaseRes = await axios.post(chatbaseUrl + '/create-chatbot', payloadString, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + process.env.CHATBASE_API_KEY
       }
-    );
+    });
 
     log(`Sent create-chatbot.. `, chatbaseRes.status);
 
@@ -197,25 +181,24 @@ const createChatbaseChatbot = async (
       if (chatbaseResJson.chatbotId) {
         return chatbaseResJson.chatbotId;
       } else {
-        log(`No chatbot was created ${JSON.stringify(chatbaseResJson)}`);  
+        log(`No chatbot was created ${JSON.stringify(chatbaseResJson)}`);
       }
     } else {
       log(`Invalid response from chatbase ${chatbaseRes}`);
     }
   } catch (err) {
-    log(err);    
+    log(err);
   }
 
   return null;
-}
+};
 
 /**
- * Check if chatbot exists. 
+ * Check if chatbot exists.
  * @param chatbaseId
  * @returns boolean - exists?
  */
 const checkChatbaseChatbotExists = async (chatbaseId: string) => {
-
   const getRes = await axios.get(chatbaseChatbotUrl + chatbaseId);
 
   if (getRes.status === 307) {
@@ -236,9 +219,9 @@ const checkChatbaseChatbotExists = async (chatbaseId: string) => {
   // };
 
   // log('checkChatbaseChatbotExists axios post');
-  
+
   // const chatbaseRes = await axios.post(
-  //   chatbaseUrl + '/chat', 
+  //   chatbaseUrl + '/chat',
   //   query,
   //   {
   //     headers: {
@@ -257,16 +240,14 @@ const checkChatbaseChatbotExists = async (chatbaseId: string) => {
   // }
 
   // return false;
-}
-
+};
 
 /**
  * Tell chatbase to crawl the webiste and return array of sites to scrape.
- * @param chatsite 
- * @returns 
+ * @param chatsite
+ * @returns
  */
 const crawlChatsite = async (chatsite: string) => {
-
   log(`crawlChatsite - ${chatsite}`);
 
   const chatsiteRes = await fetch(`${chatbaseUrl}/fetch-links?sourceURL=${chatsite}`, {
@@ -282,4 +263,4 @@ const crawlChatsite = async (chatsite: string) => {
   }
 
   return null;
-}
+};

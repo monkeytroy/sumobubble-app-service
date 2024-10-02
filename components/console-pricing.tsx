@@ -3,13 +3,13 @@ import { Dialog, Transition } from '@headlessui/react';
 import { useState, Fragment } from 'react';
 import { IAppProps } from '@/services/ssp-default';
 
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'stripe-pricing-table': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-    }
-  }
-}
+// declare global {
+//   namespace JSX {
+//     interface IntrinsicElements {
+//       'stripe-pricing-table': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+//     }
+//   }
+// }
 
 interface IConsolePricingProps extends IAppProps {
   startClosed?: boolean;
@@ -86,9 +86,7 @@ export default function ConsolePricing(props: IConsolePricingProps) {
                             pricing-table-id={props?.stripe?.consoleId}
                             publishable-key={props?.stripe?.key}
                             customer-email={session?.user?.email}
-                            success-url={
-                              process.env.STRIPE_SUCCESS_URL + '?session_id={CHECKOUT_SESSION_ID}'
-                            }></stripe-pricing-table>
+                            success-url="/console/thanks"></stripe-pricing-table>
                         )}
                       </div>
                     </div>
