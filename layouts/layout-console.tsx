@@ -1,10 +1,11 @@
-import { ReactElement } from "react";
-import { ToastContainer } from "react-toastify";
-import Footer from "../components/footer";
-import Nav from "../components/nav";
-import NavSide from "../components/nav-side";
+import { ReactElement } from 'react';
+import { ToastContainer } from 'react-toastify';
+import Footer from '../components/footer';
+import Nav from '../components/nav';
+import NavSide from '../components/nav-side';
+import AppScript from '@/components/app-script';
 
-export default function Layout({ siteId, children } : { siteId: string, children: ReactElement }) {
+export default function Layout({ siteId, children }: { siteId: string; children: ReactElement }) {
   return (
     <div className="flex min-h-screen">
       <div className="fixed w-full left-0 z-50">
@@ -16,16 +17,12 @@ export default function Layout({ siteId, children } : { siteId: string, children
 
       <div className="flex flex-col grow ml-48 md:ml-60 mt-16 px-6 overflow-hidden">
         <ToastContainer />
+        <AppScript site={siteId} preview={true} />
         <div className="min-h-screen max-w-full overflow-hidden px-4">
           <main>{children}</main>
         </div>
         <Footer></Footer>
       </div>
-
-      <script type="module" src="https://app.infochatapp.com/wc/infochat-app.js" 
-        id="infochat-app-scriptastic"></script>
-      <infochat-app preview="true" site={siteId}></infochat-app>
-      
     </div>
-  )
+  );
 }

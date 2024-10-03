@@ -5,16 +5,22 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 First, run the development server:
 
 ```bash
-npm run dev
-# or
 yarn dev
-# or
-pnpm dev
 ```
+
+## Stripe Notes
+
+Stripe uses webhooks to send subscription information to the server. The api/subscribe endpoint handles this but for localhost testing the stripe cli needs to be used
+
+```
+stripe listen --forward-to localhost:3000/apio/subscribe
+```
+
+So open a terminal and run that when doing local dev
 
 ## Config
 
-DB config manually created to start.  At some point will be schema based...
+DB config manually created to start. At some point will be schema based...
 
 ```
 {
@@ -39,12 +45,12 @@ DB config manually created to start.  At some point will be schema based...
   "contact": {
     "content": "Please let us know how we can serve you.",
     "contact": "fredarters@gmail.com"
-  },  
+  },
   "social": {
     "youtube": "https://www.youtube.com/wrpca"
   },
-  "funny": { 
-    "content": "A bland man walked into a bar, and chair, and a door..." 
+  "funny": {
+    "content": "A bland man walked into a bar, and chair, and a door..."
   },
   "verse": {
     "content": "**Psalm 41:11** Put your hope in God, for I will yet praise him, my Savior and my God."
@@ -57,9 +63,10 @@ DB config manually created to start.  At some point will be schema based...
 
 ```
 
-
 ## Debounce
+
 Example for reference
+
 ```
   // setup debounced save.. do we need this for button based?
   const debounceSave = useCallback(
@@ -69,7 +76,7 @@ Example for reference
         saveSite({..._site, title: _title, theme: {primary: _themePrimary}});
         setTimeout(() => setSaving(false), 1000);
       }
-    }, 100), 
+    }, 100),
   []);
 
   const onSave = () => {
