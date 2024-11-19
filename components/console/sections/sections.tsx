@@ -1,15 +1,13 @@
 import { ReactElement } from 'react';
 
 import { section as sectionSetup } from './config-setup';
-import { section as sectionChatbot } from './config-chatbot';
 import { section as sectionChat } from './config-chat';
 import { section as sectionSummary } from './config-summary';
 import { section as sectionSections } from './config-sections';
-import { section as sectionContact } from '@/components/sections/config-contact';
-import { section as sectionInfoRequest } from '@/components/sections/config-info-request';
-import { section as sectionSpotlight } from '@/components/sections/config-spotlight';
+import { section as sectionContact } from './config-contact';
+import { section as sectionInfoRequest } from './config-info-request';
+import { section as sectionSpotlight } from './config-spotlight';
 //import { section as sectionFunny } from '@/components/sections/config-funny';
-//import { section as sectionVerse } from '@/components/sections/config-verse';
 
 export interface ISection {
   name: string;
@@ -23,13 +21,11 @@ export interface ISection {
 
 export const sections: Array<ISection> = [
   { ...sectionSetup },
-  { ...sectionChatbot },
   { ...sectionChat },
   { ...sectionSummary },
   { ...sectionSections },
   { ...sectionContact },
   { ...sectionInfoRequest },
   { ...sectionSpotlight }
-  //{ ...sectionVerse },
   //{ ...sectionFunny }
 ];

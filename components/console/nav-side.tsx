@@ -1,5 +1,5 @@
-import { HomeIcon } from '@heroicons/react/24/outline'
-import { ISection, sections } from '@/components/sections/sections';
+import { HomeIcon } from '@heroicons/react/24/outline';
+import { ISection, sections } from '@/components/console/sections/sections';
 import { useRouter } from 'next/router';
 import { useAppStore } from '@/store/app-store';
 import { useEffect, useState } from 'react';
@@ -8,28 +8,25 @@ import { toast } from 'react-toastify';
 import { SubscriptionStatus } from '@/models/customer';
 
 // configuration so 'current' works.
-const navigation: Array<ISection> = [
-  ...sections
-]
+const navigation: Array<ISection> = [...sections];
 
 function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(' ');
 }
 
 export default function NavSide() {
-
   const router = useRouter();
   const { section, siteId } = router.query;
   const currentRoute = router.route;
-  
+
   const customer = useAppStore((state) => state.customer);
   const configuration = useAppStore((state) => state.site);
   const [saving, setSaving] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
 
   const current = (item: ISection) => {
-    return currentRoute.endsWith(`/${item.name}`) || section == item.name.toLowerCase()
-  }
+    return currentRoute.endsWith(`/${item.name}`) || section == item.name.toLowerCase();
+  };
 
   useEffect(() => {
     setSubscribed(customer?.subscription?.status === SubscriptionStatus.Active);
@@ -40,33 +37,37 @@ export default function NavSide() {
       setSaving(true);
 
       try {
-        await publishSite(configuration._id);       
+        await publishSite(configuration._id);
       } finally {
         setTimeout(() => setSaving(false), 2000);
       }
-      
     } else {
       toast.warn('No site loaded... cannot publish.', {
-        position: "top-center",
+        position: 'top-center',
         autoClose: 3000,
-        hideProgressBar: true,
+        hideProgressBar: true
       });
     }
-  }
+  };
 
   return (
-    <div className="flex min-h-screen shrink-0 
+    <div
+      className="flex min-h-screen shrink-0 
       flex-col overflow-y-auto bg-indigo-600 px-4 pt-20">
       <nav className="">
         <ul role="list" className="flex flex-col gap-4">
           <li>
             <ul role="list" className="-mx-2 space-y-1">
-              <a href={`/console`}
-                className={classNames(currentRoute == '/console' ? 'bg-indigo-700 text-white'
+              <a
+                href={`/console`}
+                className={classNames(
+                  currentRoute == '/console'
+                    ? 'bg-indigo-700 text-white'
                     : 'text-indigo-200 hover:text-white hover:bg-indigo-700',
                   'group flex gap-x-3 rounded-md p-2 leading-6 font-semibold'
                 )}>
-                <span className={classNames(
+                <span
+                  className={classNames(
                     currentRoute == '/console' ? 'text-white' : 'text-indigo-200 group-hover:text-white',
                     'h-6 w-6 shrink-0'
                   )}
@@ -77,7 +78,7 @@ export default function NavSide() {
               </a>
             </ul>
           </li>
-          
+
           <li>
             <div className="border-t border-gray-400 py-2 text-xs font-semibold leading-6 text-indigo-200">
               Site Name
@@ -85,7 +86,9 @@ export default function NavSide() {
             <div className="text-white group rounded-md leading-6 font-semibold truncate">
               {configuration?.title || 'Create or Select'}
             </div>
-            <button type="button" disabled={!configuration || saving || !subscribed}
+            <button
+              type="button"
+              disabled={!configuration || saving || !subscribed}
               onClick={() => onPublish()}
               title="Site changes only available to user after a publish!"
               className="w-full mt-6 rounded-md bg-blue-500 py-2 px-3 text-sm font-semibold 
@@ -95,7 +98,6 @@ export default function NavSide() {
             </button>
           </li>
           <li>
-
             <div className="border-t border-gray-400 py-2 text-xs font-semibold leading-6 text-indigo-200">
               Site Settings
             </div>
@@ -104,7 +106,8 @@ export default function NavSide() {
               <ul role="list" className="-mx-2 space-y-1">
                 {navigation.map((item) => (
                   <li key={item.name}>
-                    <a href={`/console/site/${siteId}/${item.name}`}
+                    <a
+                      href={`/console/site/${siteId}/${item.name}`}
                       className={classNames(
                         item.class,
                         current(item)
@@ -112,12 +115,13 @@ export default function NavSide() {
                           : 'text-indigo-200 hover:text-white hover:bg-indigo-700',
                         'group flex gap-x-3 rounded-md p-2 leading-6 font-semibold'
                       )}>
-                      <span className={classNames(
+                      <span
+                        className={classNames(
                           current(item) ? 'text-white' : 'text-indigo-200 group-hover:text-white',
                           'h-6 w-6 shrink-0'
                         )}
-                        aria-hidden="true"
-                      >{item.icon}
+                        aria-hidden="true">
+                        {item.icon}
                       </span>
                       {item.title}
                     </a>
@@ -127,10 +131,9 @@ export default function NavSide() {
             </div>
           </li>
 
-          <li className="mt-auto">
-          </li>
+          <li className="mt-auto"></li>
         </ul>
       </nav>
     </div>
-  )
+  );
 }

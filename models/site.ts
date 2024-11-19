@@ -1,12 +1,32 @@
 import { Schema, model, models } from 'mongoose';
 
+export interface IContactCategory {
+  title: string;
+  email: string;
+}
+
+export interface ISiteSection {
+  title?: string;
+  enabled: boolean;
+  content: string;
+  urls?: string[];
+  props?: {
+    verseRef?: string;
+    autoFill?: boolean;
+    translation?: string;
+    email?: string[];
+    copyright?: string;
+    categories?: IContactCategory[];
+  };
+}
+
 const sectionSchema = new Schema<ISiteSection>({
-  title: { type: String, required: false},
+  title: { type: String, required: false },
   enabled: { type: Boolean, required: true },
   content: { type: String, trim: true },
   urls: {
     type: Array<String>,
-    trim: true, 
+    trim: true,
     required: false
   },
   props: {
@@ -19,11 +39,11 @@ const sectionSchema = new Schema<ISiteSection>({
       min: 3
     },
     email: {
-      type: Array<String>, 
+      type: Array<String>,
       default: undefined,
       validate: {
         validator: (val: string) => {
-          return (!val?.match || (val?.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) && val?.length <= 320));
+          return !val?.match || (val?.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) && val?.length <= 320);
         },
         message: 'Contact is not a valid email failed'
       }
@@ -39,12 +59,13 @@ const sectionSchema = new Schema<ISiteSection>({
 const siteSchema = new Schema<ISite>({
   customerId: { type: String, required: true },
   customerEmail: { type: String, required: true },
-  title: { type: String, required: true, min: 4, max: 160},
+  title: { type: String, required: true, min: 4, max: 160 },
   button: { type: String, required: false },
   theme: {
     primary: String
   },
-  social: {                          // unused for now. placeholder.
+  social: {
+    // unused for now. placeholder.
     youtube: String
   },
   summary: {

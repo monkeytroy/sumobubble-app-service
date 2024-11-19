@@ -5,20 +5,19 @@ import { Editor } from '@tinymce/tinymce-react';
 import { saveFile } from '@/services/file';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { ISection } from './sections';
-import { ConsoleBody } from '../console-body';
+import { ConsoleBody } from '@/components/console/console-body';
 
-export const section: ISection = { 
-  name: 'info', 
+export const section: ISection = {
+  name: 'info',
   title: 'Info',
-  description: 'Summary info displayed when app is opened', 
-  icon: <InformationCircleIcon/>,
+  description: 'Summary info displayed when app is opened',
+  icon: <InformationCircleIcon />,
   class: 'text-sm',
-  component: <ConfigSummary/>,
+  component: <ConfigSummary />,
   isInfoSection: false
-}
+};
 
 export default function ConfigSummary() {
-  
   // site and editable values
   const site = useAppStore((state) => state.site);
 
@@ -50,41 +49,45 @@ export default function ConfigSummary() {
   const onSave = async () => {
     if (site) {
       setSaving(true);
-      await saveSite({...site, summary: { enabled, content: newSummary, special}});
+      await saveSite({ ...site, summary: { enabled, content: newSummary, special } });
       setTimeout(() => setSaving(false), 2000);
     }
-  }
+  };
 
-  // validation.  effect on values. Set invalid. 
+  // validation.  effect on values. Set invalid.
   useEffect(() => {
     setInvalid(enabled && newSummary.length === 0);
-  }, [content, newSummary])
+  }, [content, newSummary]);
 
   // more component support
-  const onImagesUpload = (blobInfo:any) => new Promise<string>(async (resolve, reject) => {
-    
-    const res = await saveFile(site?.customerEmail || 'unknown', blobInfo.blob());
+  const onImagesUpload = (blobInfo: any) =>
+    new Promise<string>(async (resolve, reject) => {
+      const res = await saveFile(site?.customerEmail || 'unknown', blobInfo.blob());
 
-    if (res.success) {
-      resolve(res.data.url);
-    } else {
-      reject('Oh no!');
-    }
-
-  });
+      if (res.success) {
+        resolve(res.data.url);
+      } else {
+        reject('Oh no!');
+      }
+    });
 
   return (
-    <ConsoleBody 
-      title="Info Summary" subTitle="Summarize your organization." 
-      invalid={invalid} saving={saving} 
-      onSave={() => onSave()} onCancel={() => reset()}>
-        
+    <ConsoleBody
+      title="Info Summary"
+      subTitle="Summarize your organization."
+      invalid={invalid}
+      saving={saving}
+      onSave={() => onSave()}
+      onCancel={() => reset()}>
       <div className="flex flex-col gap-8">
-        
         <div className="flex gap-3">
           <div className="flex h-6 items-center">
-            <input id="spotlightEnabled" name="spotlightEnabled" type="checkbox"
-              checked={enabled} onChange={(e) => setEnabled(e.target.checked)}
+            <input
+              id="spotlightEnabled"
+              name="spotlightEnabled"
+              type="checkbox"
+              checked={enabled}
+              onChange={(e) => setEnabled(e.target.checked)}
               className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
             />
           </div>
@@ -93,22 +96,22 @@ export default function ConfigSummary() {
               Enable the section
             </label>
           </div>
-        </div>  
+        </div>
 
         <div className="h-160 flex flex-col">
-
           <label htmlFor="summary" className="block text-sm font-medium leading-6 text-gray-900">
             Summary - Summary text
-          </label>           
+          </label>
 
-          <div className={
-              "mt-2 grow w-full rounded-xl h-full " + 
-              (enabled && invalid ? 'border-2 border-red-300': '') +
-              (!enabled ? 'select-none': '')
+          <div
+            className={
+              'mt-2 grow w-full rounded-xl h-full ' +
+              (enabled && invalid ? 'border-2 border-red-300' : '') +
+              (!enabled ? 'select-none' : '')
             }>
-
-            {(summaryLoading || !enabled) && 
-              <div role="status" 
+            {(summaryLoading || !enabled) && (
+              <div
+                role="status"
                 className="relative h-full flex flex-col gap-4 animate-pulse border-2 border-gray-200 p-4 rounded-lg">
                 <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48"></div>
                 <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
@@ -121,16 +124,19 @@ export default function ConfigSummary() {
                 <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[330px]"></div>
                 <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[300px]"></div>
                 <div className="h-2 bg-gray-200 rounded-full dark:bg-gray-700 max-w-[360px]"></div>
-                
+
                 {enabled && summaryLoading && <span className="absolute inset-1/2 -mx-6 text-gray-500">Loading</span>}
               </div>
-            }
+            )}
 
-            {(enabled) && 
+            {enabled && (
               <Editor
                 id="summaryEditor"
                 tinymceScriptSrc={'/tinymce/tinymce.min.js'}
-                onInit={(evt, editor) => { setSummaryLoading(false); editorRef.current = editor; }}
+                onInit={(evt, editor) => {
+                  setSummaryLoading(false);
+                  editorRef.current = editor;
+                }}
                 initialValue={content}
                 onEditorChange={(newValue) => setNewSummary(newValue)}
                 //onDirty={() => setDirty(true)}  // content changed.. needed?
@@ -140,26 +146,55 @@ export default function ConfigSummary() {
                   height: '100%',
                   statusbar: false,
                   menu: {
-                    file: { title: 'File', items: ''},
-                    edit: { title: 'Edit', items: 'undo redo | cut copy paste pastetext | selectall | searchreplace code' },
+                    file: { title: 'File', items: '' },
+                    edit: {
+                      title: 'Edit',
+                      items: 'undo redo | cut copy paste pastetext | selectall | searchreplace code'
+                    },
                     view: { title: 'View', items: '' }, // code visualaid visualchars visualblocks | spellchecker | preview fullscreen | showcomments
-                    insert: { title: 'Insert', items: 'image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor tableofcontents | insertdatetime' },
-                    format: { title: 'Format', items: 'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontfamily fontsize align lineheight | forecolor backcolor | language | removeformat' },
+                    insert: {
+                      title: 'Insert',
+                      items:
+                        'image link media addcomment pageembed template codesample inserttable | charmap emoticons hr | pagebreak nonbreaking anchor tableofcontents | insertdatetime'
+                    },
+                    format: {
+                      title: 'Format',
+                      items:
+                        'bold italic underline strikethrough superscript subscript codeformat | styles blocks fontfamily fontsize align lineheight | forecolor backcolor | language | removeformat'
+                    },
                     tools: { title: 'Tools', items: '' }, // a11ycheck spellcheckerlanguage spellchecker
-                    table: { title: 'Table', items: 'inserttable | cell row column | advtablesort | tableprops deletetable' },
+                    table: {
+                      title: 'Table',
+                      items: 'inserttable | cell row column | advtablesort | tableprops deletetable'
+                    },
                     help: { title: 'Help', items: 'help' } // help
                   },
                   plugins: [
-                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
-                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                    'insertdatetime', 'media', 'table', 'help', 'emoticons'
+                    'advlist',
+                    'autolink',
+                    'lists',
+                    'link',
+                    'image',
+                    'charmap',
+                    'anchor',
+                    'searchreplace',
+                    'visualblocks',
+                    'code',
+                    'fullscreen',
+                    'insertdatetime',
+                    'media',
+                    'table',
+                    'help',
+                    'emoticons'
                   ],
-                  toolbar: 'undo redo | blocks | ' +
+                  toolbar:
+                    'undo redo | blocks | ' +
                     'bold italic forecolor emoticons | alignleft aligncenter ' +
                     'alignright alignjustify | bullist numlist outdent indent '
-                    //'image media | removeformat code | help'
-                }}/>
-              }
+                  //'image media | removeformat code | help'
+                }}
+              />
+            )}
           </div>
         </div>
 
@@ -170,8 +205,11 @@ export default function ConfigSummary() {
           <div className="">
             <textarea
               disabled={!enabled}
-              id="special" name="special" rows={3}
-              value={special} onChange={e => setSpecial(e.target.value)}
+              id="special"
+              name="special"
+              rows={3}
+              value={special}
+              onChange={(e) => setSpecial(e.target.value)}
               className="block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 
                 ring-inset ring-gray-300 placeholder:text-gray-400 disabled:opacity-50
                 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:py-1.5 sm:text-sm sm:leading-6"
@@ -180,5 +218,5 @@ export default function ConfigSummary() {
         </div>
       </div>
     </ConsoleBody>
-  )
+  );
 }

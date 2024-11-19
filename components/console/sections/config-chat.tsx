@@ -1,26 +1,25 @@
-import { saveSite } from "@/services/site";
-import { useAppStore } from "@/store/app-store";
-import { ChatBubbleOvalLeftIcon, ExclamationCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, MinusCircleIcon,  } from "@heroicons/react/24/outline";
-import { useState, useEffect, useCallback } from "react";
-import { ISection } from "./sections";
-import { ConsoleBody } from "../console-body";
-import { SubscriptionStatus } from "@/models/customer";
-import ConsolePricing from "../console-pricing";
-import { IAppProps } from "@/services/ssp-default";
-import { ChatbaseSeedState } from "@/models/siteState";
+import { saveSite } from '@/services/site';
+import { useAppStore } from '@/store/app-store';
+import { ChatBubbleOvalLeftIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { useState, useEffect, useCallback } from 'react';
+import { ISection } from './sections';
+import { ConsoleBody } from '@/components/console/console-body';
+import { SubscriptionStatus } from '@/models/customer';
+import ConsolePricing from '@/components/console/console-pricing';
+import { IAppProps } from '@/services/ssp-default';
+import { ChatbaseSeedState } from '@/models/siteState';
 
 export const section: ISection = {
   name: 'chat',
   title: 'AI Chat',
   description: 'An AI powered chat feature based on document sources.',
-  icon: <ChatBubbleOvalLeftIcon/>,
+  icon: <ChatBubbleOvalLeftIcon />,
   class: 'text-sm',
-  component: <ConfigChatbot/>,
+  component: <ConfigChatbot />,
   isInfoSection: false
-}
+};
 
 export default function ConfigChatbot(props: IAppProps) {
-
   // site and editable values
   const site = useAppStore((state) => state.site);
   const siteState = useAppStore((state) => state.siteState);
@@ -30,7 +29,7 @@ export default function ConfigChatbot(props: IAppProps) {
   const [enabled, setEnabled] = useState(false);
   const [chatsite, setChatsite] = useState('');
   const chatbot = site?.chatbot;
-  
+
   // local component state
   const [saving, setSaving] = useState(false);
   const [invalid, setInvalid] = useState(false);
@@ -38,7 +37,6 @@ export default function ConfigChatbot(props: IAppProps) {
   // reset to site state
   const reset = useCallback(() => {
     setEnabled(!!chatbot?.enabled);
-    setChatsite(chatbot?.chatsite || '');
   }, [chatbot]);
 
   // reset to modified site upon changes from state
@@ -47,7 +45,6 @@ export default function ConfigChatbot(props: IAppProps) {
   }, [reset, site]);
 
   const onSave = async () => {
-
     setInvalid(false);
 
     if (site) {
@@ -56,6 +53,7 @@ export default function ConfigChatbot(props: IAppProps) {
       // copy configuration
       const newSite = JSON.parse(JSON.stringify(site));
 
+      // replace.
       newSite.chatbot.chatsite = chatsite;
       newSite.chatbot.enabled = enabled;
 
@@ -64,61 +62,63 @@ export default function ConfigChatbot(props: IAppProps) {
 
       setTimeout(() => setSaving(false), 2000);
     }
-  }
+  };
 
-  const validateChatSiteUrl = (url: string) => {
-    setChatsite(url);
-    if (url) {
-      var regExp = /^(https)?(\:\/\/)?[\w-]+(\.[\w-]+)+([\w.,@?^!=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])+$/;
-      setInvalid(!regExp.test(url));
+  // const validateChatSiteUrl = (url: string) => {
+  //   setChatsite(url);
+  //   if (url) {
+  //     var regExp = /^(https)?(\:\/\/)?[\w-]+(\.[\w-]+)+([\w.,@?^!=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])+$/;
+  //     setInvalid(!regExp.test(url));
+  //   }
+  // };
+
+  const processFile = (files: FileList | null) => {
+    if (files?.length) {
+      console.log(files[0]);
+
+      // todo upload
     }
-  }
+  };
 
   return (
-    <ConsoleBody full={true}
-      title={section.title} subTitle={section.description}
-      invalid={invalid} saving={saving} 
+    <ConsoleBody
+      full={true}
+      title={section.title}
+      subTitle={section.description}
+      invalid={invalid}
+      saving={saving}
       saveOff={customer?.subscription?.status != SubscriptionStatus.Active}
-      onSave={() => onSave()} onCancel={() => reset()}>
-
+      onSave={() => onSave()}
+      onCancel={() => reset()}>
       <div className="">
-
-        {customer?.subscription?.status != SubscriptionStatus.Active &&
+        {customer?.subscription?.status != SubscriptionStatus.Active && (
           <div className="text-lg text-gray-600 mt-4 flex flex-col gap-4">
             Subscribe to configure and enable chatbot.
-
             <div className="">
               <ConsolePricing {...props} startClosed={true}></ConsolePricing>
-            </div>          
+            </div>
           </div>
-        }
+        )}
 
-        {customer?.subscription?.status == SubscriptionStatus.Active && 
-          !customer?.subscription?.metadata?.chatbot && 
-
-          <div className="mt-12 py-8 text-2xl text-gray-600 flex flex-col gap-8 text-center
+        {customer?.subscription?.status == SubscriptionStatus.Active && !customer?.subscription?.metadata?.chatbot && (
+          <div
+            className="mt-12 py-8 text-2xl text-gray-600 flex flex-col gap-8 text-center
             rounded-lg bg-gray-100">
-
             Your subscription does not support chatbot.. upgrade?
-
             <div className="text-xl">
               <a href="mailto:support@infochatapp.com">Contact us</a>
             </div>
-            
           </div>
-        } 
+        )}
 
-        {customer?.subscription?.status == SubscriptionStatus.Active && 
-          customer?.subscription?.metadata?.chatbot && 
-          
+        {customer?.subscription?.status == SubscriptionStatus.Active && customer?.subscription?.metadata?.chatbot && (
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-3">
               <label htmlFor="spotlightUrl" className="block text-sm font-medium leading-6 text-gray-900">
                 Chatbot Status
               </label>
               <div className="mx-6">
-
-                {siteState?.seeded == ChatbaseSeedState.unseeded &&
+                {siteState?.seeded == ChatbaseSeedState.unseeded && (
                   <div className="rounded-md bg-blue-50 p-4">
                     <div className="flex">
                       <div className="flex-shrink-0">
@@ -126,24 +126,26 @@ export default function ConfigChatbot(props: IAppProps) {
                       </div>
                       <div className="ml-3 flex-1 md:flex md:justify-between">
                         <div className="text-sm text-blue-700">
-                          The chatbot needs documents with information used to answer questions.  Upload 
-                          one or more documents to make chatbot active.
+                          The chatbot needs documents with information used to answer questions. Upload one or more
+                          documents to make chatbot active.
                         </div>
                       </div>
                     </div>
                   </div>
-                }
-
+                )}
               </div>
             </div>
-          
-            <div className="flex flex-col gap-6">
 
-              {chatbot?.chatbaseId &&
+            <div className="flex flex-col gap-6">
+              {chatbot?.chatbotId && (
                 <div className="flex gap-3">
                   <div className="flex h-6 items-center">
-                    <input id="sectionEnabled" name="sectionEnabled" type="checkbox"
-                      checked={enabled} onChange={(e) => setEnabled(e.target.checked)}
+                    <input
+                      id="sectionEnabled"
+                      name="sectionEnabled"
+                      type="checkbox"
+                      checked={enabled}
+                      onChange={(e) => setEnabled(e.target.checked)}
                       className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
                     />
                   </div>
@@ -152,43 +154,39 @@ export default function ConfigChatbot(props: IAppProps) {
                       Enable Chatbot
                     </label>
                   </div>
-                </div>      
-              }
+                </div>
+              )}
 
               <div className="flex flex-col gap-2">
                 <label htmlFor="spotlightUrl" className="block text-sm font-medium leading-6 text-gray-900">
                   Chatbot Document Source Upload
                 </label>
                 <div className="flex gap-3">
-                  <div className="w-128 max-w-full flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 
+                  <div
+                    className="w-128 max-w-full flex rounded-md ring-0 ring-inset ring-gray-300 
                     focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 relative">
-                    <input type="file" 
-                      name="uploadDoc" id="uploadDoc"
-                      placeholder="Select a document"
+                    <input
+                      type="file"
+                      name="uploadDoc"
+                      id="uploadDoc"
                       aria-invalid={invalid}
+                      onChange={(e) => processFile(e.target.files)}
                       className="peer disabled:opacity-30
-                        block w-full rounded-md border-0 text-gray-900 invalid:text-red-900 shadow-sm py-1.5 pr-10 
-                        ring-1 ring-inset ring-g ray-300 invalid:ring-red-300 placeholder:text-gray-300 
-                        focus:ring-2 focus:ring-inset focus:ring-indigo-600 invalid:focus:ring-red-500 sm:py-1.5 sm:text-sm sm:leading-6"
+                        block w-full rounded-md border-0 text-gray-900 invalid:text-red-900 py-1.5 pr-10 
+                        ring-0 invalid:ring-red-300
+                        focus:ring-0  
+                        sm:py-1.5 sm:text-sm sm:leading-6"
                     />
-
                   </div>
                 </div>
               </div>
               <div>
-                <label htmlFor="spotlightUrl" className="block text-sm font-medium leading-6 text-gray-900">
-                  Chatbot Document Source(s) (AI Trained from these documents)
-                </label>
-                <div>
-                  Document list soon.
-                </div>
+                <div>Document list soon.</div>
               </div>
             </div>
           </div>
-        }
+        )}
       </div>
-    
     </ConsoleBody>
-    
-  )
+  );
 }

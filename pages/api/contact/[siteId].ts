@@ -3,7 +3,7 @@ import Cors from 'cors';
 import { mailIt } from '@/services/mail';
 import { apiMiddleware } from '@/services/api-middleware';
 import connectMongo from '@/services/mongoose';
-import Site from '@/models/site';
+import Site, { IContactCategory } from '@/models/site';
 import { log } from '@/services/log';
 
 const cors = Cors({

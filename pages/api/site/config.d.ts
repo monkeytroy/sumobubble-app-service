@@ -1,4 +1,3 @@
-
 // enum Sections {
 //   contact = 'contact'
 // }
@@ -11,40 +10,32 @@ interface ISite {
   button?: string;
   theme?: {
     primary?: string;
-  }
+  };
   social?: {
     youtube?: string;
-  }
+  };
   summary: {
     enabled: boolean;
     content: string;
     special?: string;
-  },
+  };
   chatbot: {
     enabled: boolean;
-    chatsite?: string;                // the url for the site the chat will be baesd off
-    chatbaseId?: string;              // the chatbase bot id
-  }
-  sections: ISiteSections
+    sites?: IChatSite[];
+    chatbotId?: string;
+  };
+  sections: ISiteSections;
 }
 
 interface ISiteSections {
-  [name: string]: ISiteSection
+  [name: string]: ISiteSection;
 }
 
-interface ISiteSection {
-  title?: string;
-  enabled: boolean;
-  content: string;
-  urls?: string[];
-  props?: {
-    verseRef?: string;
-    autoFill?: boolean;
-    translation?: string;
-    email?: string[];
-    copyright?: string;
-    categories?: IContactCategory[];
-  }
+interface IChatSite {
+  url: string;
+  active: boolean;
+  progress: number;
+  message: string;
 }
 
 interface Copyrights {
@@ -52,12 +43,7 @@ interface Copyrights {
 }
 
 type ConfigRes = {
-  success: boolean,
-  message: string,
-  data: ISite
-}
-
-interface IContactCategory {
-  title: string,
-  email: string
-}
+  success: boolean;
+  message: string;
+  data: ISite;
+};

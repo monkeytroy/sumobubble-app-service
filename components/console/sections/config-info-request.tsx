@@ -1,22 +1,22 @@
-import { saveSite } from "@/services/site";
-import { useAppStore } from "@/store/app-store";
-import { ExclamationCircleIcon, MinusCircleIcon, StarIcon } from "@heroicons/react/24/outline";
-import { useState, useEffect, useCallback } from "react";
-import { ISection } from "./sections";
-import { ConsoleBody } from "../console-body";
+import { saveSite } from '@/services/site';
+import { useAppStore } from '@/store/app-store';
+import { ExclamationCircleIcon, MinusCircleIcon, StarIcon } from '@heroicons/react/24/outline';
+import { useState, useEffect, useCallback } from 'react';
+import { ISection } from './sections';
+import { ConsoleBody } from '@/components/console/console-body';
+import { IContactCategory, ISiteSection } from '@/models/site';
 
 export const section: ISection = {
   name: 'inforequest',
   title: 'Info Request',
   description: 'Configurable information requests.',
-  icon: <StarIcon/>,
+  icon: <StarIcon />,
   class: 'ml-2 text-xs',
-  component: <ConfigInfoRequest/>,
+  component: <ConfigInfoRequest />,
   isInfoSection: true
 };
 
 export default function ConfigInfoRequest() {
-
   // site and editable values
   const site = useAppStore((state) => state.site);
   const thisSection: ISiteSection | undefined = site?.sections[section.name];
@@ -40,12 +40,12 @@ export default function ConfigInfoRequest() {
     setEmail(thisSection?.props?.email || []);
     setCategories(thisSection?.props?.categories || []);
   }, [thisSection]);
-  
+
   // reset to modifed site upon changes from state
   useEffect(() => {
     reset();
   }, [reset, site]);
-  
+
   // save the new site info
   const onSave = async () => {
     setInvalid(false);
@@ -53,7 +53,7 @@ export default function ConfigInfoRequest() {
       setInvalid(true);
       return;
     }
-    
+
     if (site) {
       setSaving(true);
 
@@ -65,35 +65,33 @@ export default function ConfigInfoRequest() {
           email,
           categories: Array.from(categories)
         }
-      }
+      };
 
       // save the new site
       await saveSite({
         ...site,
         sections: {
           ...site.sections,
-          [section.name]: {...newSection}
+          [section.name]: { ...newSection }
         }
       });
 
       setTimeout(() => setSaving(false), 2000);
     }
-  }
+  };
 
-  // validation.  effect on values. Set invalid. 
+  // validation.  effect on values. Set invalid.
   useEffect(() => {
-    setInvalid(enabled && (email.length == 0));
-  }, [email, enabled])
+    setInvalid(enabled && email.length == 0);
+  }, [email, enabled]);
 
   /**
    * Add a new category duh
-   * @returns 
+   * @returns
    */
   const addNewCategory = () => {
-
-    if (!newCategory || !newCategoryEmail || 
-        categories.filter((cat) => cat.title === newCategory).length == 1) {
-      // todo show some error 
+    if (!newCategory || !newCategoryEmail || categories.filter((cat) => cat.title === newCategory).length == 1) {
+      // todo show some error
       return;
     }
 
@@ -107,43 +105,51 @@ export default function ConfigInfoRequest() {
 
     setNewCategory('');
     setNewCategoryEmail('');
-  }
+  };
 
   const removeCategory = (catTitle: string) => {
     setCategories(categories.filter((cat) => cat.title !== catTitle));
-  }
-  
+  };
+
   return (
-    <ConsoleBody 
-      title={section.title} subTitle={section.description}
-      invalid={invalid} saving={saving} 
-      onSave={() => onSave()} onCancel={() => reset()}>
-
+    <ConsoleBody
+      title={section.title}
+      subTitle={section.description}
+      invalid={invalid}
+      saving={saving}
+      onSave={() => onSave()}
+      onCancel={() => reset()}>
       <div className="flex flex-col gap-8">
-
         <div className="flex gap-3">
           <div className="flex h-6 items-center">
-            <input id="sectionEnabled" name="sectionEnabled" type="checkbox"
-              checked={enabled} onChange={(e) => setEnabled(e.target.checked)}
+            <input
+              id="sectionEnabled"
+              name="sectionEnabled"
+              type="checkbox"
+              checked={enabled}
+              onChange={(e) => setEnabled(e.target.checked)}
               className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
             />
           </div>
           <div className="text-sm leading-6">
             <label htmlFor="comments" className="font-medium text-gray-900">
-              Enable this section 
+              Enable this section
             </label>
           </div>
         </div>
-        
+
         <div className="flex flex-col gap-3">
           <label htmlFor="contact" className="block text-sm font-medium leading-6 text-gray-900">
             Invitation - A message to your users.
           </label>
           <div className="">
-            <textarea 
-              id="content" name="content" rows={3}
-              value={content} 
-              onChange={e => setContent(e.target.value)} disabled={!enabled}
+            <textarea
+              id="content"
+              name="content"
+              rows={3}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              disabled={!enabled}
               className="disabled:opacity-30
                 block w-full rounded-md border-0 text-gray-900 shadow-sm 
                 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 
@@ -154,13 +160,16 @@ export default function ConfigInfoRequest() {
 
         <div className="flex flex-col gap-3">
           <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-            Default email address - Used if a category is not selected by the user. 
+            Default email address - Used if a category is not selected by the user.
           </label>
           <div className="relative">
-            <input required
-              id="email" name="email" type="email"
-              value={email} 
-              onChange={e => setEmail(e.target.value ? [e.target.value.trim()] : [])} 
+            <input
+              required
+              id="email"
+              name="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value ? [e.target.value.trim()] : [])}
               disabled={!enabled}
               placeholder="you@example.com"
               aria-invalid={invalid}
@@ -174,19 +183,17 @@ export default function ConfigInfoRequest() {
             <div className="hidden peer-invalid:flex pointer-events-none absolute inset-y-0 right-0 items-center pr-3">
               <ExclamationCircleIcon className="h-5 w-5 text-red-500" aria-hidden="true" />
             </div>
-
           </div>
         </div>
 
         <div className="flex flex-col gap-3">
-          <label htmlFor="contact" 
-            className="block text-sm font-medium leading-6 text-gray-900">
-              Categories
+          <label htmlFor="contact" className="block text-sm font-medium leading-6 text-gray-900">
+            Categories
           </label>
-        
-          <div className="rounded-md border border-gray-300 shadow-sm 
+
+          <div
+            className="rounded-md border border-gray-300 shadow-sm 
             flex flex-wrap divide-x divide-gray-300">
-            
             <div className="p-4 flex flex-col gap-3 w-1/2 min-w-fit">
               <div className="flex flex-col gap-3">
                 <label htmlFor="catName" className="block text-sm font-medium leading-6 text-gray-900">
@@ -194,9 +201,11 @@ export default function ConfigInfoRequest() {
                 </label>
                 <div className="">
                   <input
-                    id="category" name="category" type="text"
-                    value={newCategory} 
-                    onChange={e => setNewCategory(e.target.value)} 
+                    id="category"
+                    name="category"
+                    type="text"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
                     disabled={!enabled}
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm 
                       ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 disabled:opacity-30
@@ -210,9 +219,11 @@ export default function ConfigInfoRequest() {
                 </label>
                 <div className="">
                   <input
-                    id="email" name="email" type="email"
-                    value={newCategoryEmail} 
-                    onChange={e => setNewCategoryEmail(e.target.value)} 
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={newCategoryEmail}
+                    onChange={(e) => setNewCategoryEmail(e.target.value)}
                     disabled={!enabled}
                     autoComplete="email"
                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm 
@@ -221,7 +232,9 @@ export default function ConfigInfoRequest() {
                   />
                 </div>
               </div>
-              <button type="button" onClick={addNewCategory}
+              <button
+                type="button"
+                onClick={addNewCategory}
                 disabled={!enabled}
                 className="rounded-md bg-indigo-600 p-1 text-white shadow-sm 
                   hover:bg-indigo-500 focus-visible:outline disabled:opacity-30
@@ -231,16 +244,15 @@ export default function ConfigInfoRequest() {
             </div>
 
             <div className="p-4 flex flex-col">
-
-              <label htmlFor="contact" 
-                className="block text-sm font-medium leading-6 text-gray-900">
-                  Selected Categories ({categories.length})
+              <label htmlFor="contact" className="block text-sm font-medium leading-6 text-gray-900">
+                Selected Categories ({categories.length})
               </label>
 
               <ul role="list" className="">
-                {categories.length == 0 && 
+                {categories.length == 0 && (
                   <div className="opacity-30 flex py-2">
-                    <button type="button" 
+                    <button
+                      type="button"
                       className="rounded-full text-gray-600
                         focus-visible:bg-indigo-200 focus-visible:ring-0 focus-visible:ring-offset-0
                         focus-visible:outline-0">
@@ -249,12 +261,13 @@ export default function ConfigInfoRequest() {
                     <div className="ml-3">
                       <p className="text-sm font-medium text-gray-900">Some Category</p>
                       <p className="text-sm text-gray-500">someone@somewhere.com</p>
-                    </div>           
+                    </div>
                   </div>
-                }
+                )}
                 {categories.map((cat) => (
                   <li key={cat.title} className="flex py-2">
-                    <button type="button" 
+                    <button
+                      type="button"
                       onClick={() => removeCategory(cat.title)}
                       disabled={!enabled}
                       className="rounded-full text-gray-600 disabled:opacity-30
@@ -271,8 +284,8 @@ export default function ConfigInfoRequest() {
               </ul>
             </div>
           </div>
-        </div>        
-      </div>        
+        </div>
+      </div>
     </ConsoleBody>
-  )
+  );
 }

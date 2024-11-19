@@ -1,22 +1,22 @@
-import { saveSite } from "@/services/site";
-import { useAppStore } from "@/store/app-store";
-import { ExclamationCircleIcon, TvIcon } from "@heroicons/react/24/outline";
-import { useState, FormEvent, useEffect, useCallback } from "react";
-import { ISection } from "./sections";
-import { ConsoleBody } from "../console-body";
+import { saveSite } from '@/services/site';
+import { useAppStore } from '@/store/app-store';
+import { ExclamationCircleIcon, TvIcon } from '@heroicons/react/24/outline';
+import { useState, useEffect, useCallback } from 'react';
+import { ISection } from './sections';
+import { ConsoleBody } from '@/components/console/console-body';
+import { ISiteSection } from '@/models/site';
 
 export const section: ISection = {
   name: 'spotlight',
   title: 'Spotlight',
   description: 'A video or channel to spotlight for your guests.',
-  icon: <TvIcon/>,
+  icon: <TvIcon />,
   class: 'ml-2 text-xs',
-  component: <ConfigSpotlight/>,
+  component: <ConfigSpotlight />,
   isInfoSection: true
 };
 
 export default function ConfigSpotlight() {
-
   // load this site and editable values
   const site = useAppStore((state) => state.site);
   const thisSection: ISiteSection | undefined = site?.sections[section.name];
@@ -25,7 +25,7 @@ export default function ConfigSpotlight() {
   const [enabled, setEnabled] = useState(false);
   const [content, setContent] = useState('');
   const [urls, setUrls] = useState([] as Array<string>);
-  
+
   // local component state
   const [saving, setSaving] = useState(false);
   const [invalid, setInvalid] = useState(false);
@@ -50,7 +50,7 @@ export default function ConfigSpotlight() {
 
   // save the new site info
   const onSave = async () => {
-    if (enabled && invalid) {      
+    if (enabled && invalid) {
       return;
     }
 
@@ -62,42 +62,46 @@ export default function ConfigSpotlight() {
         enabled,
         content,
         urls,
-        props: {
-        }
-      }
+        props: {}
+      };
 
       // save the new site
       await saveSite({
         ...site,
         sections: {
           ...site.sections,
-          [section.name]: {...newSection}
+          [section.name]: { ...newSection }
         }
       });
-    
+
       setTimeout(() => setSaving(false), 2000);
     }
-  }
+  };
 
-  // validation.  effect on values. Set invalid. 
+  // validation.  effect on values. Set invalid.
   useEffect(() => {
     var regExp = /^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+$/;
     // only one for now
     setInvalid(enabled && !regExp.test(urls[0]));
   }, [urls, enabled]);
-  
-  return (
-    <ConsoleBody 
-      title={section.title} subTitle={section.description}
-      invalid={invalid} saving={saving} 
-      onSave={() => onSave()} onCancel={() => reset()}>
-        
-      <div className="flex flex-col gap-8">
 
+  return (
+    <ConsoleBody
+      title={section.title}
+      subTitle={section.description}
+      invalid={invalid}
+      saving={saving}
+      onSave={() => onSave()}
+      onCancel={() => reset()}>
+      <div className="flex flex-col gap-8">
         <div className="flex gap-3">
           <div className="flex h-6 items-center">
-            <input id="spotlightEnabled" name="spotlightEnabled" type="checkbox"
-              checked={enabled} onChange={(e) => setEnabled(e.target.checked)}
+            <input
+              id="spotlightEnabled"
+              name="spotlightEnabled"
+              type="checkbox"
+              checked={enabled}
+              onChange={(e) => setEnabled(e.target.checked)}
               className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
             />
           </div>
@@ -114,16 +118,18 @@ export default function ConfigSpotlight() {
           </label>
           <div className="">
             <textarea
-              id="spotlightContent" name="spotlightContent" rows={4}
-              value={content} onChange={e => setContent(e.target.value)} disabled={!enabled}
+              id="spotlightContent"
+              name="spotlightContent"
+              rows={4}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              disabled={!enabled}
               className="block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 
                 ring-inset ring-gray-300 placeholder:text-gray-400 disabled:opacity-30
                 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:py-1.5 sm:text-sm sm:leading-6"
             />
           </div>
-          <p className="mt-3 text-sm leading-6 text-gray-600 flex gap-6">
-            Introduce the spotlight video.
-          </p>
+          <p className="mt-3 text-sm leading-6 text-gray-600 flex gap-6">Introduce the spotlight video.</p>
         </div>
 
         <div className="flex flex-col gap-3">
@@ -131,31 +137,32 @@ export default function ConfigSpotlight() {
             YouTube Video URL
           </label>
           <div className="">
-            <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 
+            <div
+              className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 
               focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md relative">
-                
-              <input required
+              <input
+                required
                 disabled={!enabled}
                 pattern="https?://.+"
-                type="text" name="spotlightUrl" id="spotlightUrl"
-                placeholder="https://www.youtube.com/watch?v=qVEOJzAYIW4"
-                value={urls} 
-                onChange={e => setUrls([e.target.value])} 
+                type="text"
+                name="spotlightUrl"
+                id="spotlightUrl"
+                placeholder="Paste the URL from the embed code from YouTube share"
+                value={urls}
+                onChange={(e) => setUrls([e.target.value])}
                 className="peer disabled:opacity-30
                   block w-full rounded-md border-0 text-gray-900 invalid:text-red-900 shadow-sm py-1.5 pr-10 
                   ring-1 ring-inset ring-gray-300 invalid:ring-red-300 placeholder:text-gray-300 
                   focus:ring-2 focus:ring-inset focus:ring-indigo-600 invalid:focus:ring-red-500 sm:py-1.5 sm:text-sm sm:leading-6"
-
               />
 
               <div className="hidden peer-invalid:flex pointer-events-none absolute inset-y-0 right-0 items-center pr-3">
                 <ExclamationCircleIcon className="h-5 w-5 text-red-500" aria-hidden="true" />
               </div>
-
             </div>
           </div>
         </div>
       </div>
     </ConsoleBody>
-  )
+  );
 }

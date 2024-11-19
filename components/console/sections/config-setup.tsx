@@ -4,13 +4,12 @@ import { ISection } from './sections';
 import { useCallback, useEffect, useState } from 'react';
 import { saveSite } from '@/services/site';
 import { TwitterPicker } from 'react-color';
-import { ConsoleBody } from '../console-body';
+import { ConsoleBody } from '@/components/console/console-body';
 import { formClass } from '@/constants/form-class';
 import { SubscriptionStatus } from '@/models/customer';
 import { IAppProps } from '@/services/ssp-default';
 
-import ConsolePricing from '../console-pricing';
-import AppScript from '@/components/app-script';
+import ConsolePricing from '@/components/console/console-pricing';
 
 export const section: ISection = {
   name: 'setup',

@@ -3,11 +3,10 @@ import { ReactElement, useEffect } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { getServerSideProps, ISiteProps } from '@/services/ssp-site';
 import { useRouter } from 'next/router';
-import { sections } from '@/components/sections/sections';
+import { sections } from '@/components/console/sections/sections';
 import React from 'react';
 
 export default function SectionPage(props: ISiteProps) {
-
   const router = useRouter();
   const { section } = router.query || 'contact';
 
@@ -27,16 +26,10 @@ export default function SectionPage(props: ISiteProps) {
       setSiteState(props.siteState);
     }
   }, [setSite, setCustomer, props.site, props.customer]);
-  
+
   const child: ReactElement | undefined = sections.find((val) => val.name.toLowerCase() == section)?.component;
 
-  return (
-    <>
-      {child && 
-        <div>{React.cloneElement(child, props)}</div>
-      }
-    </>
-  )
+  return <>{child && <div>{React.cloneElement(child, props)}</div>}</>;
 }
 
-export { getServerSideProps }
+export { getServerSideProps };

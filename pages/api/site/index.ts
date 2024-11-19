@@ -1,5 +1,4 @@
-
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
 import { apiMiddleware } from '@/services/api-middleware';
 import connectMongo from '@/services/mongoose';
@@ -8,32 +7,28 @@ import Site from '@/models/site';
 import { log } from '@/services/log';
 
 const cors = Cors({
-  methods: ['PUT'],
+  methods: ['PUT']
 });
 
-export default async function handler(
-  req: NextApiRequest, res: NextApiResponse<ConfigRes | any>
-) {
-  
+export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) {
   await apiMiddleware(req, res, cors);
 
   switch (req.method) {
     case 'PUT':
       await put(req, res);
       break;
-    default: 
+    default:
       res.status(405).send({ success: false, message: 'Method unsupported' });
   }
 }
 
 /**
  * Create a new record.
- * @param req 
- * @param res 
- * @returns 
+ * @param req
+ * @param res
+ * @returns
  */
 const put = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) => {
-
   try {
     await connectMongo();
 
@@ -57,7 +52,7 @@ const put = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
     }
 
     // TODO check subscription limits
-    const total = await Site.find({ customerId: customerId}).count();
+    const total = await (await Site.find({ customerId: customerId })).length;
     if (total >= 2) {
       invalid(res, 'Already at the max number of sites allowed.');
       return;
@@ -76,20 +71,18 @@ const put = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) =
         enabled: false
       },
       sections: {}
-    }
+    };
 
     const newSiteRes = await Site.create(newSite);
-    const { __v, ...siteRes} = newSiteRes.toJSON();  
+    const { __v, ...siteRes } = newSiteRes.toJSON();
 
     res.json({ success: true, message: 'Created', data: siteRes });
-
   } catch (err: any) {
     log(err);
-    res.status(400).send({ success: false, message: err?.message || 'Something went wrong.'});
+    res.status(400).send({ success: false, message: err?.message || 'Something went wrong.' });
   }
-
-}
+};
 
 const invalid = (res: NextApiResponse, reason: string) => {
-  res.status(400).send({ success: false, message: reason});
-}
+  res.status(400).send({ success: false, message: reason });
+};

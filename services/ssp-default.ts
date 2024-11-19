@@ -34,7 +34,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const customerId = session?.user?.id;
   const email = session?.user.email;
   const username = session?.user.name;
-  const siteId = context?.query.siteId;
+  // const siteId = context?.query.siteId;
 
   // if session but no email.. something is wrong. error out.
   if (!customerId || !email) {

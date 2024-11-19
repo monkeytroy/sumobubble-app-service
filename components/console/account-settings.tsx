@@ -1,6 +1,6 @@
-import SiteList from '@/components/site-list';
-import ConsolePricing from '@/components/console-pricing';
-import SiteAdd from '@/components/site-add';
+import SiteList from '@/components/console/site-list';
+import ConsolePricing from '@/components/console/console-pricing';
+import SiteAdd from '@/components/console/site-add';
 import { useAppStore } from '@/store/app-store';
 import { IAppProps } from '@/services/ssp-default';
 

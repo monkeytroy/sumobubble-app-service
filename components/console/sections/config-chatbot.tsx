@@ -1,26 +1,30 @@
-import { saveSite } from "@/services/site";
-import { useAppStore } from "@/store/app-store";
-import { ChatBubbleOvalLeftIcon, ExclamationCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, MinusCircleIcon,  } from "@heroicons/react/24/outline";
-import { useState, useEffect, useCallback } from "react";
-import { ISection } from "./sections";
-import { ConsoleBody } from "../console-body";
-import { SubscriptionStatus } from "@/models/customer";
-import ConsolePricing from "../console-pricing";
-import { IAppProps } from "@/services/ssp-default";
-import { ChatbaseSeedState } from "@/models/siteState";
+import { saveSite } from '@/services/site';
+import { useAppStore } from '@/store/app-store';
+import {
+  ChatBubbleOvalLeftIcon,
+  ExclamationCircleIcon,
+  ExclamationTriangleIcon,
+  InformationCircleIcon,
+  MinusCircleIcon
+} from '@heroicons/react/24/outline';
+import { useState, useEffect, useCallback } from 'react';
+import { ISection } from './sections';
+import { ConsoleBody } from '@/components/console/console-body';
+import { SubscriptionStatus } from '@/models/customer';
+import ConsolePricing from '@/components/console/console-pricing';
+import { IAppProps } from '@/services/ssp-default';
 
 export const section: ISection = {
   name: 'chatbot',
   title: 'AI Chatbot',
   description: 'An AI powered chat bot based on your summary and website.',
-  icon: <ChatBubbleOvalLeftIcon/>,
+  icon: <ChatBubbleOvalLeftIcon />,
   class: 'text-sm',
-  component: <ConfigChatbot/>,
+  component: <ConfigChatbot />,
   isInfoSection: false
-}
+};
 
 export default function ConfigChatbot(props: IAppProps) {
-
   // site and editable values
   const site = useAppStore((state) => state.site);
   const siteState = useAppStore((state) => state.siteState);
@@ -28,9 +32,8 @@ export default function ConfigChatbot(props: IAppProps) {
 
   // setup local state for editing.
   const [enabled, setEnabled] = useState(false);
-  const [chatsite, setChatsite] = useState('');
   const chatbot = site?.chatbot;
-  
+
   // local component state
   const [saving, setSaving] = useState(false);
   const [invalid, setInvalid] = useState(false);
@@ -38,7 +41,6 @@ export default function ConfigChatbot(props: IAppProps) {
   // reset to site state
   const reset = useCallback(() => {
     setEnabled(!!chatbot?.enabled);
-    setChatsite(chatbot?.chatsite || '');
   }, [chatbot]);
 
   // reset to modified site upon changes from state
@@ -47,7 +49,6 @@ export default function ConfigChatbot(props: IAppProps) {
   }, [reset, site]);
 
   const onSave = async () => {
-
     setInvalid(false);
 
     if (site) {
@@ -56,7 +57,6 @@ export default function ConfigChatbot(props: IAppProps) {
       // copy configuration
       const newSite = JSON.parse(JSON.stringify(site));
 
-      newSite.chatbot.chatsite = chatsite;
       newSite.chatbot.enabled = enabled;
 
       // save!
@@ -64,111 +64,82 @@ export default function ConfigChatbot(props: IAppProps) {
 
       setTimeout(() => setSaving(false), 2000);
     }
-  }
+  };
 
   const validateChatSiteUrl = (url: string) => {
-    setChatsite(url);
     if (url) {
       var regExp = /^(https)?(\:\/\/)?[\w-]+(\.[\w-]+)+([\w.,@?^!=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])+$/;
       setInvalid(!regExp.test(url));
     }
-  }
+  };
 
   return (
-    <ConsoleBody full={true}
-      title={section.title} subTitle={section.description}
-      invalid={invalid} saving={saving} 
+    <ConsoleBody
+      full={true}
+      title={section.title}
+      subTitle={section.description}
+      invalid={invalid}
+      saving={saving}
       saveOff={customer?.subscription?.status != SubscriptionStatus.Active}
-      onSave={() => onSave()} onCancel={() => reset()}>
-
+      onSave={() => onSave()}
+      onCancel={() => reset()}>
       <div className="">
-
-        {customer?.subscription?.status != SubscriptionStatus.Active &&
+        {customer?.subscription?.status != SubscriptionStatus.Active && (
           <div className="text-lg text-gray-600 mt-4 flex flex-col gap-4">
             Subscribe to configure and enable chatbot.
-
             <div className="">
               <ConsolePricing {...props} startClosed={true}></ConsolePricing>
-            </div>          
+            </div>
           </div>
-        }
+        )}
 
-        {customer?.subscription?.status == SubscriptionStatus.Active && 
-          !customer?.subscription?.metadata?.chatbot && 
-
-          <div className="mt-12 py-8 text-2xl text-gray-600 flex flex-col gap-8 text-center
+        {customer?.subscription?.status == SubscriptionStatus.Active && !customer?.subscription?.metadata?.chatbot && (
+          <div
+            className="mt-12 py-8 text-2xl text-gray-600 flex flex-col gap-8 text-center
             rounded-lg bg-gray-100">
-
             Your subscription does not support chatbot.. upgrade?
-
             <div className="text-xl">
               <a href="mailto:support@infochatapp.com">Contact us</a>
             </div>
-            
           </div>
-        } 
+        )}
 
-        {customer?.subscription?.status == SubscriptionStatus.Active && 
-          customer?.subscription?.metadata?.chatbot && 
-          
+        {customer?.subscription?.status == SubscriptionStatus.Active && customer?.subscription?.metadata?.chatbot && (
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-3">
               <label htmlFor="spotlightUrl" className="block text-sm font-medium leading-6 text-gray-900">
                 Chatbot Status
               </label>
               <div className="mx-6">
-
-                {siteState?.seeded == ChatbaseSeedState.seedfail &&
+                {!chatbot?.chatbotId && (
                   <div className="rounded-md bg-blue-50 p-4">
                     <div className="flex">
                       <div className="flex-shrink-0">
                         <InformationCircleIcon className="h-5 w-5 text-blue-400" aria-hidden="true" />
                       </div>
                       <div className="ml-3 flex-1 md:flex md:justify-between">
-                        <div className="text-sm text-blue-700">
-                          The chatbot source was not set correctly. Verify the 
-                          Chatbot Root Source value and save value again. 
-                        </div>
+                        <div className="text-sm text-blue-700">The chatbot has not been setup.</div>
                       </div>
                     </div>
                   </div>
-                }
+                )}
 
-                {!chatbot?.chatbaseId && 
-                  <div className="rounded-md bg-blue-50 p-4">
-                    <div className="flex">
-                      <div className="flex-shrink-0">
-                        <InformationCircleIcon className="h-5 w-5 text-blue-400" aria-hidden="true" />
-                      </div>
-                      <div className="ml-3 flex-1 md:flex md:justify-between">
-                        <div className="text-sm text-blue-700">
-                          The chatbot will not be created until the source url has been entered (below) and saved.
-                          <ul className="list-disc pl-6 hidden">
-                            <li>Info summary text has been entered. (more than 100 characters)</li>
-                            <li>Chatbot Root Source has been entered below.</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                }
-
-                {chatbot?.chatbaseId && 
-                  <div className="w-full p-6 rounded bg-blue-200">
-                    Your chatbot is created and ready to go!
-                  </div>
-                }
-
+                {chatbot?.chatbotId && (
+                  <div className="w-full p-6 rounded bg-blue-200">Your chatbot is created and ready to go!</div>
+                )}
               </div>
             </div>
-          
-            <div className="flex flex-col gap-6">
 
-              {chatbot?.chatbaseId &&
+            <div className="flex flex-col gap-6">
+              {chatbot?.chatbotId && (
                 <div className="flex gap-3">
                   <div className="flex h-6 items-center">
-                    <input id="sectionEnabled" name="sectionEnabled" type="checkbox"
-                      checked={enabled} onChange={(e) => setEnabled(e.target.checked)}
+                    <input
+                      id="sectionEnabled"
+                      name="sectionEnabled"
+                      type="checkbox"
+                      checked={enabled}
+                      onChange={(e) => setEnabled(e.target.checked)}
                       className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
                     />
                   </div>
@@ -177,22 +148,28 @@ export default function ConfigChatbot(props: IAppProps) {
                       Enable Chatbot
                     </label>
                   </div>
-                </div>      
-              }
+                </div>
+              )}
 
+              {
+                // todo update with multi url input UI
+              }
               <div className="flex flex-col gap-2">
                 <label htmlFor="spotlightUrl" className="block text-sm font-medium leading-6 text-gray-900">
                   Chatbot Root Source (AI Trained from this website)
                 </label>
                 <div className="flex gap-3">
-                  <div className="w-128 max-w-full flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 
-                    focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 relative">                      
+                  <div
+                    className="w-128 max-w-full flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 
+                    focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 relative">
                     <input
                       pattern="^https://?[\w-]+(\.[\w-]+)+([\w.,@?^!=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])+$"
-                      type="text" name="siteUrl" id="siteUrl"
+                      type="text"
+                      name="siteUrl"
+                      id="siteUrl"
                       placeholder="https://my-website.com"
-                      value={chatsite}
-                      onChange={e => validateChatSiteUrl(e.target.value)}
+                      value={''}
+                      onChange={(e) => validateChatSiteUrl(e.target.value)}
                       aria-invalid={invalid}
                       className="peer disabled:opacity-30
                         block w-full rounded-md border-0 text-gray-900 invalid:text-red-900 shadow-sm py-1.5 pr-10 
@@ -212,30 +189,24 @@ export default function ConfigChatbot(props: IAppProps) {
                     </div>
                     <div className="ml-3 flex-1 md:flex md:justify-between">
                       <div className="text-sm text-blue-700">
-                        When the Chatbot Root Source is first entered or changed,  
-                        setup and training of the chatbot begins. This process may take
-                        some time depending on the amount of information on your
-                        website. 
-                        <br/><br/>
-                        The chatbot will work right away,  but may not understand everything
-                        about your website for several minutes.
+                        When the Chatbot Root Source is first entered or changed, setup and training of the chatbot
+                        begins. This process may take some time depending on the amount of information on your website.
+                        <br />
+                        <br />
+                        The chatbot will work right away, but may not understand everything about your website for
+                        several minutes.
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-
-              
             </div>
           </div>
-        }
+        )}
       </div>
-    
     </ConsoleBody>
-    
-  )
+  );
 }
-
 
 /**
 

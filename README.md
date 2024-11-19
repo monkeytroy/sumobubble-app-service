@@ -16,8 +16,6 @@ Stripe uses webhooks to send subscription information to the server. The api/sub
 stripe listen --forward-to localhost:3000/apio/subscribe
 ```
 
-So open a terminal and run that when doing local dev
-
 ## Config
 
 DB config manually created to start. At some point will be schema based...
