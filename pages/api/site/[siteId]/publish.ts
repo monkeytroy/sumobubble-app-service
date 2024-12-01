@@ -61,7 +61,9 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
         Bucket: process.env.SPACES_BUCKET,
         ACL: 'public-read',
         Key: objectKey,
-        Body: Readable.from(JSON.stringify(siteRes)),
+        // todo fix s3 lib to spaces issue
+        // @ts-ignore
+        Body: JSON.stringify(siteRes),
         ContentType: 'application/json'
       };
 

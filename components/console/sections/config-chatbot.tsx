@@ -99,7 +99,7 @@ export default function ConfigChatbot(props: IAppProps) {
             rounded-lg bg-gray-100">
             Your subscription does not support chatbot.. upgrade?
             <div className="text-xl">
-              <a href="mailto:support@infochatapp.com">Contact us</a>
+              <a href="mailto:support@sumobubble.com">Contact us</a>
             </div>
           </div>
         )}

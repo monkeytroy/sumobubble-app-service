@@ -99,7 +99,7 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
 
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
-    // reworking chat
+    // TODO reworking chat
 
     // const newChatsite = body?.chatbot?.chatsite;
 
