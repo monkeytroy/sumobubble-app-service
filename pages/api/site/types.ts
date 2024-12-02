@@ -2,7 +2,9 @@
 //   contact = 'contact'
 // }
 
-interface ISite {
+import { ISiteSection } from '@/models/site';
+
+export interface ISite {
   _id?: string;
   customerId: string;
   customerEmail: string;
@@ -27,23 +29,23 @@ interface ISite {
   sections: ISiteSections;
 }
 
-interface ISiteSections {
+export interface ISiteSections {
   [name: string]: ISiteSection;
 }
 
-interface IChatSite {
+export interface IChatSite {
   url: string;
   active: boolean;
   progress: number;
   message: string;
 }
 
-interface Copyrights {
+export interface Copyrights {
   [name: string]: string;
 }
 
-type ConfigRes = {
+export type ConfigRes = {
   success: boolean;
   message: string;
-  data: ISite;
+  data?: ISite;
 };

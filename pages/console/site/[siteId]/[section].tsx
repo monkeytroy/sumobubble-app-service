@@ -12,7 +12,6 @@ export default function SectionPage(props: ISiteProps) {
 
   // app props on app state
   const setSite = useAppStore((state) => state.setSite);
-  const setSiteState = useAppStore((state) => state.setSiteState);
   const setCustomer = useAppStore((state) => state.setCustomer);
 
   useEffect(() => {
@@ -21,9 +20,6 @@ export default function SectionPage(props: ISiteProps) {
     }
     if (props.customer) {
       setCustomer(props.customer);
-    }
-    if (props.siteState) {
-      setSiteState(props.siteState);
     }
   }, [setSite, setCustomer, props.site, props.customer]);
 

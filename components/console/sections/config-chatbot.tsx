@@ -1,12 +1,6 @@
 import { saveSite } from '@/services/site';
 import { useAppStore } from '@/store/app-store';
-import {
-  ChatBubbleOvalLeftIcon,
-  ExclamationCircleIcon,
-  ExclamationTriangleIcon,
-  InformationCircleIcon,
-  MinusCircleIcon
-} from '@heroicons/react/24/outline';
+import { ChatBubbleOvalLeftIcon, ExclamationCircleIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { useState, useEffect, useCallback } from 'react';
 import { ISection } from './sections';
 import { ConsoleBody } from '@/components/console/console-body';
@@ -16,7 +10,7 @@ import { IAppProps } from '@/services/ssp-default';
 
 export const section: ISection = {
   name: 'chatbot',
-  title: 'AI Chatbot',
+  title: 'Ask AI',
   description: 'An AI powered chat bot based on your summary and website.',
   icon: <ChatBubbleOvalLeftIcon />,
   class: 'text-sm',
@@ -27,7 +21,6 @@ export const section: ISection = {
 export default function ConfigChatbot(props: IAppProps) {
   // site and editable values
   const site = useAppStore((state) => state.site);
-  const siteState = useAppStore((state) => state.siteState);
   const customer = useAppStore((state) => state.customer);
 
   // setup local state for editing.

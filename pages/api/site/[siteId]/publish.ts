@@ -6,13 +6,14 @@ import { log } from '@/services/log';
 import Site from '@/models/site';
 import { getS3Client } from '@/services/s3';
 import { PutObjectCommand, PutObjectRequest } from '@aws-sdk/client-s3';
-import { Readable } from 'stream';
+import { ConfigRes } from '../types';
+// import { Readable } from 'stream';
 
 const cors = Cors({
   methods: ['POST', 'DELETE', 'HEAD']
 });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes>) {
   await apiMiddleware(req, res, cors);
 
   switch (req.method) {
@@ -24,14 +25,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   }
 }
 
-const invalid = (res: NextApiResponse, reason: string) => {
-  res.status(400).send({ success: false, message: reason });
-};
-
-const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) => {
+const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
   const { siteId } = req.query;
-
-  log(`api/site/${siteId}/publish {POST}`);
+  log(`POST: api/site/${siteId}/publish`);
 
   try {
     await connectMongo();
@@ -42,16 +38,6 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
       // remove unnecessary fields
       const { __v, ...siteRes } = site.toJSON();
 
-      // massage any data
-      const spotlight = siteRes.sections['spotlight'];
-      if (spotlight) {
-        let spotlightUrl = spotlight?.urls[0];
-        if (spotlightUrl.indexOf('watch?v=') > 0) {
-          spotlightUrl = spotlightUrl.replace('watch?v=', 'embed/');
-          spotlight.urls = [spotlightUrl];
-        }
-      }
-
       // write file to space.
       const s3Client = getS3Client();
 
@@ -61,30 +47,27 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
         Bucket: process.env.SPACES_BUCKET,
         ACL: 'public-read',
         Key: objectKey,
-        // todo fix s3 lib to spaces issue
+        // todo resolve this type issue where s3 library != spaces api types.
         // @ts-ignore
         Body: JSON.stringify(siteRes),
         ContentType: 'application/json'
       };
 
       log('Writing object to spaces: ', fileParams);
-
       const putObjectRes = await s3Client.send(new PutObjectCommand(fileParams));
-
       log(putObjectRes);
 
       if (putObjectRes.$metadata.httpStatusCode == 200) {
         res.status(200).json({ success: true, message: 'Published', data: siteRes });
       } else {
-        res.status(400).send({ success: false, message: 'Failed to publish site file' });
+        res.status(500).json({ success: false, message: 'Failed to publish site file' });
       }
     } else {
-      log('Could not publish siteId: ' + siteId);
-      invalid(res, 'Failed to publish');
-      return;
+      const message = `Site with id ${siteId} was not found.`;
+      log(message);
+      res.status(404).json({ success: false, message });
     }
   } catch (err) {
-    res.status(405).send({ success: false, message: `Error ${(<Error>err)?.message}` });
-    return;
+    res.status(500).json({ success: false, message: `Error ${(<Error>err)?.message}` });
   }
 };

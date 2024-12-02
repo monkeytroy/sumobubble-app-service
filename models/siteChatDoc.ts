@@ -5,7 +5,7 @@ export interface ISiteChatDoc {
   customerId: string;
   origFilename: string;
   filenameKey: string;
-  doc: {}
+  doc: {};
 }
 
 const siteChatDocSchema = new Schema<ISiteChatDoc>({

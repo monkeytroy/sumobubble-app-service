@@ -1,6 +1,5 @@
-
 import { ICustomer } from '@/models/customer';
-import { ISiteState } from '@/models/siteState';
+import { ISite, ISiteSections } from '@/pages/api/site/types';
 import { preview } from '@/services/preview';
 import { addNewSite, removeSite, saveSite } from '@/services/site';
 import { ISitesSummary } from '@/services/ssp-default';
@@ -8,57 +7,49 @@ import { toast } from 'react-toastify';
 import { create } from 'zustand';
 
 export interface IAppState {
-
-  sites: Array<ISitesSummary>,
-  site: ISite | null,
-  siteState: ISiteState | null,
+  sites: Array<ISitesSummary>;
+  site: ISite | null;
   siteChanged: boolean;
   customer: ICustomer | null;
 
-  setCustomer: (val: ICustomer) => void; 
+  setCustomer: (val: ICustomer) => void;
   setSites: (val: Array<ISitesSummary>) => void;
   addSite: (siteTitle: string) => void;
   removeSite: (siteId: string) => void;
   setSite: (val: ISite) => void;
-  setSiteState: (val: ISiteState) => void;
   setSiteChanged: (val: boolean) => void;
   enableSection: (val: boolean, section: string) => void;
 }
 
-export const useAppStore = create<IAppState>( (set, get) => ({
-
+export const useAppStore = create<IAppState>((set, get) => ({
   sites: [],
   site: null,
-  siteState: null,
   siteChanged: false,
   customer: null,
 
-  setCustomer: (val: ICustomer) => set (() => ({ customer: {...val}})),
+  setCustomer: (val: ICustomer) => set(() => ({ customer: { ...val } })),
 
-  setSites: (val: Array<ISitesSummary>) => set (() => ({ sites: [...val]})),
+  setSites: (val: Array<ISitesSummary>) => set(() => ({ sites: [...val] })),
 
   addSite: async (siteTitle: string) => {
-
-    // call the service. 
-    const newSiteRes = await addNewSite(siteTitle); 
+    // call the service.
+    const newSiteRes = await addNewSite(siteTitle);
 
     // update store
     if (newSiteRes?.success && newSiteRes?.data) {
-      set (state => ({ sites: [...state.sites, {...newSiteRes?.data}]}));
+      set((state) => ({ sites: [...state.sites, { ...newSiteRes?.data }] }));
 
       toast.success('Created!', {
-        position: "top-center",
+        position: 'top-center',
         autoClose: 3000,
-        hideProgressBar: true,
-        });
-
+        hideProgressBar: true
+      });
     } else {
-
       toast.error('Ooops! New site was not created. ' + newSiteRes.message, {
-        position: "top-center",
+        position: 'top-center',
         autoClose: 3000,
-        hideProgressBar: true,
-        });
+        hideProgressBar: true
+      });
     }
   },
 
@@ -68,21 +59,18 @@ export const useAppStore = create<IAppState>( (set, get) => ({
 
     // update the store
     if (removeSiteRes) {
-      set(state => ({ sites: [...state.sites.filter((val) => val._id !== siteId)]}));
+      set((state) => ({ sites: [...state.sites.filter((val) => val._id !== siteId)] }));
     }
   },
 
   setSite: (val: ISite) => {
     preview(val);
-    set (() => ({ site: {...val} }) );
+    set(() => ({ site: { ...val } }));
   },
 
-  setSiteState: (val: ISiteState) => set (() => ({ siteState: {...val} }) ),
-
-  setSiteChanged: (val: boolean) => set ( () => ({ siteChanged: val})),
+  setSiteChanged: (val: boolean) => set(() => ({ siteChanged: val })),
 
   enableSection: async (val: boolean, sectionName: string) => {
-
     const site = get().site;
 
     if (site) {
@@ -96,20 +84,16 @@ export const useAppStore = create<IAppState>( (set, get) => ({
           enabled: val,
           content: '',
           props: {}
-        }
+        };
       }
 
-      site.sections[sectionName as keyof ISiteSections] = {...selectedSection};
-      
+      site.sections[sectionName as keyof ISiteSections] = { ...selectedSection };
+
       // service
       const res = await saveSite(site);
 
       // back to state
       get().setSite(res);
-  
     }
-
   }
-
 }));
-

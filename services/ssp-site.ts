@@ -3,12 +3,11 @@ import { getSession } from 'next-auth/react';
 import { log } from './log';
 import { GetServerSideProps } from 'next/types';
 import { fetchOrCreateCustomer } from './customer';
-import { fetchCustomerSite, fetchSiteState } from './site';
-import { ISiteState } from '@/models/siteState';
+import { fetchCustomerSite } from './site';
+import { ISite } from '@/pages/api/site/types';
 
 export interface ISiteProps {
   customer?: ICustomer;
-  siteState?: ISiteState;
   site?: ISite;
 }
 
@@ -47,8 +46,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const customer = await fetchOrCreateCustomer({ customerId, username, email });
 
-  const siteState = await fetchSiteState(Array.isArray(siteId) ? siteId[0] : siteId);
-
   // fetch customer site
   const site = await fetchCustomerSite(Array.isArray(siteId) ? siteId[0] : siteId);
   if (site) {
@@ -57,7 +54,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       props: {
         customer: customer,
         site: JSON.parse(JSON.stringify(site)),
-        siteState: JSON.parse(JSON.stringify(siteState)),
         stripe: {
           key: process.env.STRIPE_KEY || null,
           homeId: process.env.STRIPE_HOME_ID || null,

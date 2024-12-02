@@ -2,12 +2,13 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
 import { apiMiddleware } from '@/services/api-middleware';
 import { log } from '@/services/log';
+import { ConfigRes } from '../../site/types';
 
 const cors = Cors({
   methods: ['GET', 'POST', 'HEAD']
 });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes>) {
   await apiMiddleware(req, res, cors);
 
   switch (req.method) {
@@ -25,17 +26,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 /**
  * Not sure.  Maybe get chat history?
  */
-const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) => {
+const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
   try {
     res.status(200).send({ success: false, message: 'No chat history yet.' });
   } catch (err) {
-    res.status(405).send({ success: false, message: `Error ${(<Error>err)?.message}` });
+    res.status(500).send({ success: false, message: `Error ${(<Error>err)?.message}` });
     return;
   }
 };
 
 const invalid = (res: NextApiResponse, reason: string) => {
-  res.status(400).send({ success: false, message: reason });
+  res.status(500).send({ success: false, message: reason });
 };
 
 /**
@@ -45,7 +46,7 @@ const invalid = (res: NextApiResponse, reason: string) => {
  * @param res
  * @returns
  */
-const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) => {
+const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
   const { chatId, siteId } = req.query;
 
   const siteIdVal = Array.isArray(siteId) ? siteId[0] : siteId;

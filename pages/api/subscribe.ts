@@ -1,11 +1,10 @@
-
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
 import { apiMiddleware } from '@/services/api-middleware';
 import connectMongo from '@/services/mongoose';
 import Customer, { ICustomer, SubscriptionStatus } from '@/models/customer';
 import { log } from '@/services/log';
-
+import { ConfigRes } from './site/types';
 
 /**
  * The following stripe hook 'event' objects are most important currently.
@@ -14,22 +13,22 @@ import { log } from '@/services/log';
  *  customer.subscription.created
  *  customer.deleted
  *  customer.subscription.deleted
- * 
+ *
  * TODO potentially capture invoices to show to the user
  *  invoice.created
  *  invoice.finalized
  *  invoice.paid
  *  invoice.payment_succeeded
- *  
- *  product.updated - when metadata changed.. 
+ *
+ *  product.updated - when metadata changed..
  *    should capture and update local md based on data.object.id 'prod_O1AZsc9SaxmdVK' for object 'product'
- *   
+ *
  * The following stripe hook 'subscription' object is the main thing.
  * Things to possibly collect include...
- * 
+ *
  *   customer: string id of customer on stripe
  *   id: subscription id
- * 
+ *
  *   cancel_at_period_end: boolean
  *   cancel_at: ? null
  *   cancleed_at: timestamp?
@@ -48,33 +47,23 @@ import { log } from '@/services/log';
  *   trial_end, _start, _settings
  */
 
-
 const cors = Cors({
-  methods: ['GET', 'POST', 'HEAD'],
+  methods: ['POST', 'HEAD']
 });
 
-export default async function handler(
-  req: NextApiRequest, res: NextApiResponse<ConfigRes | any>
-) {
-
+export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes>) {
   await apiMiddleware(req, res, cors);
 
   switch (req.method) {
-    case 'GET': 
-      //await get(req, res);
-      break;
     case 'POST':
       await post(req, res);
       break;
-    default: 
-      res.status(405).send({ success: false, message: 'Method unsupported' })  
+    default:
+      res.status(405).send({ success: false, message: 'Method unsupported' });
   }
-
 }
 
-
-const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) => {
-
+const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
   log('Webhook called ------------------------------------------------------');
 
   // handle invoice status.
@@ -87,65 +76,55 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) 
   }
 
   res.status(200).send({ success: true, message: 'Success' });
-
 };
-
 
 /**
  * TODO Replace with queue event.
  * @param eventObject
  */
 const linkCustomer = async (eventObject: any) => {
-
   if (eventObject.object == 'customer') {
-
     const id = eventObject.id;
     const email = eventObject.email;
 
     //console.log(eventObject)
 
     if (id && email) {
-
       try {
         connectMongo();
-        
-        const customer = await Customer.findOne({ email: email});
+
+        const customer = await Customer.findOne({ email: email });
         if (customer) {
           customer.subscription.customerId = id;
           customer.save();
         } else {
           log(`linkCustomer:: error - customer was not found for email ${email}.`, eventObject);
         }
-
-      } catch(err) {
+      } catch (err) {
         log(`linkCustomer:: error - failed linking customer to event object.`, err, eventObject);
       }
-
     } else {
       log(`linkCustomer:: error - customer object but missing id or email.`, eventObject);
     }
-
   }
-}
+};
 
 /**
  * TODO Replace with queue
- * @param eventObject 
+ * @param eventObject
  */
 const updateSubscription = async (eventObject: any) => {
-  
   if (eventObject.object == 'subscription') {
-
     const customerId = eventObject.customer;
     const status = eventObject.status;
-    
+
     let subscriptionId = eventObject.id;
     let productId = eventObject.plan.product;
     let chatbot = false;
 
     // todo store more info like dates.
 
-    // todo more.. query the product for metadata instead of 
+    // todo more.. query the product for metadata instead of
     // storing the product id's here
     if ((process.env.STRIPE_CHAT_PRODUCTS || ['']).includes(productId)) {
       chatbot = true;
@@ -158,30 +137,26 @@ const updateSubscription = async (eventObject: any) => {
     }
 
     if (customerId) {
-
       try {
         connectMongo();
-        
-        const customer = await Customer.findOne({ 'subscription.customerId': customerId});
+
+        const customer = await Customer.findOne({ 'subscription.customerId': customerId });
         if (customer) {
           customer.subscription.id = subscriptionId;
           customer.subscription.status = status;
           customer.subscription.productId = productId;
           customer.subscription.metadata = {
             chatbot
-          }
+          };
           customer.save();
         } else {
           log(`updateSubscription:: error - could not find customer ${customerId} for event object.`, eventObject);
         }
-
-      } catch(err) {
+      } catch (err) {
         log(`updateSubscription:: error - could not find customer ${customerId} for event object.`, err, eventObject);
       }
-
     } else {
       log(`updateSubscription:: error - customerId missing in event.`, eventObject);
     }
-
   }
-}
+};

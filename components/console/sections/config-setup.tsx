@@ -210,8 +210,7 @@ export default function ConfigSetup(props: IAppProps) {
           {customer?.subscription?.status == SubscriptionStatus.Active && (
             <div className="flex flex-col gap-2">
               <div className="flex gap-4 items-baseline">
-                <span className="text-xl font-semibold text-gray-900">Deploy Code</span>
-                <span className="text-sm text-gray-600">Deploy to a site using code.</span>
+                <span className="text-xl font-semibold text-gray-900">Deploy Using Code</span>
               </div>
               <div className="block text-sm font-medium leading-6 text-gray-900">
                 Copy and paste this into your webpage!
@@ -233,7 +232,6 @@ export default function ConfigSetup(props: IAppProps) {
 
               <div className="flex gap-4 items-baseline mt-6">
                 <span className="text-xl font-semibold text-gray-900">Deploy to Wix</span>
-                <span className="text-sm text-gray-600">Do the following</span>
               </div>
 
               <div className="block text-sm font-medium leading-6 text-gray-900">

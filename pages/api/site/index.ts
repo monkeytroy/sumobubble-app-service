@@ -5,12 +5,13 @@ import connectMongo from '@/services/mongoose';
 import { getToken } from 'next-auth/jwt';
 import Site from '@/models/site';
 import { log } from '@/services/log';
+import { ConfigRes, ISite } from './types';
 
 const cors = Cors({
   methods: ['PUT']
 });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes>) {
   await apiMiddleware(req, res, cors);
 
   switch (req.method) {
@@ -28,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
  * @param res
  * @returns
  */
-const put = async (req: NextApiRequest, res: NextApiResponse<ConfigRes | any>) => {
+const put = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
   try {
     await connectMongo();
 

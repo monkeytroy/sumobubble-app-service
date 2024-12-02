@@ -5,40 +5,26 @@ import { apiMiddleware } from '@/services/api-middleware';
 import connectMongo from '@/services/mongoose';
 import Site, { IContactCategory } from '@/models/site';
 import { log } from '@/services/log';
+import { ContactRes, ContactData } from './types';
 
 const cors = Cors({
   methods: ['POST', 'GET', 'HEAD']
 });
 
-type ContactRes = {
-  success: boolean;
-  message: string;
-};
-
-type ContactData = {
-  section: string;
-  category?: string;
-  email: string;
-  name: string;
-  message: string;
-  phone?: string;
-  moreInfo?: boolean;
-  token: string;
-};
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse<ContactRes>) {
-  let resultStatus = 400;
-  const result = {
-    success: false,
-    message: 'Could not send message'
-  };
-
   await apiMiddleware(req, res, cors);
 
   if (req.method !== 'POST') {
     res.status(405).send({ success: false, message: 'Only POST requests allowed' });
     return;
   }
+
+  let resultStatus = 400;
+
+  const result = {
+    success: false,
+    message: 'Could not send message'
+  };
 
   try {
     const { section, category, email, name, phone, moreInfo, message, token }: ContactData = JSON.parse(req.body);
@@ -118,7 +104,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       result.message = 'Bad contact data';
     }
   } catch (err) {
-    result.message = 'Invalid message body or missing fields';
+    resultStatus = 500;
+    result.message = `Error ${(<Error>err)?.message}`;
   }
 
   res.status(resultStatus).json(result);

@@ -19,11 +19,12 @@ export interface ISection {
   isInfoSection?: boolean;
 }
 
+// These sections are what are loaded for the side bar and available to users.
 export const sections: Array<ISection> = [
   { ...sectionSetup },
   { ...sectionChat },
   { ...sectionSummary },
-  { ...sectionSections },
+  //{ ...sectionSections },
   { ...sectionContact },
   { ...sectionInfoRequest },
   { ...sectionSpotlight }

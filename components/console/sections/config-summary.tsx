@@ -9,7 +9,7 @@ import { ConsoleBody } from '@/components/console/console-body';
 
 export const section: ISection = {
   name: 'info',
-  title: 'Info',
+  title: 'Info Summary',
   description: 'Summary info displayed when app is opened',
   icon: <InformationCircleIcon />,
   class: 'text-sm',
