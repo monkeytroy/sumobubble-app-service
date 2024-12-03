@@ -39,7 +39,7 @@ export const fetchCustomerSite = async (siteId: string) => {
  */
 export const addNewSite = async (siteTitle: string) => {
   const res = await fetch(`/api/site`, {
-    method: 'PUT',
+    method: 'POST',
     body: JSON.stringify({ title: siteTitle })
   });
 
