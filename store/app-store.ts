@@ -1,7 +1,9 @@
+import { IAskSource } from '@/models/askSource';
 import { ICustomer } from '@/models/customer';
 import { ISite, ISiteSections } from '@/pages/api/site/types';
 import { preview } from '@/services/preview';
 import { addNewSite, removeSite, saveSite } from '@/services/site';
+import { getSourceDocuments } from '@/services/source';
 import { ISitesSummary } from '@/services/ssp-default';
 import { toast } from 'react-toastify';
 import { create } from 'zustand';
@@ -11,6 +13,7 @@ export interface IAppState {
   site: ISite | null;
   siteChanged: boolean;
   customer: ICustomer | null;
+  askSources: IAskSource[];
 
   setCustomer: (val: ICustomer) => void;
   setSites: (val: Array<ISitesSummary>) => void;
@@ -19,6 +22,7 @@ export interface IAppState {
   setSite: (val: ISite) => void;
   setSiteChanged: (val: boolean) => void;
   enableSection: (val: boolean, section: string) => void;
+  refreshAskSources: () => void;
 }
 
 export const useAppStore = create<IAppState>((set, get) => ({
@@ -26,6 +30,7 @@ export const useAppStore = create<IAppState>((set, get) => ({
   site: null,
   siteChanged: false,
   customer: null,
+  askSources: [],
 
   setCustomer: (val: ICustomer) => set(() => ({ customer: { ...val } })),
 
@@ -65,6 +70,7 @@ export const useAppStore = create<IAppState>((set, get) => ({
 
   setSite: (val: ISite) => {
     preview(val);
+    get().refreshAskSources();
     set(() => ({ site: { ...val } }));
   },
 
@@ -94,6 +100,17 @@ export const useAppStore = create<IAppState>((set, get) => ({
 
       // back to state
       get().setSite(res);
+    }
+  },
+
+  refreshAskSources: async () => {
+    const site = get().site;
+    if (site?._id) {
+      const res = await getSourceDocuments(site?._id);
+      if (res?.success) {
+        const sources = res.data;
+        set(() => ({ askSources: sources }));
+      }
     }
   }
 }));

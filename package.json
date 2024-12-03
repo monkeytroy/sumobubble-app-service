@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.663.0",
+    "@google/generative-ai": "^0.21.0",
     "@headlessui/react": "^2.1.9",
     "@headlessui/tailwindcss": "^0.2.1",
     "@heroicons/react": "^2.1.5",

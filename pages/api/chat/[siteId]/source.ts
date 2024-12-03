@@ -2,12 +2,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
 import { apiMiddleware } from '@/services/api-middleware';
 import { log } from '@/services/log';
-import { AskSourceRes, ConfigRes } from '../../site/types';
+import { AskSourceRes } from '../../site/types';
 import { Fields, Files, IncomingForm, File } from 'formidable';
 import fs from 'node:fs';
 import connectMongo from '@/services/mongoose';
 import AskSource, { IAskSource } from '@/models/askSource';
-import { originalPathname } from 'next/dist/build/templates/app-page';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const cors = Cors({
   methods: ['GET', 'POST', 'DELETE', 'HEAD']
@@ -19,7 +19,7 @@ export const config = {
   }
 };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes>) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<AskSourceRes>) {
   await apiMiddleware(req, res, cors);
 
   switch (req.method) {
@@ -62,7 +62,7 @@ const getSourceDocs = async (req: NextApiRequest, res: NextApiResponse<AskSource
       }
     );
 
-    res.status(200).send({ success: false, message: `Sources for site ${siteIdVal}`, data: sources });
+    res.status(200).send({ success: true, message: `Sources for site ${siteIdVal}`, data: sources });
   } catch (err) {
     res.status(500).send({ success: false, message: `Error ${(<Error>err)?.message}` });
     return;
@@ -76,7 +76,7 @@ const getSourceDocs = async (req: NextApiRequest, res: NextApiResponse<AskSource
  * @param res
  * @returns
  */
-const addSourceDoc = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
+const addSourceDoc = async (req: NextApiRequest, res: NextApiResponse<AskSourceRes>) => {
   const { siteId } = req.query;
 
   const siteIdVal = Array.isArray(siteId) ? siteId[0] : siteId;
@@ -85,6 +85,11 @@ const addSourceDoc = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>
 
   if (!siteIdVal) {
     return res.status(500).send({ success: false, message: 'Missing site id' });
+  }
+
+  const aiApiKey = process.env.GEMINI_API_KEY;
+  if (!aiApiKey) {
+    return res.status(500).send({ success: false, message: 'AI is not configured' });
   }
 
   try {
@@ -153,6 +158,23 @@ const addSourceDoc = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>
       masterSource += '/n----------DocStart----------' + source.contents;
     }
 
+    // ai gen a master doc
+    const genAI = new GoogleGenerativeAI(aiApiKey);
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+    // todo configure
+    const prompt = `
+      I have a document with a bunch of information about an organization or individual.
+      I need a highly detailed summary of the document, grouped by topic, 
+      and including all information that person might ask about the document 
+      contents and the organization. This summary will be used in future AI 
+      queries to answer user questions. This summary should include the 
+      full text of as much of the document that makes sense. Be very verbose. 
+    `;
+
+    const masterDocResult = await model.generateContent([prompt, masterSource]);
+    const masterDocContents = masterDocResult.response.text();
+
     // write to source record
     const masterRec = await AskSource.findOneAndReplace(
       { siteId: siteIdVal, isMaster: true },
@@ -160,7 +182,7 @@ const addSourceDoc = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>
         customerId: '',
         siteId: siteIdVal,
         isMaster: true,
-        contents: masterSource
+        contents: masterDocContents
       },
       {
         new: true,

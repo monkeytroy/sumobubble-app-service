@@ -45,14 +45,15 @@ export interface Copyrights {
   [name: string]: string;
 }
 
-export type ConfigRes = {
+export interface IApiRes {
   success: boolean;
   message: string;
-  data?: ISite;
-};
+}
 
-export type AskSourceRes = {
-  success: boolean;
-  message: string;
+export interface ConfigRes extends IApiRes {
+  data?: ISite;
+}
+
+export interface AskSourceRes extends IApiRes {
   data?: IAskSource[];
-};
+}

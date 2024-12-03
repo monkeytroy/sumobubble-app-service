@@ -7,6 +7,7 @@ import { ConsoleBody } from '@/components/console/console-body';
 import { SubscriptionStatus } from '@/models/customer';
 import ConsolePricing from '@/components/console/console-pricing';
 import { IAppProps } from '@/services/ssp-default';
+import { uploadSourceDocument } from '@/services/source';
 
 export const section: ISection = {
   name: 'chat',
@@ -22,10 +23,11 @@ export default function ConfigChatbot(props: IAppProps) {
   // site and editable values
   const site = useAppStore((state) => state.site);
   const customer = useAppStore((state) => state.customer);
+  const askSources = useAppStore((state) => state.askSources);
+  const refreshAskSources = useAppStore((state) => state.refreshAskSources);
 
   // setup local state for editing.
   const [enabled, setEnabled] = useState(false);
-  const [chatsite, setChatsite] = useState('');
   const chatbot = site?.chatbot;
 
   // local component state
@@ -52,7 +54,6 @@ export default function ConfigChatbot(props: IAppProps) {
       const newSite = JSON.parse(JSON.stringify(site));
 
       // replace.
-      newSite.chatbot.chatsite = chatsite;
       newSite.chatbot.enabled = enabled;
 
       // save!
@@ -70,11 +71,12 @@ export default function ConfigChatbot(props: IAppProps) {
   //   }
   // };
 
-  const processFile = (files: FileList | null) => {
-    if (files?.length) {
-      console.log(files[0]);
+  const processFile = async (files: FileList | null) => {
+    if (files?.length && site?._id) {
+      await uploadSourceDocument(site?._id, files);
 
-      // todo upload
+      // todo repace with async update of file status
+      refreshAskSources();
     }
   };
 
@@ -117,7 +119,7 @@ export default function ConfigChatbot(props: IAppProps) {
                   id="askAiEnabled"
                   name="askAiEnabled"
                   type="checkbox"
-                  disabled={chatbot?.chatbotId == undefined || chatbot?.chatbotId == null}
+                  disabled={false}
                   checked={enabled}
                   onChange={(e) => setEnabled(e.target.checked)}
                   className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
@@ -151,32 +153,36 @@ export default function ConfigChatbot(props: IAppProps) {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="spotlightUrl" className="block text-sm font-medium leading-6 text-gray-900">
+              <label htmlFor="spotlightUrl" className="text-sm font-medium leading-6 text-gray-900">
                 Upload a source document for Ask AI
               </label>
               <div className="flex gap-3">
-                <div
-                  className="w-128 max-w-full flex rounded-md ring-0 ring-inset ring-gray-300 
-                  focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 relative">
+                <div className="font-[sans-serif] min-w-96">
                   <input
                     type="file"
                     name="uploadDoc"
                     id="uploadDoc"
                     aria-invalid={invalid}
                     onChange={(e) => processFile(e.target.files)}
-                    className="peer disabled:opacity-30
-                      block w-full rounded-md border-0 text-gray-900 invalid:text-red-900 py-1.5 pr-10 
-                      ring-0 invalid:ring-red-300
-                      focus:ring-0  
-                      sm:py-1.5 sm:text-sm sm:leading-6"
+                    className="w-full text-gray-400 font-semibold text-sm bg-white border 
+                    file:cursor-pointer cursor-pointer file:border-0 file:py-3 file:px-4 
+                    file:mr-4 file:bg-gray-100 file:hover:bg-gray-200 file:text-gray-500 rounded"
                   />
+                  <p className="text-xs text-gray-400 mt-2">TXT only for now.</p>
                 </div>
               </div>
             </div>
 
-            <div className="text-xl p-8">
-              <hr></hr>
-              <div>~ Document list coming soon ~</div>
+            <div className="flex flex-col gap-2">
+              <div className="font-semibold leading-6 text-gray-900">Source Files</div>
+              <div className="text-gray-600">
+                {askSources &&
+                  askSources.map((v) => (
+                    <div key={v._id} className="py-2 border-t border-gray-300">
+                      {v.origFilename}
+                    </div>
+                  ))}
+              </div>
             </div>
           </div>
         )}

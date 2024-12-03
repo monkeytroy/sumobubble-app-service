@@ -60,7 +60,7 @@ const updateSite = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) 
   // }
 
   const { siteId } = req.query;
-  log(`POST: api/site/${siteId}`);
+  log(`PUT: api/site/${siteId}`);
 
   try {
     await connectMongo();

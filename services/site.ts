@@ -83,7 +83,7 @@ export const saveSite = async (config: ISite) => {
   preview(config);
 
   const res = await fetch(`/api/site/${config._id}`, {
-    method: 'POST',
+    method: 'PUT',
     body: JSON.stringify(config)
   });
 

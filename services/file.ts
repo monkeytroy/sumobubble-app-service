@@ -1,11 +1,10 @@
 /**
  * Upload a file to the api for saving
- * @param id 
- * @param fileblob 
- * @returns 
+ * @param id
+ * @param fileblob
+ * @returns
  */
 export const saveFile = async (id: string, fileblob: Blob) => {
-
   const formData = new FormData();
 
   formData.append('file', fileblob);
@@ -18,4 +17,4 @@ export const saveFile = async (id: string, fileblob: Blob) => {
   const json = await res.json();
 
   return json;
-}
+};

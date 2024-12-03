@@ -59,7 +59,7 @@ export default function ConfigSummary() {
     setInvalid(enabled && newSummary.length === 0);
   }, [content, newSummary]);
 
-  // more component support
+  // image upload not currently activated
   const onImagesUpload = (blobInfo: any) =>
     new Promise<string>(async (resolve, reject) => {
       const res = await saveFile(site?.customerEmail || 'unknown', blobInfo.blob());
