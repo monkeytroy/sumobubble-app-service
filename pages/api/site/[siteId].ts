@@ -7,7 +7,7 @@ import Site from '@/models/site';
 import { ConfigRes, ISite } from './types';
 
 const cors = Cors({
-  methods: ['GET', 'POST', 'DELETE', 'HEAD']
+  methods: ['GET', 'PUT', 'DELETE', 'HEAD']
 });
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes>) {
@@ -15,10 +15,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
   switch (req.method) {
     case 'GET':
-      await get(req, res);
+      await getSite(req, res);
       break;
-    case 'POST':
-      await post(req, res);
+    case 'PUT':
+      await updateSite(req, res);
       break;
     case 'DELETE':
       await deleteSite(req, res);
@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   }
 }
 
-const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
+const getSite = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
   try {
     await connectMongo();
 
@@ -50,7 +50,7 @@ const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
   }
 };
 
-const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
+const updateSite = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
   // route should be protected in middleware - disabled for the moment.
   // const session = await getToken({ req, secret: process.env.JWT_SECRET })
   // early exit if not authorized.

@@ -8,15 +8,15 @@ import { log } from '@/services/log';
 import { ConfigRes, ISite } from './types';
 
 const cors = Cors({
-  methods: ['PUT']
+  methods: ['POST']
 });
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes>) {
   await apiMiddleware(req, res, cors);
 
   switch (req.method) {
-    case 'PUT':
-      await put(req, res);
+    case 'POST':
+      await createSite(req, res);
       break;
     default:
       res.status(405).send({ success: false, message: 'Method unsupported' });
@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
  * @param res
  * @returns
  */
-const put = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
+const createSite = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
   try {
     await connectMongo();
 

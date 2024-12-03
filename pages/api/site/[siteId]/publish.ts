@@ -10,7 +10,7 @@ import { ConfigRes } from '../types';
 // import { Readable } from 'stream';
 
 const cors = Cors({
-  methods: ['POST', 'DELETE', 'HEAD']
+  methods: ['POST', 'HEAD']
 });
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes>) {
@@ -18,14 +18,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
   switch (req.method) {
     case 'POST':
-      await post(req, res);
+      await publishSite(req, res);
       break;
     default:
       res.status(405).send({ success: false, message: 'Method unsupported' });
   }
 }
 
-const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
+const publishSite = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
   const { siteId } = req.query;
   log(`POST: api/site/${siteId}/publish`);
 

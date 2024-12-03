@@ -1,3 +1,4 @@
+import { ISite } from '@/pages/api/site/types';
 import { Schema, model, models } from 'mongoose';
 
 export interface IContactCategory {

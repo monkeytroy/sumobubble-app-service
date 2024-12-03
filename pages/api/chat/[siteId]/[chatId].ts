@@ -35,10 +35,6 @@ const get = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
   }
 };
 
-const invalid = (res: NextApiResponse, reason: string) => {
-  res.status(500).send({ success: false, message: reason });
-};
-
 /**
  * User posted chat message - todo figure out
  *
@@ -47,15 +43,15 @@ const invalid = (res: NextApiResponse, reason: string) => {
  * @returns
  */
 const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
-  const { chatId, siteId } = req.query;
+  const { siteId } = req.query;
 
   const siteIdVal = Array.isArray(siteId) ? siteId[0] : siteId;
-  const chatIdVal = Array.isArray(chatId) ? chatId[0] : chatId;
 
-  log(`api/chat/${siteId}/${chatId}`);
+  log(`api/chat/${siteId}`);
 
   if (!siteIdVal) {
-    return invalid(res, 'Missing site id');
+    res.status(500).send({ success: false, message: 'Missing site id' });
+    return;
   }
 
   try {
@@ -75,12 +71,11 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
     if (text) {
       res.status(200).json({ success: true, message: text });
     } else {
-      log(`Chat failed siteId: ${siteId} and chatId: ${chatId}`);
-      invalid(res, 'Failed to chat');
-      return;
+      const msg = `Chat failed siteId: ${siteId}`;
+      log(msg);
+      res.status(500).send({ success: false, message: msg });
     }
   } catch (err) {
     res.status(405).send({ success: false, message: `Error ${(<Error>err)?.message}` });
-    return;
   }
 };

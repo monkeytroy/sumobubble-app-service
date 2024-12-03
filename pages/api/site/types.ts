@@ -2,6 +2,7 @@
 //   contact = 'contact'
 // }
 
+import { IAskSource } from '@/models/askSource';
 import { ISiteSection } from '@/models/site';
 
 export interface ISite {
@@ -48,4 +49,10 @@ export type ConfigRes = {
   success: boolean;
   message: string;
   data?: ISite;
+};
+
+export type AskSourceRes = {
+  success: boolean;
+  message: string;
+  data?: IAskSource[];
 };
