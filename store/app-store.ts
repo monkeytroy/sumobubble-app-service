@@ -7,6 +7,7 @@ import { getSourceDocuments } from '@/services/source';
 import { ISitesSummary } from '@/services/ssp-default';
 import { toast } from 'react-toastify';
 import { create } from 'zustand';
+import _ from 'lodash';
 
 export interface IAppState {
   sites: Array<ISitesSummary>;
@@ -14,12 +15,14 @@ export interface IAppState {
   siteChanged: boolean;
   customer: ICustomer | null;
   askSources: IAskSource[];
+  saving: boolean;
 
   setCustomer: (val: ICustomer) => void;
   setSites: (val: Array<ISitesSummary>) => void;
   addSite: (siteTitle: string) => void;
   removeSite: (siteId: string) => void;
   setSite: (val: ISite) => void;
+  updateSite: (val: ISite) => void;
   setSiteChanged: (val: boolean) => void;
   enableSection: (val: boolean, section: string) => void;
   refreshAskSources: () => void;
@@ -31,10 +34,15 @@ export const useAppStore = create<IAppState>((set, get) => ({
   siteChanged: false,
   customer: null,
   askSources: [],
+  saving: false,
+
+  setSaving: (val: boolean) => set(() => ({ saving: val })),
 
   setCustomer: (val: ICustomer) => set(() => ({ customer: { ...val } })),
 
   setSites: (val: Array<ISitesSummary>) => set(() => ({ sites: [...val] })),
+
+  setSiteChanged: (val: boolean) => set(() => ({ siteChanged: val })),
 
   addSite: async (siteTitle: string) => {
     // call the service.
@@ -68,13 +76,21 @@ export const useAppStore = create<IAppState>((set, get) => ({
     }
   },
 
-  setSite: (val: ISite) => {
-    preview(val);
+  setSite: (site: ISite) => {
+    // update the preview with the loaded config
+    preview(site);
+    // load the ask documents
     get().refreshAskSources();
-    set(() => ({ site: { ...val } }));
+    // put the site on the store.
+    set(() => ({ site: { ...site } }));
   },
 
-  setSiteChanged: (val: boolean) => set(() => ({ siteChanged: val })),
+  updateSite: async (site: ISite) => {
+    set(() => ({ saving: true }));
+    const newSite = await saveSite(site);
+    get().setSite(newSite);
+    set(() => ({ saving: false }));
+  },
 
   enableSection: async (val: boolean, sectionName: string) => {
     const site = get().site;
