@@ -1,6 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import Cors from 'cors';
-import { apiMiddleware } from '@/services/api-middleware';
 import connectMongo from '@/services/mongoose';
 import { log } from '@/services/log';
 import Site from '@/models/site';
@@ -9,13 +7,7 @@ import { PutObjectCommand, PutObjectRequest } from '@aws-sdk/client-s3';
 import { ConfigRes } from '../types';
 // import { Readable } from 'stream';
 
-const cors = Cors({
-  methods: ['POST', 'HEAD']
-});
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes>) {
-  await apiMiddleware(req, res, cors);
-
   switch (req.method) {
     case 'POST':
       await publishSite(req, res);

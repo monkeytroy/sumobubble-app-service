@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { saveSite } from '@/services/site';
 import { useAppStore } from '@/store/app-store';
 import { Editor } from '@tinymce/tinymce-react';
 import { saveFile } from '@/services/file';
@@ -8,11 +7,11 @@ import { ISection } from './sections';
 import { ConsoleBody } from '@/components/console/console-body';
 
 export const section: ISection = {
-  name: 'info',
-  title: 'Info Summary',
+  name: 'summary',
+  title: 'Summary',
   description: 'Summary info displayed when app is opened',
   icon: <InformationCircleIcon />,
-  class: 'text-sm',
+  class: '',
   component: <ConfigSummary />,
   isInfoSection: false
 };
@@ -20,6 +19,8 @@ export const section: ISection = {
 export default function ConfigSummary() {
   // site and editable values
   const site = useAppStore((state) => state.site);
+  const updateSite = useAppStore((state) => state.updateSite);
+  const saving = useAppStore((state) => state.saving);
 
   const [enabled, setEnabled] = useState(false);
   const [content, setContent] = useState('');
@@ -27,7 +28,6 @@ export default function ConfigSummary() {
 
   // local component state
   const [newSummary, setNewSummary] = useState('');
-  const [saving, setSaving] = useState(false);
   const [invalid, setInvalid] = useState(false);
   const [summaryLoading, setSummaryLoading] = useState(true);
   const editorRef = useRef({} as any);
@@ -48,9 +48,7 @@ export default function ConfigSummary() {
   // save the new site info
   const onSave = async () => {
     if (site) {
-      setSaving(true);
-      await saveSite({ ...site, summary: { enabled, content: newSummary, special } });
-      setTimeout(() => setSaving(false), 2000);
+      await updateSite({ ...site, summary: { enabled, content: newSummary, special } });
     }
   };
 
@@ -73,8 +71,8 @@ export default function ConfigSummary() {
 
   return (
     <ConsoleBody
-      title="Info Summary"
-      subTitle="Summarize your organization."
+      title={section.title}
+      subTitle={section.description}
       invalid={invalid}
       saving={saving}
       onSave={() => onSave()}

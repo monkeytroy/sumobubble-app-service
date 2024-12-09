@@ -103,7 +103,7 @@ export default function NavSide() {
             </div>
 
             <div className={configuration ? '' : 'pointer-events-none select-none opacity-50'}>
-              <ul role="list" className="-mx-2 space-y-1">
+              <ul role="list" className="-mx-2 space-y-1 text-sm">
                 {navigation.map((item) => (
                   <li key={item.name}>
                     <a

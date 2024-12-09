@@ -1,4 +1,3 @@
-import { saveSite } from '@/services/site';
 import { useAppStore } from '@/store/app-store';
 import { ChatBubbleOvalLeftIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { useState, useEffect, useCallback } from 'react';
@@ -14,7 +13,7 @@ export const section: ISection = {
   title: 'Ask AI',
   description: 'An AI powered chat feature based on document sources.',
   icon: <ChatBubbleOvalLeftIcon />,
-  class: 'text-sm',
+  class: '',
   component: <ConfigChatbot />,
   isInfoSection: false
 };
@@ -25,13 +24,14 @@ export default function ConfigChatbot(props: IAppProps) {
   const customer = useAppStore((state) => state.customer);
   const askSources = useAppStore((state) => state.askSources);
   const refreshAskSources = useAppStore((state) => state.refreshAskSources);
+  const updateSite = useAppStore((state) => state.updateSite);
+  const saving = useAppStore((state) => state.saving);
 
   // setup local state for editing.
   const [enabled, setEnabled] = useState(false);
   const chatbot = site?.chatbot;
 
   // local component state
-  const [saving, setSaving] = useState(false);
   const [invalid, setInvalid] = useState(false);
 
   // reset to site state
@@ -48,8 +48,6 @@ export default function ConfigChatbot(props: IAppProps) {
     setInvalid(false);
 
     if (site) {
-      setSaving(true);
-
       // copy configuration
       const newSite = JSON.parse(JSON.stringify(site));
 
@@ -57,9 +55,7 @@ export default function ConfigChatbot(props: IAppProps) {
       newSite.chatbot.enabled = enabled;
 
       // save!
-      await saveSite(newSite);
-
-      setTimeout(() => setSaving(false), 2000);
+      await updateSite(newSite);
     }
   };
 
@@ -132,9 +128,9 @@ export default function ConfigChatbot(props: IAppProps) {
               </div>
             </div>
 
-            <div className="flex flex-col gap-3">
-              <div className="mx-6">
-                {true && (
+            {askSources.length === 0 && (
+              <div className="flex flex-col gap-3">
+                <div className="mx-6">
                   <div className="rounded-md bg-blue-50 p-4">
                     <div className="flex">
                       <div className="flex-shrink-0">
@@ -148,9 +144,9 @@ export default function ConfigChatbot(props: IAppProps) {
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="flex flex-col gap-2">
               <label htmlFor="spotlightUrl" className="text-sm font-medium leading-6 text-gray-900">

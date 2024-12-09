@@ -10,7 +10,7 @@ export interface ISiteSection {
   title?: string;
   enabled: boolean;
   content: string;
-  urls?: string[];
+  url?: string;
   props?: {
     verseRef?: string;
     autoFill?: boolean;
@@ -25,8 +25,8 @@ const sectionSchema = new Schema<ISiteSection>({
   title: { type: String, required: false },
   enabled: { type: Boolean, required: true },
   content: { type: String, trim: true },
-  urls: {
-    type: Array<String>,
+  url: {
+    type: String,
     trim: true,
     required: false
   },

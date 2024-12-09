@@ -1,6 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import Cors from 'cors';
-import { apiMiddleware } from '@/services/api-middleware';
 import { log } from '@/services/log';
 import { AskSourceRes } from '../../site/types';
 import { Fields, Files, IncomingForm, File } from 'formidable';
@@ -9,10 +7,6 @@ import connectMongo from '@/services/mongoose';
 import AskSource, { IAskSource } from '@/models/askSource';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const cors = Cors({
-  methods: ['GET', 'POST', 'DELETE', 'HEAD']
-});
-
 export const config = {
   api: {
     bodyParser: false // Disable Next.js's default body parser
@@ -20,8 +14,6 @@ export const config = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<AskSourceRes>) {
-  await apiMiddleware(req, res, cors);
-
   switch (req.method) {
     case 'GET':
       await getSourceDocs(req, res);

@@ -1,18 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import Cors from 'cors';
-import { apiMiddleware } from '@/services/api-middleware';
 import connectMongo from '@/services/mongoose';
 import { log } from '@/services/log';
 import Site from '@/models/site';
 import { ConfigRes, ISite } from './types';
-
-const cors = Cors({
-  methods: ['GET', 'PUT', 'DELETE', 'HEAD']
-});
+import { getToken } from 'next-auth/jwt';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes>) {
-  await apiMiddleware(req, res, cors);
-
   switch (req.method) {
     case 'GET':
       await getSite(req, res);
@@ -28,6 +21,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   }
 }
 
+/**
+ * Get site could be disabled as it's no longer needed after moving to a file based publish.
+ * @param req
+ * @param res
+ */
 const getSite = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
   try {
     await connectMongo();
@@ -50,14 +48,20 @@ const getSite = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => 
   }
 };
 
+/**
+ * Update the site on user edits.
+ * @param req
+ * @param res
+ */
 const updateSite = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
-  // route should be protected in middleware - disabled for the moment.
-  // const session = await getToken({ req, secret: process.env.JWT_SECRET })
+  // route should be protected
+  // todo middleware or lib function for protected routes.
+  const session = await getToken({ req, secret: process.env.JWT_SECRET });
   // early exit if not authorized.
-  // if (!session) {
-  //   res.status(403).send({ success: false, message: 'Unauthorized'});
-  //   return
-  // }
+  if (!session) {
+    res.status(403).send({ success: false, message: 'Unauthorized' });
+    return;
+  }
 
   const { siteId } = req.query;
   log(`PUT: api/site/${siteId}`);
@@ -67,16 +71,19 @@ const updateSite = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) 
 
     const siteConfig: ISite = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
-    // massage the spotlight urls if needed
-    // todo - verify UI should not let it get this far
+    // massage the spotlight url if needed
     const spotlight = siteConfig.sections['spotlight'];
-    if (spotlight?.urls) {
-      let spotlightUrl = spotlight.urls[0];
-      if (spotlightUrl.indexOf('watch?v=') > 0) {
-        spotlightUrl = spotlightUrl.replace('watch?v=', 'embed/');
-        spotlight.urls = [spotlightUrl];
+    if (spotlight?.url) {
+      const YT_KEY = 'watch?v=';
+      if (spotlight.url.indexOf(YT_KEY) > 0) {
+        const urlParts = spotlight.url.split(YT_KEY);
+        if (urlParts.length > 1) {
+          spotlight.url = `https://www.youtube.com/embed/${urlParts[1]}`;
+        }
       }
     }
+
+    siteConfig.title = siteConfig.title.trim();
 
     // find or create
     const site = await Site.findOneAndUpdate({ _id: siteId }, siteConfig, {
@@ -95,6 +102,11 @@ const updateSite = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) 
   }
 };
 
+/**
+ * Delete a site
+ * @param req
+ * @param res
+ */
 const deleteSite = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
   const { siteId } = req.query;
   log(`DELETE: api/site/${siteId}`);
@@ -113,45 +125,3 @@ const deleteSite = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) 
     res.status(500).send({ success: false, message: `Error ${(<Error>err)?.message}` });
   }
 };
-
-// disabled for now
-// const getDailyFunny = async (siteConfig: any) => {
-//   log('getDailyFunny -------------------------------------------------------');
-//   const funny = JSON.parse(JSON.stringify(siteConfig.sections.get('funny') || {}));
-
-//   if (funny && funny.enabled) {
-//     const d = new Date();
-//     const findToday = parseInt(d.toISOString().split('T')[0].replace(/\-/g, ''));
-
-//     log('funny: ', funny);
-
-//     if (funny?.props?.autoFill) {
-//       // fall back on disabled
-//       funny.enabled = false;
-//       try {
-//         const funnyRes: Array<IFunny> = await Funny.find({ day: { $lte: findToday } })
-//           .sort({ day: -1 })
-//           .limit(1);
-//         //log('funnyRes: ', funnyRes);
-
-//         if (funnyRes[0]) {
-//           const daily = funnyRes[0];
-//           log('daily: ', daily, daily.urls);
-
-//           // merge in the funny lines.
-//           funny.content = daily.content;
-//           funny.urls = [...daily.urls];
-//           log('funny: ', funny);
-
-//           funny.enabled = true;
-//           siteConfig.sections.set('funny', funny);
-//           log('getDailyFunny is setting funny section to: ', siteConfig);
-//         }
-//       } catch (err) {
-//         console.log('Could not pull in funny for today.', err);
-//       }
-//     }
-//   } else {
-//     log('funny: No funny section detected to fill with daily');
-//   }
-// };

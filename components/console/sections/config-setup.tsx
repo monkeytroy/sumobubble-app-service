@@ -2,10 +2,8 @@ import { useAppStore } from '@/store/app-store';
 import { CogIcon } from '@heroicons/react/24/outline';
 import { ISection } from './sections';
 import { useCallback, useEffect, useState } from 'react';
-import { saveSite } from '@/services/site';
 import { TwitterPicker } from 'react-color';
 import { ConsoleBody } from '@/components/console/console-body';
-import { formClass } from '@/constants/form-class';
 import { SubscriptionStatus } from '@/models/customer';
 import { IAppProps } from '@/services/ssp-default';
 
@@ -16,7 +14,7 @@ export const section: ISection = {
   title: 'Site Setup',
   description: 'Name, setup, and deploy this site.',
   icon: <CogIcon></CogIcon>,
-  class: 'text-sm',
+  class: '',
   component: <ConfigSetup />,
   isInfoSection: false
 };
@@ -63,6 +61,8 @@ export default function ConfigSetup(props: IAppProps) {
   // site and editable values
   const site = useAppStore((state: any) => state.site);
   const customer = useAppStore((state: any) => state.customer);
+  const updateSite = useAppStore((state) => state.updateSite);
+  const saving = useAppStore((state) => state.saving);
 
   const [title, setTitle] = useState('');
   const [themePrimary, setThemePrimary] = useState(DEFAULT_THEME_COLOR);
@@ -70,7 +70,6 @@ export default function ConfigSetup(props: IAppProps) {
 
   // local component state
   const [showPickColor, setShowPickColor] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [invalid, setInvalid] = useState(false);
 
   // reset to site state
@@ -88,9 +87,7 @@ export default function ConfigSetup(props: IAppProps) {
   // save the new site info.
   const onSave = async () => {
     if (site) {
-      setSaving(true);
-      await saveSite({ ...site, title: title, theme: { primary: themePrimary }, button });
-      setTimeout(() => setSaving(false), 1000);
+      await updateSite({ ...site, title: title, theme: { primary: themePrimary }, button });
     }
   };
 
@@ -135,7 +132,12 @@ export default function ConfigSetup(props: IAppProps) {
                     id="title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className={formClass}
+                    className="peer disabled:opacity-30
+                      block w-full rounded-md border-0 text-gray-900 
+                      invalid:text-red-900 shadow-sm py-1.5 pr-10
+                      ring-1 ring-inset ring-gray-300 invalid:ring-red-300 placeholder:text-gray-300
+                      focus:ring-2 focus:ring-inset focus:ring-indigo-600 
+                      invalid:focus:ring-red-300 sm:py-1.5 sm:text-sm sm:leading-6"
                   />
                 </div>
               </div>

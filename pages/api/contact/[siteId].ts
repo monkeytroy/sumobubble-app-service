@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
 import { mailIt } from '@/services/mail';
-import { apiMiddleware } from '@/services/api-middleware';
+import { apiMiddleware } from '@/lib/api-middleware';
 import connectMongo from '@/services/mongoose';
 import Site, { IContactCategory } from '@/models/site';
 import { log } from '@/services/log';

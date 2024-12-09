@@ -1,5 +1,14 @@
 import { Fragment } from 'react';
-import { Disclosure, Menu, Transition } from '@headlessui/react';
+import {
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+  Transition
+} from '@headlessui/react';
 import { Bars3Icon, BellIcon, UserCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useSession, signOut, signIn } from 'next-auth/react';
 import Image from 'next/image';
@@ -56,12 +65,12 @@ export default function Nav() {
                 {session && session?.user?.name && (
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                      <MenuButton className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         <span className="sr-only">Open customer menu</span>
                         <div className="h-8 w-8 rounded-full flex justify-center items-center text-gray-500 hover:text-gray-800">
                           <UserCircleIcon></UserCircleIcon>
                         </div>
-                      </Menu.Button>
+                      </MenuButton>
                     </div>
                     <Transition
                       as={Fragment}
@@ -71,15 +80,18 @@ export default function Nav() {
                       leave="transition ease-in duration-75"
                       leaveFrom="transform opacity-100 scale-100"
                       leaveTo="transform opacity-0 scale-95">
-                      <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        <Menu.Item>
+                      <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <MenuItem>
                           <div className="flex items-center px-2 py-2">
                             <div>
-                              <img
-                                className="inline-block h-9 w-9 rounded-full"
-                                src={session?.user.image || ''}
-                                alt="user"
-                              />
+                              {session?.user.image && (
+                                <img
+                                  className="inline-block h-9 w-9 rounded-full"
+                                  referrerPolicy="no-referrer"
+                                  src={session.user.image || ''}
+                                  alt="user"
+                                />
+                              )}
                             </div>
                             <div className="ml-3">
                               <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
@@ -90,8 +102,8 @@ export default function Nav() {
                               </p>
                             </div>
                           </div>
-                        </Menu.Item>
-                        <Menu.Item>
+                        </MenuItem>
+                        <MenuItem>
                           {({ active }: { active: boolean }) => (
                             <a
                               href="#"
@@ -103,27 +115,27 @@ export default function Nav() {
                               Sign out
                             </a>
                           )}
-                        </Menu.Item>
-                      </Menu.Items>
+                        </MenuItem>
+                      </MenuItems>
                     </Transition>
                   </Menu>
                 )}
               </div>
               <div className="-mr-2 flex items-center sm:hidden">
                 {/* Mobile menu button */}
-                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                <DisclosureButton className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
                     <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
                   ) : (
                     <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
                   )}
-                </Disclosure.Button>
+                </DisclosureButton>
               </div>
             </div>
           </div>
 
-          <Disclosure.Panel className="sm:hidden">
+          <DisclosurePanel className="sm:hidden">
             <div className="space-y-1 pb-3 pt-2">
               {/* Current: "bg-indigo-50 border-indigo-500 text-indigo-700", Default: "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700" */}
               <Disclosure.Button
@@ -155,15 +167,15 @@ export default function Nav() {
                 </button>
               </div>
               <div className="mt-3 space-y-1">
-                <Disclosure.Button
+                <DisclosureButton
                   as="a"
                   href="#"
                   className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800">
                   Sign out
-                </Disclosure.Button>
+                </DisclosureButton>
               </div>
             </div>
-          </Disclosure.Panel>
+          </DisclosurePanel>
         </>
       )}
     </Disclosure>

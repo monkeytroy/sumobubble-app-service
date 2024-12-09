@@ -1,6 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import Cors from 'cors';
-import { apiMiddleware } from '@/services/api-middleware';
 import connectMongo from '@/services/mongoose';
 import Customer, { ICustomer, SubscriptionStatus } from '@/models/customer';
 import { log } from '@/services/log';
@@ -47,13 +45,7 @@ import { ConfigRes } from './site/types';
  *   trial_end, _start, _settings
  */
 
-const cors = Cors({
-  methods: ['POST', 'HEAD']
-});
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes>) {
-  await apiMiddleware(req, res, cors);
-
   switch (req.method) {
     case 'POST':
       await post(req, res);

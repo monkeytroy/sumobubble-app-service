@@ -3,15 +3,6 @@ import { Dialog, Transition } from '@headlessui/react';
 import { useState, Fragment } from 'react';
 import { IAppProps } from '@/services/ssp-default';
 
-// Define the stripe table
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'stripe-pricing-table': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-    }
-  }
-}
-
 interface IConsolePricingProps extends IAppProps {
   startClosed?: boolean;
 }

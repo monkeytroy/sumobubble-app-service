@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
-import { apiMiddleware } from '@/services/api-middleware';
+import { apiMiddleware } from '@/lib/api-middleware';
 import { log } from '@/services/log';
 import { IApiRes } from '../../site/types';
 import { GoogleGenerativeAI } from '@google/generative-ai';

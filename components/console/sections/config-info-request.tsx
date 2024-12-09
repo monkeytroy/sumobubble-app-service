@@ -1,4 +1,3 @@
-import { saveSite } from '@/services/site';
 import { useAppStore } from '@/store/app-store';
 import { ExclamationCircleIcon, MinusCircleIcon, StarIcon } from '@heroicons/react/24/outline';
 import { useState, useEffect, useCallback } from 'react';
@@ -11,7 +10,7 @@ export const section: ISection = {
   title: 'Info Request',
   description: 'Configurable information requests.',
   icon: <StarIcon />,
-  class: 'ml-2 text-xs',
+  class: '',
   component: <ConfigInfoRequest />,
   isInfoSection: true
 };
@@ -19,6 +18,8 @@ export const section: ISection = {
 export default function ConfigInfoRequest() {
   // site and editable values
   const site = useAppStore((state) => state.site);
+  const updateSite = useAppStore((state) => state.updateSite);
+  const saving = useAppStore((state) => state.saving);
   const thisSection: ISiteSection | undefined = site?.sections[section.name];
 
   // setup local state for editing.
@@ -30,7 +31,6 @@ export default function ConfigInfoRequest() {
   // local component state
   const [newCategory, setNewCategory] = useState('');
   const [newCategoryEmail, setNewCategoryEmail] = useState('');
-  const [saving, setSaving] = useState(false);
   const [invalid, setInvalid] = useState(false);
 
   // reset to site state
@@ -55,8 +55,6 @@ export default function ConfigInfoRequest() {
     }
 
     if (site) {
-      setSaving(true);
-
       // create the new section
       const newSection: ISiteSection = {
         enabled,
@@ -68,15 +66,13 @@ export default function ConfigInfoRequest() {
       };
 
       // save the new site
-      await saveSite({
+      await updateSite({
         ...site,
         sections: {
           ...site.sections,
           [section.name]: { ...newSection }
         }
       });
-
-      setTimeout(() => setSaving(false), 2000);
     }
   };
 

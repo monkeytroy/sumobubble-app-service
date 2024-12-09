@@ -1,4 +1,3 @@
-import { saveSite } from '@/services/site';
 import { useAppStore } from '@/store/app-store';
 import { ExclamationCircleIcon, TvIcon } from '@heroicons/react/24/outline';
 import { useState, useEffect, useCallback } from 'react';
@@ -11,7 +10,7 @@ export const section: ISection = {
   title: 'Spotlight',
   description: 'A video or channel to spotlight for your guests.',
   icon: <TvIcon />,
-  class: 'ml-2 text-xs',
+  class: '',
   component: <ConfigSpotlight />,
   isInfoSection: true
 };
@@ -19,22 +18,24 @@ export const section: ISection = {
 export default function ConfigSpotlight() {
   // load this site and editable values
   const site = useAppStore((state) => state.site);
+  const updateSite = useAppStore((state) => state.updateSite);
+  const saving = useAppStore((state) => state.saving);
+
   const thisSection: ISiteSection | undefined = site?.sections[section.name];
 
   // setup local state for editing.
   const [enabled, setEnabled] = useState(false);
   const [content, setContent] = useState('');
-  const [urls, setUrls] = useState([] as Array<string>);
+  const [url, setUrl] = useState('');
 
   // local component state
-  const [saving, setSaving] = useState(false);
   const [invalid, setInvalid] = useState(false);
 
   // reset to site state
   const reset = useCallback(() => {
     setEnabled(!!thisSection?.enabled);
     setContent(thisSection?.content || '');
-    setUrls(thisSection?.urls || ['']);
+    setUrl(thisSection?.url || '');
   }, [thisSection]);
 
   // reset to modified site upon changes from state
@@ -44,7 +45,7 @@ export default function ConfigSpotlight() {
 
   useEffect(() => {
     if (!enabled) {
-      setUrls(['']);
+      setUrl('');
     }
   }, [enabled]);
 
@@ -55,26 +56,22 @@ export default function ConfigSpotlight() {
     }
 
     if (site) {
-      setSaving(true);
-
       // create the new section
       const newSection: ISiteSection = {
         enabled,
         content,
-        urls,
+        url,
         props: {}
       };
 
       // save the new site
-      await saveSite({
+      await updateSite({
         ...site,
         sections: {
           ...site.sections,
           [section.name]: { ...newSection }
         }
       });
-
-      setTimeout(() => setSaving(false), 2000);
     }
   };
 
@@ -82,8 +79,8 @@ export default function ConfigSpotlight() {
   useEffect(() => {
     var regExp = /^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+$/;
     // only one for now
-    setInvalid(enabled && !regExp.test(urls[0]));
-  }, [urls, enabled]);
+    setInvalid(enabled && !regExp.test(url));
+  }, [url, enabled]);
 
   return (
     <ConsoleBody
@@ -148,8 +145,8 @@ export default function ConfigSpotlight() {
                 name="spotlightUrl"
                 id="spotlightUrl"
                 placeholder="Paste the URL from the embed code from YouTube share"
-                value={urls}
-                onChange={(e) => setUrls([e.target.value])}
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
                 className="peer disabled:opacity-30
                   block w-full rounded-md border-0 text-gray-900 invalid:text-red-900 shadow-sm py-1.5 pr-10 
                   ring-1 ring-inset ring-gray-300 invalid:ring-red-300 placeholder:text-gray-300 
