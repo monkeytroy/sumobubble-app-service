@@ -14,8 +14,7 @@ export const section: ISection = {
   description: 'An AI powered chat feature based on document sources.',
   icon: <ChatBubbleOvalLeftIcon />,
   class: '',
-  component: <ConfigChatbot />,
-  isInfoSection: false
+  component: <ConfigChatbot />
 };
 
 export default function ConfigChatbot(props: IAppProps) {

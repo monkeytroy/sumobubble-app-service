@@ -11,8 +11,7 @@ export const section: ISection = {
   description: 'Configurable information requests.',
   icon: <StarIcon />,
   class: '',
-  component: <ConfigInfoRequest />,
-  isInfoSection: true
+  component: <ConfigInfoRequest />
 };
 
 export default function ConfigInfoRequest() {

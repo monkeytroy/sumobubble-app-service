@@ -6,8 +6,8 @@ import { useEffect, useState } from 'react';
 import { publishSite } from '@/src/services/site';
 import { toast } from 'react-toastify';
 import { SubscriptionStatus } from '@/src/models/customer';
-import { useClassNames } from '@/src/hooks/classnames';
 import { ISection } from './types';
+import { combineClassnames } from '@/src/lib/classnames';
 
 // configuration so 'current' works.
 const navigation: Array<ISection> = [...sections];
@@ -58,14 +58,14 @@ export default function NavSide() {
             <ul role="list" className="-mx-2 space-y-1">
               <a
                 href={`/console`}
-                className={useClassNames(
+                className={combineClassnames(
                   currentRoute == '/console'
                     ? 'bg-indigo-700 text-white'
                     : 'text-indigo-200 hover:text-white hover:bg-indigo-700',
                   'group flex gap-x-3 rounded-md p-2 leading-6 font-semibold'
                 )}>
                 <span
-                  className={useClassNames(
+                  className={combineClassnames(
                     currentRoute == '/console' ? 'text-white' : 'text-indigo-200 group-hover:text-white',
                     'h-6 w-6 shrink-0'
                   )}
@@ -106,7 +106,7 @@ export default function NavSide() {
                   <li key={item.name}>
                     <a
                       href={`/console/site/${siteId}/${item.name}`}
-                      className={useClassNames(
+                      className={combineClassnames(
                         item.class,
                         current(item)
                           ? 'bg-indigo-700 text-white'
@@ -114,7 +114,7 @@ export default function NavSide() {
                         'group flex gap-x-3 rounded-md p-2 leading-6 font-semibold'
                       )}>
                       <span
-                        className={useClassNames(
+                        className={combineClassnames(
                           current(item) ? 'text-white' : 'text-indigo-200 group-hover:text-white',
                           'h-6 w-6 shrink-0'
                         )}

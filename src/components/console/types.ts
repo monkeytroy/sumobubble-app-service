@@ -6,8 +6,7 @@ export interface ISection {
   description: string;
   icon: ReactElement;
   class: string;
-  component?: ReactElement;
-  isInfoSection?: boolean;
+  component: ReactElement;
 }
 
 export interface IConsoleHeadingProps {

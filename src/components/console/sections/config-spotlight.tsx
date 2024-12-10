@@ -11,8 +11,7 @@ export const section: ISection = {
   description: 'A video or channel to spotlight for your guests.',
   icon: <TvIcon />,
   class: '',
-  component: <ConfigSpotlight />,
-  isInfoSection: true
+  component: <ConfigSpotlight />
 };
 
 export default function ConfigSpotlight() {

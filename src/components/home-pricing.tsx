@@ -21,13 +21,16 @@ export default function HomePricing(props: IAppProps) {
               onClick={() => signIn('auth0', { callbackUrl: '/#pricing' })}></div>
           )}
 
-          {props.stripe?.key && props.stripe?.homeId && (
-            <stripe-pricing-table
-              customer-email={session?.user?.email}
-              success-url="/console/thanks"
-              pricing-table-id={props.stripe?.homeId}
-              publishable-key={props.stripe?.key}></stripe-pricing-table>
-          )}
+          <div data-testid="pricing-table-container">
+            {props.stripe?.key && props.stripe?.homeId && (
+              <stripe-pricing-table
+                data-testid="pricing-table"
+                customer-email={session?.user?.email}
+                success-url="/console/thanks"
+                pricing-table-id={props.stripe?.homeId}
+                publishable-key={props.stripe?.key}></stripe-pricing-table>
+            )}
+          </div>
         </div>
       </div>
     </div>

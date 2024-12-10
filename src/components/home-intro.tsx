@@ -21,10 +21,12 @@ export default function HomePricing(props: IAppProps) {
           </div>
         </div>
         <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">SumoBubble</h1>
+          <h1 data-testid="main-title" className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+            SumoBubble
+          </h1>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            An easy to create and use helper for your organizations website. Chat, summarized info, easy feedback and
-            more.
+            An simple helper for your organizations website. Summarized information, Ask AI about your content, easy
+            feedback and more.
           </p>
           {false && (
             <div className="mt-10 flex items-center justify-center gap-x-6">

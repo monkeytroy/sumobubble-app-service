@@ -13,7 +13,7 @@ import { Bars3Icon, BellIcon, UserCircleIcon, XMarkIcon } from '@heroicons/react
 import { useSession, signOut, signIn } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useClassNames } from '@/src/hooks/classnames';
+import { combineClassnames } from '@/src/lib/classnames';
 
 export default function Nav() {
   const { data: session } = useSession();
@@ -43,7 +43,7 @@ export default function Nav() {
                 </div>
                 <div className="flex items-center">
                   {session && (
-                    <Link href="/console" className="text-normal font-semibold leading-6">
+                    <Link data-testid="link-console" href="/console" className="text-normal font-semibold leading-6">
                       Console
                     </Link>
                   )}
@@ -81,11 +81,13 @@ export default function Nav() {
                         <MenuItem>
                           <div className="flex items-center px-2 py-2">
                             <div>
-                              {session?.user.image && (
-                                <img
+                              {session?.user?.image && (
+                                <Image
                                   className="inline-block h-9 w-9 rounded-full"
                                   referrerPolicy="no-referrer"
-                                  src={session.user.image || ''}
+                                  src={session.user.image}
+                                  width="36"
+                                  height="36"
                                   alt="user"
                                 />
                               )}
@@ -104,7 +106,7 @@ export default function Nav() {
                           {({ active }: { active: boolean }) => (
                             <a
                               href="#"
-                              className={useClassNames(
+                              className={combineClassnames(
                                 active ? 'bg-gray-100' : '',
                                 'block px-4 py-2 text-sm text-gray-700'
                               )}

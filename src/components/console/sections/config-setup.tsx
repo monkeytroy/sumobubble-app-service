@@ -17,8 +17,7 @@ export const section: ISection = {
   description: 'Name, setup, and deploy this site.',
   icon: <CogIcon></CogIcon>,
   class: '',
-  component: <ConfigSetup />,
-  isInfoSection: false
+  component: <ConfigSetup />
 };
 
 export default function ConfigSetup(props: IAppProps) {

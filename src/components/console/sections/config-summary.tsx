@@ -12,8 +12,7 @@ export const section: ISection = {
   description: 'Summary info displayed when app is opened',
   icon: <InformationCircleIcon />,
   class: '',
-  component: <ConfigSummary />,
-  isInfoSection: false
+  component: <ConfigSummary />
 };
 
 export default function ConfigSummary() {
@@ -55,7 +54,7 @@ export default function ConfigSummary() {
   // validation.  effect on values. Set invalid.
   useEffect(() => {
     setInvalid(enabled && newSummary.length === 0);
-  }, [content, newSummary]);
+  }, [enabled, content, newSummary]);
 
   // image upload not currently activated
   const onImagesUpload = (blobInfo: { blob: () => Blob }) =>
