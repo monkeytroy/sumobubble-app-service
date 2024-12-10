@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
-import { apiMiddleware } from '@/lib/api-middleware';
-import { log } from '@/services/log';
-import { IApiRes } from '../../site/types';
+import { apiMiddleware } from '@/src/lib/api-middleware';
+import { log } from '@/src/lib/log';
+import { IApiRes } from '../../types';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import AskSource from '@/models/askSource';
-import connectMongo from '@/services/mongoose';
+import AskSource from '@/src/models/askSource';
+import connectMongo from '@/src/lib/mongoose';
 
 const cors = Cors({
   methods: ['GET', 'POST', 'HEAD']

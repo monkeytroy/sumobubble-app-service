@@ -1,17 +1,28 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Cors from 'cors';
-import { mailIt } from '@/services/mail';
-import { apiMiddleware } from '@/lib/api-middleware';
-import connectMongo from '@/services/mongoose';
-import Site, { IContactCategory } from '@/models/site';
-import { log } from '@/services/log';
-import { ContactRes, ContactData } from './types';
+import { mailIt } from '@/src/services/mail';
+import { apiMiddleware } from '@/src/lib/api-middleware';
+import connectMongo from '@/src/lib/mongoose';
+import Site, { IContactCategory } from '@/src/models/site';
+import { log } from '@/src/lib/log';
+import { IApiRes } from '@/pages/api/types';
 
 const cors = Cors({
   methods: ['POST', 'GET', 'HEAD']
 });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<ContactRes>) {
+type ContactData = {
+  section: string;
+  category?: string;
+  email: string;
+  name: string;
+  message: string;
+  phone?: string;
+  moreInfo?: boolean;
+  token: string;
+};
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse<IApiRes>) {
   await apiMiddleware(req, res, cors);
 
   if (req.method !== 'POST') {

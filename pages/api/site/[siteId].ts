@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import connectMongo from '@/services/mongoose';
-import { log } from '@/services/log';
-import Site from '@/models/site';
-import { ConfigRes, ISite } from './types';
+import connectMongo from '@/src/lib/mongoose';
+import { log } from '@/src/lib/log';
+import Site, { ISite } from '@/src/models/site';
+import { ConfigRes } from '../types';
 import { getToken } from 'next-auth/jwt';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes>) {

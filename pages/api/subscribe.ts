@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import connectMongo from '@/services/mongoose';
-import Customer, { ICustomer, SubscriptionStatus } from '@/models/customer';
-import { log } from '@/services/log';
-import { ConfigRes } from './site/types';
+import connectMongo from '@/src/lib/mongoose';
+import Customer, { ICustomer, SubscriptionStatus } from '@/src/models/customer';
+import { log } from '@/src/lib/log';
+import { ConfigRes } from './types';
 
 /**
  * The following stripe hook 'event' objects are most important currently.
@@ -45,6 +45,17 @@ import { ConfigRes } from './site/types';
  *   trial_end, _start, _settings
  */
 
+interface StripeEvent {
+  object: string;
+  id: string;
+  email: string;
+  customer: string;
+  status: string;
+  plan: {
+    product: string;
+  };
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes>) {
   switch (req.method) {
     case 'POST':
@@ -74,7 +85,7 @@ const post = async (req: NextApiRequest, res: NextApiResponse<ConfigRes>) => {
  * TODO Replace with queue event.
  * @param eventObject
  */
-const linkCustomer = async (eventObject: any) => {
+const linkCustomer = async (eventObject: StripeEvent) => {
   if (eventObject.object == 'customer') {
     const id = eventObject.id;
     const email = eventObject.email;
@@ -105,7 +116,7 @@ const linkCustomer = async (eventObject: any) => {
  * TODO Replace with queue
  * @param eventObject
  */
-const updateSubscription = async (eventObject: any) => {
+const updateSubscription = async (eventObject: StripeEvent) => {
   if (eventObject.object == 'subscription') {
     const customerId = eventObject.customer;
     const status = eventObject.status;

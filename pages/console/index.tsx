@@ -1,6 +1,7 @@
-import { AccountSettings } from '@/components/console/account-settings';
-import { getServerSideProps, IAppProps } from '@/services/ssp-default';
-import { useAppStore } from '@/store/app-store';
+import { AccountSettings } from '@/src/components/console/account-settings';
+import { getServerSideProps } from '@/src/services/ssp-default';
+import { IAppProps } from '@/src/services/types';
+import { useAppStore } from '@/src/store/app-store';
 import { useEffect } from 'react';
 
 export default function Console(props: IAppProps) {

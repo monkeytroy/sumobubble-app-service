@@ -1,4 +1,4 @@
-import { ROUTES } from '@/constants/misc';
+import { ROUTES } from '@/src/constants/routes';
 import router from 'next/router';
 
 export default function Thanks() {

@@ -1,9 +1,9 @@
 import { ReactElement } from 'react';
 import { ToastContainer } from 'react-toastify';
-import Footer from '../components/footer';
-import Nav from '../components/nav';
-import NavSide from '../components/console/nav-side';
-import AppScript from '@/components/app-script';
+import Footer from '@/src/components/footer';
+import Nav from '@/src/components/nav';
+import NavSide from '@/src/components/console/nav-side';
+import AppScript from '@/src/components/app-script';
 
 export default function Layout({ siteId, children }: { siteId: string; children: ReactElement }) {
   return (

@@ -1,16 +1,19 @@
-import { IAppProps, getServerSideProps } from '@/services/ssp-default';
-import { useAppStore } from '@/store/app-store';
+import { IAppProps } from '@/src/services/types';
+import { useAppStore } from '@/src/store/app-store';
 import { useEffect } from 'react';
 
-import HomePricing from '@/components/home-pricing';
-import HomeFeatures from '@/components/home-features';
-import HomeIntro from '@/components/home-intro';
+import HomePricing from '@/src/components/home-pricing';
+import HomeFeatures from '@/src/components/home-features';
+import HomeIntro from '@/src/components/home-intro';
+import { getServerSideProps } from '@/src/services/ssp-default';
 
 export default function Home(props: IAppProps) {
-  const setCustomer = useAppStore((state: any) => state.setCustomer);
+  const setCustomer = useAppStore((state) => state.setCustomer);
 
   useEffect(() => {
-    setCustomer(props.customer);
+    if (props.customer) {
+      setCustomer(props.customer);
+    }
   }, [setCustomer, props]);
 
   return (

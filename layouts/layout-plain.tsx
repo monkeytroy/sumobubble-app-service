@@ -1,6 +1,6 @@
 import { ReactElement } from 'react';
-import Footer from '../components/footer';
-import Nav from '../components/nav';
+import Footer from '@/src/components/footer';
+import Nav from '@/src/components/nav';
 
 export default function LayoutPlain({ children }: { children: ReactElement }) {
   return (

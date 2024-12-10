@@ -1,7 +1,7 @@
-import NextAuth, { IUser, Session } from 'next-auth';
-import clientPromise from './lib/mongo-client';
+import NextAuth, { Session, User } from 'next-auth';
+import clientPromise from '@/pages/api/auth/lib/mongo-client';
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
-import { log } from '@/services/log';
+import { log } from '@/src/lib/log';
 import { JWT } from 'next-auth/jwt/types';
 import Auth0Provider from 'next-auth/providers/auth0';
 
@@ -30,25 +30,23 @@ export const authOptions = {
     })
   ],
   callbacks: {
-    async signIn(user: any) {
+    async signIn(session: { user: User | undefined }) {
       log('signIn  ----------------------------------------------------');
       try {
         //the user object is wrapped in another user object so extract it
-        log(`Sign in callback user ${JSON.stringify(user)}`);
-        user = user.user;
-
-        if (typeof user.id !== typeof undefined) {
-          return user;
-        } else {
-          log('User id was undefined');
-          return false;
+        log(`Sign in callback user ${JSON.stringify(session)}`);
+        if (session?.user?.id) {
+          return true;
         }
+
+        log('User id was not found');
       } catch (err) {
         console.error('Signin callback error:', err);
       }
+      return false;
     },
 
-    async jwt({ token, user, account, profile }: { token: JWT; account?: any; profile?: any; user?: IUser }) {
+    async jwt({ token }: { token: JWT }) {
       //console.log('jwt ----------------------------------------------------');
       //console.log(`JWT token: `, token);
       // only provided the first time after sign in.
@@ -96,14 +94,14 @@ export const authOptions = {
     // }
   },
   logger: {
-    error(code: any, metadata: any) {
+    error(code: string, metadata: any) {
       console.error(code, metadata);
     },
-    warn(code: any) {
+    warn(code: string) {
       console.warn(code);
     },
-    debug(code: any, metadata: any) {
-      //console.debug(code, metadata)
+    debug(code: string, metadata: any) {
+      console.debug(code, metadata);
     }
   }
 };

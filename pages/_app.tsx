@@ -11,6 +11,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import '@/styles/globals.css';
 import '@/styles/summary.scss';
 
+/**
+ * Module only types
+ */
+
 type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
 };
@@ -31,7 +35,6 @@ const ThisLayoutConsole = (page: ReactElement) => {
 
 const App = ({ Component, pageProps }: AppPropsWithLayout) => {
   const router = useRouter();
-  const { session, ...justThePageProps } = pageProps;
 
   const getLayout = Component.getLayout || (router.route.startsWith('/console') ? ThisLayoutConsole : ThisLayoutPlain);
 
@@ -44,7 +47,7 @@ const App = ({ Component, pageProps }: AppPropsWithLayout) => {
           content="Welcome. SumoBubble is a powerful and easy to use helper for your website providing AI Q&A and simple summary details to your visitors."
         />
       </Head>
-      <SessionProvider session={session}>{getLayout(<Component {...justThePageProps} />)}</SessionProvider>
+      <SessionProvider session={pageProps.session}>{getLayout(<Component {...pageProps} />)}</SessionProvider>
     </>
   );
 };

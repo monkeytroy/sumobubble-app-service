@@ -1,4 +1,4 @@
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 export default function Error() {
   return (
@@ -11,13 +11,11 @@ export default function Error() {
           <div className="ml-3">
             <div className="text-sm font-medium text-yellow-800">Oh no!</div>
             <div className="mt-2 text-sm text-yellow-700">
-              <p>
-                There is a problem loading the account details.  Please notify support!
-              </p>
+              <p>There is a problem loading the account details. Please notify support!</p>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

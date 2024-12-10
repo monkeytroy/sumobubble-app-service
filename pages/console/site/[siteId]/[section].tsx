@@ -1,10 +1,11 @@
 import 'react-toastify/dist/ReactToastify.css';
 import { ReactElement, useEffect } from 'react';
-import { useAppStore } from '@/store/app-store';
-import { getServerSideProps, ISiteProps } from '@/services/ssp-site';
+import { useAppStore } from '@/src/store/app-store';
+import { getServerSideProps } from '@/src/services/ssp-site';
 import { useRouter } from 'next/router';
-import { sections } from '@/components/console/sections/sections';
+import { sections } from '@/src/components/console/sections/sections';
 import React from 'react';
+import { ISiteProps } from '@/src/services/types';
 
 export default function SectionPage(props: ISiteProps) {
   const router = useRouter();

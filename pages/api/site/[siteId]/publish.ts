@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import connectMongo from '@/services/mongoose';
-import { log } from '@/services/log';
-import Site from '@/models/site';
-import { getS3Client } from '@/services/s3';
+import connectMongo from '@/src/lib/mongoose';
+import { log } from '@/src/lib/log';
+import Site from '@/src/models/site';
+import { getS3Client } from '@/src/lib/s3';
 import { PutObjectCommand, PutObjectRequest } from '@aws-sdk/client-s3';
-import { ConfigRes } from '../types';
+import { ConfigRes } from '../../types';
 // import { Readable } from 'stream';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<ConfigRes>) {

@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { log } from '@/services/log';
-import { AskSourceRes } from '../../site/types';
+import { log } from '@/src/lib/log';
+import { AskSourceRes } from '../../types';
 import { Fields, Files, IncomingForm, File } from 'formidable';
 import fs from 'node:fs';
-import connectMongo from '@/services/mongoose';
-import AskSource, { IAskSource } from '@/models/askSource';
+import connectMongo from '@/src/lib/mongoose';
+import AskSource, { IAskSource } from '@/src/models/askSource';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const config = {

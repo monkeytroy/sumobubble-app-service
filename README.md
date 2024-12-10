@@ -60,24 +60,3 @@ DB config manually created to start. At some point will be schema based...
 }
 
 ```
-
-## Debounce
-
-Example for reference
-
-```
-  // setup debounced save.. do we need this for button based?
-  const debounceSave = useCallback(
-    debounce((_site: ISite, _title: string, _themePrimary: string) => {
-      if (_site) {
-        setSaving(true);
-        saveSite({..._site, title: _title, theme: {primary: _themePrimary}});
-        setTimeout(() => setSaving(false), 1000);
-      }
-    }, 100),
-  []);
-
-  const onSave = () => {
-    debounceSave(site, title, themePrimary);
-  }
-```
